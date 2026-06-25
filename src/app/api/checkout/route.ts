@@ -5,13 +5,14 @@ import { products } from "@/lib/products";
 type IncomingItem = { slug: string; cases: number };
 
 export async function POST(req: Request) {
-  const key = process.env.STRIPE_SECRET_KEY;
+  // Accept either name (project uses STRIPE_API_KEY; STRIPE_SECRET_KEY also supported).
+  const key = process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY;
 
   if (!key) {
     return NextResponse.json(
       {
         error:
-          "Online checkout isn't connected yet. Add STRIPE_SECRET_KEY to enable payments, or contact us to order.",
+          "Online checkout isn't connected yet. Add your Stripe secret key to enable payments, or contact us to order.",
       },
       { status: 503 }
     );
