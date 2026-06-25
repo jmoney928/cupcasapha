@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/*
+  cupcasa — design tokens
+  Palette derived from the cupcasa logo: espresso brown + caramel/tan + cream,
+  with a vibrant green "leaf" pop and a warm coral accent for Poppi-style energy.
+*/
+@theme {
+  /* Brand core */
+  --color-espresso: #3a2417;
+  --color-espresso-soft: #4f3322;
+  --color-cocoa: #6f4a30;
+  --color-caramel: #b9824f;
+  --color-caramel-light: #d6a878;
+  --color-cream: #faf3e8;
+  --color-cream-deep: #f1e4d0;
+
+  /* Pops */
+  --color-leaf: #5fae3d;
+  --color-leaf-bright: #7ed957;
+  --color-coral: #ef6b4b;
+  --color-coral-soft: #f7a98f;
+  --color-butter: #f7cf5a;
+  --color-sky: #6fc3d6;
+
+  /* Semantic */
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-espresso);
+
+  /* Fonts (wired in layout.tsx via next/font) */
+  --font-display: var(--font-fredoka), system-ui, sans-serif;
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+
+  /* Radii — big & rounded, Poppi style */
+  --radius-pill: 999px;
+
+  /* Easing */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root {
+  --background: var(--color-cream);
+  --foreground: var(--color-espresso);
+}
+
+* {
+  border-color: color-mix(in srgb, var(--color-caramel) 25%, transparent);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-espresso);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Reusable utilities */
+.section-pad {
+  padding-inline: clamp(1.25rem, 5vw, 6rem);
+}
+
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  transition: transform 0.25s var(--ease-bounce), box-shadow 0.25s ease, background-color 0.2s ease;
+  will-change: transform;
+}
+.btn-pill:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+.btn-pill:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Floating animation for hero cups */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-18px) rotate(2deg); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-float-slow, .animate-marquee { animation: none; }
+  html { scroll-behavior: auto; }
+}
