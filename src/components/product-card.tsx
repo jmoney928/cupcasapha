@@ -1,17 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { type Product, formatPrice } from "@/lib/products";
-import { Cup } from "@/components/cup";
 import { useCart } from "@/components/cart-context";
-
-const bg: Record<string, string> = {
-  coral: "bg-coral-soft/40",
-  caramel: "bg-caramel-light/40",
-  leaf: "bg-leaf-bright/30",
-};
 
 export function ProductCard({ product }: { product: Product }) {
   const { add, setOpen } = useCart();
@@ -28,19 +22,23 @@ export function ProductCard({ product }: { product: Product }) {
     <div className="group rounded-[2rem] bg-white/70 border border-caramel/20 overflow-hidden flex flex-col hover:shadow-[0_20px_50px_rgba(58,36,23,0.12)] transition-shadow duration-300">
       <Link
         href={`/shop/${product.slug}`}
-        className={`relative ${bg[product.accent] ?? "bg-cream-deep"} pt-8 pb-2 flex justify-center`}
+        className="relative block aspect-[4/3] overflow-hidden"
       >
         {product.doubleWall && (
-          <span className="absolute top-4 left-4 bg-espresso text-cream text-xs font-bold px-3 py-1 rounded-full">
+          <span className="absolute top-4 left-4 z-10 bg-espresso text-cream text-xs font-bold px-3 py-1 rounded-full">
             Double wall
           </span>
         )}
-        <span className="absolute top-4 right-4 bg-cream text-espresso text-xs font-bold px-3 py-1 rounded-full">
+        <span className="absolute top-4 right-4 z-10 bg-cream text-espresso text-xs font-bold px-3 py-1 rounded-full">
           {product.size}
         </span>
-        <div className="w-32 transition-transform duration-500 group-hover:-translate-y-2 group-hover:rotate-3">
-          <Cup tone={product.accent as "coral"} doubleWall={product.doubleWall} />
-        </div>
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
       </Link>
 
       <div className="p-6 flex flex-col flex-1">

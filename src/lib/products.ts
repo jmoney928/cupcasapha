@@ -5,6 +5,7 @@ export type Product = {
   size: string;
   ozLabel: string;
   pricePerCup: number; // in dollars
+  image: string;
   caseCount: number;
   casePrice: number; // pricePerCup * caseCount
   doubleWall: boolean;
@@ -33,6 +34,7 @@ const make = (
   size: `${oz}oz`,
   ozLabel: `${oz} oz`,
   pricePerCup,
+  image: `/products/${slug}.png`,
   caseCount: 1000,
   casePrice: Math.round(pricePerCup * 1000 * 100) / 100,
   doubleWall,

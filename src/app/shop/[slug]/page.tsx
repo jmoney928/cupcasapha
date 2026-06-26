@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -11,7 +12,6 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { products, getProduct } from "@/lib/products";
-import { Cup } from "@/components/cup";
 import { AddToCart } from "@/components/add-to-cart";
 import { Button, Eyebrow } from "@/components/ui";
 
@@ -68,17 +68,20 @@ export default async function ProductPage({
 
         <div className="grid lg:grid-cols-2 gap-10">
           {/* visual */}
-          <div
-            className={`relative rounded-[2.5rem] ${bg[product.accent] ?? "bg-cream-deep"} p-10 flex items-center justify-center overflow-hidden min-h-[380px]`}
-          >
+          <div className="relative rounded-[2.5rem] overflow-hidden min-h-[380px] lg:min-h-[460px]">
             {product.doubleWall && (
-              <span className="absolute top-6 left-6 bg-espresso text-cream text-sm font-bold px-4 py-1.5 rounded-full">
+              <span className="absolute top-6 left-6 z-10 bg-espresso text-cream text-sm font-bold px-4 py-1.5 rounded-full">
                 Double wall
               </span>
             )}
-            <div className="w-56 sm:w-64 animate-float-slow">
-              <Cup tone={product.accent as "coral"} doubleWall={product.doubleWall} label={product.size} />
-            </div>
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
           </div>
 
           {/* details */}
@@ -160,10 +163,10 @@ export default async function ProductPage({
             <Link
               key={p.slug}
               href={`/shop/${p.slug}`}
-              className={`flex items-center gap-6 rounded-3xl ${bg[p.accent]} p-6 hover:shadow-lg transition-shadow`}
+              className={`flex items-center gap-6 rounded-3xl ${bg[p.accent]} p-4 hover:shadow-lg transition-shadow`}
             >
-              <div className="w-24 shrink-0">
-                <Cup tone={p.accent as "coral"} doubleWall={p.doubleWall} />
+              <div className="relative w-28 h-24 shrink-0 rounded-2xl overflow-hidden">
+                <Image src={p.image} alt={p.name} fill sizes="120px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-display text-xl font-bold">{p.name}</h3>

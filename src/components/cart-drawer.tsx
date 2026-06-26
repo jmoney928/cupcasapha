@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, Minus, Plus, Trash2, Loader2 } from "lucide-react";
 import { useCart } from "@/components/cart-context";
 import { products, formatPrice } from "@/lib/products";
@@ -79,8 +80,8 @@ export function CartDrawer() {
                 key={item.slug}
                 className="flex gap-4 bg-white/60 rounded-3xl p-4 border border-caramel/20"
               >
-                <div className="w-14 shrink-0">
-                  <Cup tone={p.accent as "coral"} doubleWall={p.doubleWall} />
+                <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden">
+                  <Image src={p.image} alt={p.name} fill sizes="56px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between gap-2">
