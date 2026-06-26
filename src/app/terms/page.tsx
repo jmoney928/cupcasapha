@@ -4,7 +4,7 @@ import { LegalShell, Clause, List } from "@/components/legal";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The terms governing your use of cups.cupcasa.com and your purchase of cupcasa PHA cups from Cup Casa Inc.",
+    "The terms governing your use of cupcasa.com and your purchase of cupcasa PHA cups from Cup Casa Inc.",
 };
 
 export default function TermsPage() {
@@ -16,7 +16,7 @@ export default function TermsPage() {
         <>
           <p>
             These Terms of Service (&quot;Terms&quot;) govern your access to and use of{" "}
-            <strong>cups.cupcasa.com</strong> (the &quot;Site&quot;) and your purchase of products
+            <strong>cupcasa.com</strong> (the &quot;Site&quot;) and your purchase of products
             from Cup Casa Inc. (&quot;<strong>cupcasa</strong>,&quot; &quot;we,&quot; &quot;us,&quot;
             or &quot;our&quot;). By using the Site or placing an order, you agree to these Terms. If you
             do not agree, please do not use the Site.

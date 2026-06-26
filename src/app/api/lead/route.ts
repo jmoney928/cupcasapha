@@ -54,7 +54,7 @@ export async function POST(req: Request) {
   const html = `
     <div style="font-family:system-ui,sans-serif;max-width:560px">
       <h2 style="color:#3a2417;margin-bottom:4px">New ${esc(type)} submission</h2>
-      <p style="color:#6f4a30;margin-top:0">From cups.cupcasa.com</p>
+      <p style="color:#6f4a30;margin-top:0">From cupcasa.com</p>
       <table style="border-collapse:collapse;width:100%">
         ${rows
           .map(

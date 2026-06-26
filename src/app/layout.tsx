@@ -20,7 +20,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cups.cupcasa.com"),
+  metadataBase: new URL("https://cupcasa.com"),
   title: {
     default: "cupcasa — Fully PHA Compostable Cups, Unbranded",
     template: "%s · cupcasa cups",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description:
       "Marine-degradable, compostable PHA cups. Blank & unbranded. Buy online or wholesale.",
     type: "website",
-    url: "https://cups.cupcasa.com",
+    url: "https://cupcasa.com",
   },
 };
 

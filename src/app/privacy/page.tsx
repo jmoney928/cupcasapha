@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             Cup Casa Inc. (&quot;<strong>cupcasa</strong>,&quot; &quot;we,&quot; &quot;us,&quot; or
             &quot;our&quot;) respects your privacy and is committed to protecting the personal
             information you share with us. This Privacy Policy explains what we collect when you
-            visit <strong>cups.cupcasa.com</strong> (the &quot;Site&quot;), place an order, or
+            visit <strong>cupcasa.com</strong> (the &quot;Site&quot;), place an order, or
             contact us, how we use it, and the choices you have.
           </p>
           <p>
