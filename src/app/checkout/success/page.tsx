@@ -2,16 +2,23 @@ import type { Metadata } from "next";
 import { CheckCircle2, Leaf } from "lucide-react";
 import { Button } from "@/components/ui";
 import { ClearCartOnMount } from "@/components/clear-cart";
+import { PurchaseTracker } from "@/components/purchase-tracker";
 
 export const metadata: Metadata = {
   title: "Order confirmed",
   robots: { index: false },
 };
 
-export default function SuccessPage() {
+export default async function SuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string }>;
+}) {
+  const { session_id } = await searchParams;
   return (
     <section className="section-pad py-28 text-center max-w-xl mx-auto">
       <ClearCartOnMount />
+      <PurchaseTracker sessionId={session_id} />
       <div className="w-20 h-20 rounded-full bg-leaf flex items-center justify-center mx-auto mb-6">
         <CheckCircle2 className="w-11 h-11 text-cream" />
       </div>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X, Minus, Plus, Trash2, Loader2 } from "lucide-react";
 import { useCart } from "@/components/cart-context";
 import { products, formatPrice } from "@/lib/products";
+import { fbqTrack } from "@/lib/fbq";
 import { Cup } from "@/components/cup";
 
 export function CartDrawer() {
@@ -15,6 +16,13 @@ export function CartDrawer() {
   const checkout = async () => {
     setLoading(true);
     setError(null);
+    fbqTrack("InitiateCheckout", {
+      content_ids: items.map((i) => i.slug),
+      contents: items.map((i) => ({ id: i.slug, quantity: i.cases })),
+      num_items: count,
+      value: Math.round(subtotal * 100) / 100,
+      currency: "CAD",
+    });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

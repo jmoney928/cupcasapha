@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { products } from "@/lib/products";
+import { fbqTrack } from "@/lib/fbq";
 
 export type CartItem = { slug: string; cases: number };
 
@@ -57,7 +58,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       isOpen,
       setOpen,
-      add: (slug, cases = 1) =>
+      add: (slug, cases = 1) => {
+        const p = products.find((x) => x.slug === slug);
+        if (p)
+          fbqTrack("AddToCart", {
+            content_ids: [slug],
+            content_type: "product",
+            content_name: p.name,
+            contents: [{ id: slug, quantity: cases }],
+            value: Math.round(p.casePrice * cases * 100) / 100,
+            currency: "CAD",
+          });
         setItems((prev) => {
           const found = prev.find((i) => i.slug === slug);
           if (found)
@@ -65,7 +76,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
               i.slug === slug ? { ...i, cases: i.cases + cases } : i
             );
           return [...prev, { slug, cases }];
-        }),
+        });
+      },
       setCases: (slug, cases) =>
         setItems((prev) =>
           cases <= 0
