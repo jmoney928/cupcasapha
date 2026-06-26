@@ -91,7 +91,7 @@ export function SiteFooter() {
                 <InstagramIcon className="w-5 h-5" />
               </a>
               <a
-                href="mailto:cupcasaadmin@gmail.com"
+                href="mailto:hello@cupcasa.com"
                 className="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-leaf transition-colors"
                 aria-label="Email cupcasa"
               >

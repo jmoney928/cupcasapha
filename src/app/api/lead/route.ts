@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
   const type = String(data.type ?? "contact");
   const company = String(data.company ?? "").trim();
-  const to = process.env.LEADS_EMAIL ?? "cupcasaadmin@gmail.com";
+  const to = process.env.LEADS_EMAIL ?? "hello@cupcasa.com";
   const from = process.env.LEADS_FROM ?? "cupcasa cups <onboarding@resend.dev>";
 
   // Build the message body from all submitted fields (excluding meta).

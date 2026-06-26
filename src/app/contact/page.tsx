@@ -48,7 +48,7 @@ export default function ContactPage() {
       <section className="section-pad pb-16 grid lg:grid-cols-[1fr_1.3fr] gap-10 items-start">
         <div className="space-y-4">
           <a
-            href="mailto:cupcasaadmin@gmail.com"
+            href="mailto:hello@cupcasa.com"
             className="flex items-center gap-4 rounded-3xl bg-white/70 border border-caramel/20 p-6 hover:shadow-lg transition-shadow"
           >
             <div className="w-12 h-12 rounded-2xl bg-coral/15 flex items-center justify-center">
@@ -56,7 +56,7 @@ export default function ContactPage() {
             </div>
             <div>
               <p className="font-display font-bold">Email us</p>
-              <p className="text-espresso/70 text-sm">cupcasaadmin@gmail.com</p>
+              <p className="text-espresso/70 text-sm">hello@cupcasa.com</p>
             </div>
           </a>
           <a

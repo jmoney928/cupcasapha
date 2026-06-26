@@ -27,8 +27,8 @@ export default function TermsPage() {
       <Clause n={1} title="Who we are">
         <p>
           The Site is operated by Cup Casa Inc., trading as cupcasa. You can reach us at{" "}
-          <a className="text-coral font-semibold underline" href="mailto:cupcasaadmin@gmail.com">
-            cupcasaadmin@gmail.com
+          <a className="text-coral font-semibold underline" href="mailto:hello@cupcasa.com">
+            hello@cupcasa.com
           </a>
           .
         </p>
@@ -114,8 +114,8 @@ export default function TermsPage() {
       <Clause n={10} title="Returns and refunds">
         <p>
           If your order arrives damaged, defective, or incorrect, contact us at{" "}
-          <a className="text-coral font-semibold underline" href="mailto:cupcasaadmin@gmail.com">
-            cupcasaadmin@gmail.com
+          <a className="text-coral font-semibold underline" href="mailto:hello@cupcasa.com">
+            hello@cupcasa.com
           </a>{" "}
           within 14 days of delivery with your order number and
           photos, and we will arrange a replacement or refund as appropriate. Because cups are food-
@@ -205,8 +205,8 @@ export default function TermsPage() {
       <Clause n={19} title="Contact">
         <p>
           Questions about these Terms? Email{" "}
-          <a className="text-coral font-semibold underline" href="mailto:cupcasaadmin@gmail.com">
-            cupcasaadmin@gmail.com
+          <a className="text-coral font-semibold underline" href="mailto:hello@cupcasa.com">
+            hello@cupcasa.com
           </a>
           .
         </p>

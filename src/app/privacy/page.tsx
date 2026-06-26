@@ -177,7 +177,7 @@ export default function PrivacyPage() {
         <List
           items={[
             <>Cup Casa Inc. — Privacy Officer</>,
-            <>Email: <a className="text-coral font-semibold underline" href="mailto:cupcasaadmin@gmail.com">cupcasaadmin@gmail.com</a></>,
+            <>Email: <a className="text-coral font-semibold underline" href="mailto:hello@cupcasa.com">hello@cupcasa.com</a></>,
           ]}
         />
         <p>
