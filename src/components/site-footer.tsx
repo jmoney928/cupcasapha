@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Leaf, Mail } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter-form";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -53,6 +54,19 @@ export function SiteFooter() {
   return (
     <footer className="bg-espresso text-cream/80 mt-24">
       <div className="section-pad py-16">
+        <div className="pb-12 mb-12 border-b border-cream/15 grid lg:grid-cols-2 gap-6 lg:items-center">
+          <div>
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-cream">
+              Join the plastic-free pour
+            </h3>
+            <p className="text-cream/70 mt-2 max-w-md">
+              Cup drops, sustainability tips and the occasional discount. No spam —
+              just the good stuff.
+            </p>
+          </div>
+          <NewsletterForm />
+        </div>
+
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Image
