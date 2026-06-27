@@ -89,7 +89,7 @@ export default function WhyPhaPage() {
               PHA — polyhydroxyalkanoate — is a biopolymer that microbes make from
               plants — and that other microbes eat when you&apos;re done with it. It&apos;s the
               rare material that&apos;s truly compostable at home, industrially,{" "}
-              <em>and</em> in the ocean. That&apos;s why we build every cupcasa cup from it.
+              <em>and</em>{" "}in the ocean. That&apos;s why we build every cupcasa cup from it.
             </p>
             <div className="mt-8">
               <Button href="/shop" variant="leaf" size="lg">
