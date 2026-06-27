@@ -168,7 +168,7 @@ export default function WholesalePage() {
                 name: "sizes",
                 label: "Sizes you're interested in",
                 type: "select",
-                options: ["8oz", "12oz", "16oz double wall", "A mix of sizes"],
+                options: ["8oz", "12oz", "16oz", "A mix of sizes"],
               },
               { name: "message", label: "Anything else?", type: "textarea" },
             ]}
