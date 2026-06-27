@@ -8,6 +8,7 @@ import {
   PackageCheck,
   Recycle,
 } from "lucide-react";
+import Image from "next/image";
 import { Button, Reveal, Eyebrow } from "@/components/ui";
 import { Cup } from "@/components/cup";
 import { ProductCard } from "@/components/product-card";
@@ -30,23 +31,31 @@ export default function Home() {
   return (
     <>
       {/* ---------------- HERO ---------------- */}
-      <section className="relative section-pad pt-12 pb-24 overflow-hidden">
+      <section className="relative section-pad pt-8 pb-16 overflow-hidden">
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-leaf-bright/20 blur-3xl" />
         <div className="absolute top-40 -left-24 w-80 h-80 rounded-full bg-coral-soft/30 blur-3xl" />
 
-        <div className="relative grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl font-bold leading-[0.95]">
-              Cups that <span className="text-coral">disappear.</span>
-              <br />
-              The good way.
+        <div className="relative">
+          <div className="relative aspect-[16/9] w-full rounded-[2.5rem] overflow-hidden shadow-[0_24px_60px_rgba(58,36,23,0.18)]">
+            <Image
+              src="/hero.png"
+              alt="cupcasa PHA cups — 8oz, 12oz and 16oz, fully compostable"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+
+          <div className="text-center max-w-2xl mx-auto mt-9">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold leading-tight">
+              Fully compostable, <span className="text-coral">unbranded</span> PHA cups.
             </h1>
-            <p className="text-lg sm:text-xl text-espresso/70 mt-6 max-w-lg">
-              Blank, unbranded cups made from 100% PHA — the plant-based material
-              that composts at home, in industrial facilities, and even in the
-              ocean. Look good. Do good. No greenwashing.
+            <p className="text-lg text-espresso/70 mt-4">
+              Blank cups made from 100% PHA — composts at home, in industrial
+              facilities, and even in the ocean. Look good. Do good.
             </p>
-            <div className="flex flex-wrap gap-4 mt-8">
+            <div className="flex flex-wrap gap-4 justify-center mt-7">
               <Button href="/shop" variant="primary" size="lg">
                 Shop cups <ArrowRight className="w-5 h-5" />
               </Button>
@@ -54,7 +63,7 @@ export default function Home() {
                 Order wholesale
               </Button>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-8 text-sm font-semibold text-espresso/70">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center mt-7 text-sm font-semibold text-espresso/70">
               <span className="flex items-center gap-2">
                 <PackageCheck className="w-4 h-4 text-leaf" /> Cases of 1,000
               </span>
@@ -64,21 +73,6 @@ export default function Home() {
               <span className="flex items-center gap-2">
                 <Recycle className="w-4 h-4 text-caramel" /> Plastic-free
               </span>
-            </div>
-          </div>
-
-          <div className="relative h-[380px] sm:h-[460px]">
-            <div className="absolute left-[8%] top-6 w-40 sm:w-52 animate-float">
-              <Cup tone="coral" label="8oz" />
-            </div>
-            <div className="absolute right-[6%] top-0 w-44 sm:w-60 animate-float-slow z-10">
-              <Cup tone="caramel" label="12oz" />
-            </div>
-            <div
-              className="absolute left-[34%] bottom-0 w-48 sm:w-64 animate-float z-20"
-              style={{ animationDelay: "1.2s" }}
-            >
-              <Cup tone="leaf" doubleWall label="16oz" />
             </div>
           </div>
         </div>
