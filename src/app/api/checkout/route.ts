@@ -38,26 +38,33 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
 
-  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-  for (const item of items) {
-    const product = products.find((p) => p.slug === item.slug);
-    if (!product) continue;
-    line_items.push({
-      quantity: Math.floor(item.cases),
+  // Flat $200 reservation deposit — regardless of sizes/quantities in the cart.
+  // Cups are arriving October 2026; the balance is settled when they ship.
+  const DEPOSIT_CAD = 200;
+
+  const reserved = items
+    .map((item) => {
+      const product = products.find((p) => p.slug === item.slug);
+      return product ? `${item.cases}× ${product.name}` : null;
+    })
+    .filter(Boolean)
+    .join(", ");
+
+  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    {
+      quantity: 1,
       price_data: {
         currency: "cad",
-        unit_amount: Math.round(product.casePrice * 100), // price per case, in cents
+        unit_amount: DEPOSIT_CAD * 100,
         product_data: {
-          name: `${product.name} — case of ${product.caseCount.toLocaleString()}`,
-          description: `${product.shortName} · 100% PHA compostable · blank`,
+          name: "cupcasa — Reservation Deposit",
+          description: `$${DEPOSIT_CAD} deposit to reserve your order. Cups arriving October 2026.${
+            reserved ? ` Reserving: ${reserved}.` : ""
+          }`,
         },
       },
-    });
-  }
-
-  if (line_items.length === 0) {
-    return NextResponse.json({ error: "No valid items." }, { status: 400 });
-  }
+    },
+  ];
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -68,6 +75,7 @@ export async function POST(req: Request) {
       shipping_address_collection: { allowed_countries: ["US", "CA"] },
       phone_number_collection: { enabled: true },
       automatic_tax: { enabled: false },
+      metadata: { type: "reservation_deposit", reserved: reserved.slice(0, 490) },
     });
     return NextResponse.json({ url: session.url });
   } catch (err) {

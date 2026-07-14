@@ -28,8 +28,9 @@ export default function ShopPage() {
             Pick your cups.
           </h1>
           <p className="text-lg text-espresso/70 mt-4 max-w-xl mx-auto">
-            Every cup is 100% PHA and totally blank. Sold by the case of 1,000 —
-            need more? <a href="/wholesale" className="text-coral font-semibold underline">Go wholesale</a>.
+            100% PHA, sold by the case of 1,000. Reserve yours now with a{" "}
+            <strong>$200 deposit</strong> — cups arriving <strong>October 2026</strong>.
+            Need more? <a href="/wholesale" className="text-coral font-semibold underline">Go wholesale</a>.
           </p>
         </div>
       </section>

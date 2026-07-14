@@ -139,12 +139,21 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="p-5 border-t border-caramel/25 space-y-3">
+            <div className="rounded-2xl bg-coral/10 text-espresso/80 text-sm p-3 leading-snug">
+              🎟️ Reserve your order with a <strong>$200 deposit</strong>. Cups are
+              arriving <strong>October 2026</strong> — we&apos;ll bill the balance when
+              they ship.
+            </div>
+            <div className="flex justify-between text-sm text-espresso/60">
+              <span>Order value (reserved)</span>
+              <span className="font-semibold">{formatPrice(subtotal)}</span>
+            </div>
             <div className="flex justify-between text-lg">
-              <span className="font-semibold">Subtotal</span>
-              <span className="font-display font-bold">{formatPrice(subtotal)}</span>
+              <span className="font-semibold">Deposit due today</span>
+              <span className="font-display font-bold">{formatPrice(200)}</span>
             </div>
             <p className="text-xs text-espresso/60">
-              Shipping & taxes calculated at checkout. Need 50+ cases?{" "}
+              Need 50+ cases?{" "}
               <a href="/wholesale" className="underline font-semibold">
                 Get wholesale pricing
               </a>
@@ -165,7 +174,7 @@ export function CartDrawer() {
                   <Loader2 className="w-5 h-5 animate-spin" /> Redirecting…
                 </>
               ) : (
-                "Checkout"
+                "Pay $200 deposit"
               )}
             </button>
           </div>

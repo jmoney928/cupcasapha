@@ -32,7 +32,7 @@ export function SiteHeader() {
       {/* announcement bar */}
       <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2 px-4 font-semibold">
         <Leaf className="inline-block w-4 h-4 mr-1.5 -mt-0.5 text-leaf-bright" />
-        Marine-degradable, home & industrial compostable — free samples on wholesale enquiries
+        Now taking deposits — reserve your cups with a $200 deposit · arriving October 2026
       </div>
 
       <header

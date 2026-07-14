@@ -60,10 +60,13 @@ export function AddToCart({ product }: { product: Product }) {
           </>
         ) : (
           <>
-            <ShoppingBag className="w-5 h-5" /> Add {cases} case{cases > 1 ? "s" : ""} to cart
+            <ShoppingBag className="w-5 h-5" /> Reserve {cases} case{cases > 1 ? "s" : ""}
           </>
         )}
       </button>
+      <p className="text-xs text-espresso/60 text-center">
+        Reserve today with a <strong>$200 deposit</strong> — cups arriving October 2026.
+      </p>
     </div>
   );
 }

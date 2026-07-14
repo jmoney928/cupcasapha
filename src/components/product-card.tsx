@@ -68,7 +68,7 @@ export function ProductCard({ product }: { product: Product }) {
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4" /> Add case
+                <Plus className="w-4 h-4" /> Reserve
               </>
             )}
           </button>
