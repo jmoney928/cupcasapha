@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle, Mark } from "@/components/brand";
-import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/products";
+import { ReserveStrip } from "@/components/reserve-strip";
 
 const pillars = [
   { icon: Printer, title: "Beautifully printed", text: "Your artwork, printed edge-to-edge in vivid, food-safe inks. Small runs to full pallets." },
@@ -259,13 +258,9 @@ export default function Home() {
             </Button>
           </div>
         </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((p, i) => (
-            <Reveal key={p.slug} delay={i * 90}>
-              <ProductCard product={p} />
-            </Reveal>
-          ))}
-        </div>
+        <Reveal>
+          <ReserveStrip />
+        </Reveal>
       </section>
 
       {/* ---------------- FINAL CTA ---------------- */}
