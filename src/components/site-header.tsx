@@ -45,7 +45,7 @@ export function SiteHeader() {
       >
         <div className="section-pad flex items-center justify-between h-16 sm:h-18">
           <Link href="/" className="flex items-center shrink-0" aria-label="cupcasa home">
-            <Logo variant="black" priority className="h-6 sm:h-7 w-auto" />
+            <Logo variant="black" priority className="h-8 sm:h-10 w-auto" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
