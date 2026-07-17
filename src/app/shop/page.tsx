@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 
 const perks = [
   { icon: Truck, text: "Ships by the case of 1,000" },
-  { icon: Leaf, text: "Home, industrial & marine compostable" },
+  { icon: Leaf, text: "TÜV certified — home & marine compostable" },
   { icon: Recycle, text: "100% plastic-free PHA" },
-  { icon: ShieldCheck, text: "Blank — your brand, or none at all" },
+  { icon: ShieldCheck, text: "Custom printed with your brand" },
 ];
 
 export default function ShopPage() {
