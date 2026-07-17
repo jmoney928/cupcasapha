@@ -149,13 +149,14 @@ export default function Home() {
       <section className="section-pad py-8">
         <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-14">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="label-caps text-coral">The signature cup</span>
+            <span className="label-caps text-coral">Custom printing in action</span>
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3 text-cream">
-              Meet the cupcasa cup.
+              Picture your brand here.
             </h2>
             <p className="text-cream/60 mt-4">
-              Our house design — the dissolving C, printed on 100% PHA and TÜV-certified
-              compostable. Here it is across all three sizes.
+              Every cup is printed to order. These show our own mark as an example —
+              full-colour, edge-to-edge on 100% PHA, in all three sizes. Your design
+              goes in its place.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
@@ -180,9 +181,12 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Button href="/shop" variant="primary" size="lg">
-              Reserve yours <ArrowRight className="w-5 h-5" />
+          <p className="text-center text-cream/40 text-xs mt-6">
+            Example design shown (the cupcasa mark). Your artwork goes here.
+          </p>
+          <div className="text-center mt-8">
+            <Button href="/wholesale" variant="primary" size="lg">
+              Start your design <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
         </div>
