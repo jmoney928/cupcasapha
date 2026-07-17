@@ -54,7 +54,9 @@ export default async function ProductPage({
   const product = getProduct(slug);
   if (!product) notFound();
 
-  const others = products.filter((p) => p.slug !== slug);
+  const others = products.filter(
+    (p) => p.slug !== slug && p.printed === product.printed
+  );
 
   return (
     <>

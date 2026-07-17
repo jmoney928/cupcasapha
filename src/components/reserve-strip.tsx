@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Check } from "lucide-react";
-import { products, formatPrice } from "@/lib/products";
+import { blankProducts, formatPrice } from "@/lib/products";
 import { useCart } from "@/components/cart-context";
 
 /** Compact reserve row — size + price + deposit CTA, no large imagery. */
@@ -19,7 +19,7 @@ export function ReserveStrip() {
 
   return (
     <div className="grid sm:grid-cols-3 gap-4">
-      {products.map((p) => (
+      {blankProducts.map((p) => (
         <div
           key={p.slug}
           className="rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6 flex flex-col"
