@@ -1,37 +1,43 @@
 @import "tailwindcss";
 
 /*
-  cupcasa — design tokens
-  Palette derived from the cupcasa logo: espresso brown + caramel/tan + cream,
-  with a vibrant green "leaf" pop and a warm coral accent for Poppi-style energy.
+  cupcasa — "made to disappear" design tokens
+  Cream-forward, near-black type, coral accent + dissolve motif, forest green
+  for nature cues, gray for secondary. Token NAMES are kept from the previous
+  system (espresso/caramel/leaf...) so existing utility classes remap cleanly.
 */
 @theme {
-  /* Brand core */
-  --color-espresso: #3a2417;
-  --color-espresso-soft: #4f3322;
-  --color-cocoa: #6f4a30;
-  --color-caramel: #b9824f;
-  --color-caramel-light: #d6a878;
-  --color-cream: #faf3e8;
-  --color-cream-deep: #f1e4d0;
+  /* near-black (was "espresso") */
+  --color-espresso: #1a1a1a;
+  --color-espresso-soft: #2c2c2c;
+  --color-cocoa: #45443f;
+  /* gray (was "caramel") */
+  --color-caramel: #9b9b94;
+  --color-caramel-light: #c4c2b9;
+  /* cream */
+  --color-cream: #ede9de;
+  --color-cream-deep: #e2ddcd;
 
-  /* Pops */
-  --color-leaf: #5fae3d;
-  --color-leaf-bright: #7ed957;
-  --color-coral: #ef6b4b;
-  --color-coral-soft: #f7a98f;
-  --color-butter: #f7cf5a;
-  --color-sky: #6fc3d6;
+  /* forest green (was "leaf") */
+  --color-leaf: #2e4a38;
+  --color-leaf-bright: #3e6349;
+  /* coral accent */
+  --color-coral: #e8735a;
+  --color-coral-soft: #f0a794;
+  --color-coral-deep: #cf5b44;
+  /* spare accents */
+  --color-butter: #e7c9a3;
+  --color-sky: #8fb3a3;
 
   /* Semantic */
   --color-background: var(--color-cream);
   --color-foreground: var(--color-espresso);
 
   /* Fonts (wired in layout.tsx via next/font) */
-  --font-display: var(--font-fredoka), system-ui, sans-serif;
-  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-display: var(--font-manrope), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 
-  /* Radii — big & rounded, Poppi style */
+  /* Radii — cleaner/tighter than before */
   --radius-pill: 999px;
 
   /* Easing */
@@ -62,7 +68,18 @@ body {
 
 h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+/* Small all-caps letter-spaced label (lifecycle/eyebrow/feature) */
+.label-caps {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  font-size: 0.72rem;
 }
 
 /* Reusable utilities */
@@ -77,15 +94,15 @@ h1, h2, h3, h4, .font-display {
   gap: 0.5rem;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 600;
-  transition: transform 0.25s var(--ease-bounce), box-shadow 0.25s ease, background-color 0.2s ease;
-  will-change: transform;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
 }
 .btn-pill:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-2px);
 }
 .btn-pill:active {
-  transform: translateY(0) scale(0.99);
+  transform: translateY(0);
 }
 
 /* Floating animation for hero cups */

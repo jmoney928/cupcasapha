@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, ShoppingBag, Leaf } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
+import { Logo, Particles } from "@/components/brand";
 
 const nav = [
   { href: "/shop", label: "Shop" },
-  { href: "/why-pha", label: "Why PHA" },
+  { href: "/why-pha", label: "The Material" },
   { href: "/sustainability", label: "Sustainability" },
-  { href: "/wholesale", label: "Wholesale" },
+  { href: "/wholesale", label: "Custom & Wholesale" },
   { href: "/about", label: "About" },
 ];
 
@@ -30,28 +30,22 @@ export function SiteHeader() {
   return (
     <>
       {/* announcement bar */}
-      <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2 px-4 font-semibold">
-        <Leaf className="inline-block w-4 h-4 mr-1.5 -mt-0.5 text-leaf-bright" />
-        Now taking deposits — reserve your cups with a $200 deposit · arriving October 2026
+      <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2.5 px-4 font-medium tracking-tight">
+        Now taking deposits — reserve your cups with{" "}
+        <span className="text-coral font-semibold">$200</span> · shipping{" "}
+        <span className="font-semibold">October 2026</span>
       </div>
 
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-cream/90 backdrop-blur-md shadow-[0_4px_24px_rgba(58,36,23,0.08)]"
-            : "bg-cream"
+            ? "bg-cream/85 backdrop-blur-md border-b border-espresso/10"
+            : "bg-cream border-b border-transparent"
         }`}
       >
-        <div className="section-pad flex items-center justify-between h-18 py-3">
-          <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src="/brand/cupcasa-wordmark.png"
-              alt="cupcasa"
-              width={170}
-              height={64}
-              priority
-              className="h-10 sm:h-12 w-auto"
-            />
+        <div className="section-pad flex items-center justify-between h-16 sm:h-18">
+          <Link href="/" className="flex items-center shrink-0" aria-label="cupcasa home">
+            <Logo variant="black" priority className="h-6 sm:h-7 w-auto" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
@@ -59,31 +53,32 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-4 py-2 rounded-full font-semibold text-espresso/80 hover:text-espresso hover:bg-cream-deep transition-colors"
+                className="px-3.5 py-2 rounded-full text-sm font-semibold text-espresso/70 hover:text-espresso hover:bg-cream-deep transition-colors"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setOpen(true)}
               aria-label="Open cart"
               className="relative p-2.5 rounded-full hover:bg-cream-deep transition-colors"
             >
-              <ShoppingBag className="w-6 h-6 text-espresso" />
+              <ShoppingBag className="w-5 h-5 text-espresso" />
               {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-coral text-cream text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-coral text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {count}
                 </span>
               )}
             </button>
             <Link
               href="/wholesale"
-              className="btn-pill hidden sm:inline-flex bg-leaf text-cream px-5 py-2.5 text-sm shadow-[0_5px_0_0_#3f7d28]"
+              className="btn-pill hidden sm:inline-flex bg-coral text-white px-5 py-2.5 text-sm hover:bg-coral-deep"
             >
-              Get a quote
+              Start your design
+              <Particles className="w-5 h-3 text-white/90" />
             </Link>
             <button
               onClick={() => setMobileOpen((v) => !v)}
@@ -95,15 +90,14 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* mobile menu */}
         {open && (
-          <div className="lg:hidden section-pad pb-6 flex flex-col gap-1 bg-cream border-t border-caramel/20">
+          <div className="lg:hidden section-pad pb-6 flex flex-col gap-1 bg-cream border-t border-espresso/10">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="px-4 py-3 rounded-2xl font-semibold text-espresso hover:bg-cream-deep"
+                className="px-4 py-3 rounded-xl font-semibold text-espresso hover:bg-cream-deep"
               >
                 {item.label}
               </Link>
@@ -111,9 +105,9 @@ export function SiteHeader() {
             <Link
               href="/wholesale"
               onClick={() => setMobileOpen(false)}
-              className="btn-pill bg-leaf text-cream px-5 py-3 mt-2 shadow-[0_5px_0_0_#3f7d28]"
+              className="btn-pill bg-coral text-white px-5 py-3 mt-2 hover:bg-coral-deep"
             >
-              Get a wholesale quote
+              Start your design
             </Link>
           </div>
         )}

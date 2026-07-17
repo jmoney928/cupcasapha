@@ -52,7 +52,7 @@ export function AddToCart({ product }: { product: Product }) {
 
       <button
         onClick={handleAdd}
-        className="btn-pill w-full bg-coral text-cream py-4 text-lg shadow-[0_6px_0_0_#c4452a]"
+        className="btn-pill w-full bg-coral text-white py-4 text-lg hover:bg-coral-deep"
       >
         {added ? (
           <>

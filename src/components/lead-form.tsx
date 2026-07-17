@@ -120,7 +120,7 @@ export function LeadForm({
       <button
         type="submit"
         disabled={status === "loading"}
-        className="btn-pill sm:col-span-2 bg-coral text-cream py-4 text-lg shadow-[0_6px_0_0_#c4452a] disabled:opacity-70"
+        className="btn-pill sm:col-span-2 bg-coral text-white py-4 text-lg hover:bg-coral-deep disabled:opacity-70"
       >
         {status === "loading" ? (
           <>

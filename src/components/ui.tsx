@@ -14,12 +14,10 @@ type ButtonProps = {
 };
 
 const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary:
-    "bg-coral text-cream shadow-[0_8px_0_0_#c4452a] hover:shadow-[0_5px_0_0_#c4452a]",
-  leaf: "bg-leaf text-cream shadow-[0_8px_0_0_#3f7d28] hover:shadow-[0_5px_0_0_#3f7d28]",
-  dark: "bg-espresso text-cream shadow-[0_8px_0_0_#1d120b] hover:shadow-[0_5px_0_0_#1d120b]",
-  cream:
-    "bg-cream text-espresso shadow-[0_8px_0_0_#d6a878] hover:shadow-[0_5px_0_0_#d6a878]",
+  primary: "bg-coral text-white hover:bg-coral-deep shadow-sm",
+  leaf: "bg-leaf text-cream hover:bg-leaf-bright shadow-sm",
+  dark: "bg-espresso text-cream hover:bg-espresso-soft shadow-sm",
+  cream: "bg-cream text-espresso border border-espresso/15 hover:bg-cream-deep",
   outline:
     "bg-transparent text-espresso border-2 border-espresso hover:bg-espresso hover:text-cream",
 };

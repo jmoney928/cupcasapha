@@ -58,7 +58,7 @@ export function NewsletterForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="btn-pill bg-leaf text-cream px-6 py-3.5 shadow-[0_5px_0_0_#3f7d28] disabled:opacity-70 shrink-0"
+          className="btn-pill bg-coral text-white px-6 py-3.5 hover:bg-coral-deep disabled:opacity-70 shrink-0"
         >
           {status === "loading" ? (
             <>

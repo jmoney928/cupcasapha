@@ -167,7 +167,7 @@ export function CartDrawer() {
             <button
               onClick={checkout}
               disabled={loading}
-              className="btn-pill w-full bg-coral text-cream py-4 text-lg shadow-[0_6px_0_0_#c4452a] disabled:opacity-70"
+              className="btn-pill w-full bg-coral text-white py-4 text-lg hover:bg-coral-deep disabled:opacity-70"
             >
               {loading ? (
                 <>

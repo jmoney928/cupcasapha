@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
+import { Manrope, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
@@ -9,40 +9,40 @@ import { MetaPixelRouteTracker } from "@/components/meta-pixel";
 
 const META_PIXEL_ID = "2179463309497237";
 
-const fredoka = Fredoka({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-fredoka",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-manrope",
   display: "swap",
 });
 
-const nunito = Nunito({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-nunito",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cupcasa.com"),
   title: {
-    default: "cupcasa — Fully PHA Compostable Cups, Unbranded",
-    template: "%s · cupcasa cups",
+    default: "cupcasa — Custom-Printed Compostable Cups",
+    template: "%s · cupcasa",
   },
   description:
-    "Marine-degradable, home & industrial compostable PHA cups. Blank, unbranded, and built to make your café look as good as it does good. Buy online or order wholesale by the case.",
+    "Your design. Our cup. A better future. Custom-printed PHA cups that are beautifully printed, made from better material, and designed to return to nature. Printed to be seen, made to disappear.",
   keywords: [
+    "custom printed cups",
     "PHA cups",
     "compostable cups",
-    "marine degradable",
-    "unbranded cups",
-    "wholesale compostable cups",
-    "plastic-free cups",
+    "custom coffee cups",
+    "branded compostable cups",
+    "eco cups",
   ],
   openGraph: {
-    title: "cupcasa — Fully PHA Compostable Cups",
+    title: "cupcasa — Printed to be seen. Made to disappear.",
     description:
-      "Marine-degradable, compostable PHA cups. Blank & unbranded. Buy online or wholesale.",
+      "Custom-printed, fully compostable PHA cups. Your design, our cup, a better future.",
     type: "website",
     url: "https://cupcasa.com",
   },
@@ -52,7 +52,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${fredoka.variable} ${nunito.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
       <body>
         {/* Meta Pixel */}
         <Script id="meta-pixel" strategy="afterInteractive">

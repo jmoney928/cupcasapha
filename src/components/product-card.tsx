@@ -58,8 +58,8 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="flex gap-2">
           <button
             onClick={handleAdd}
-            className={`btn-pill flex-1 py-3 text-sm shadow-[0_5px_0_0_#3f7d28] ${
-              added ? "bg-leaf text-cream" : "bg-leaf text-cream"
+            className={`btn-pill flex-1 py-3 text-sm text-white ${
+              added ? "bg-leaf" : "bg-coral hover:bg-coral-deep"
             }`}
           >
             {added ? (
