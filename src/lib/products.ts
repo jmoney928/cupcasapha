@@ -34,7 +34,7 @@ const make = (
   size: `${oz}oz`,
   ozLabel: `${oz} oz`,
   pricePerCup,
-  image: `/products/${slug}.png`,
+  image: `/rebrand/branded-${oz}oz.jpg`,
   caseCount: 1000,
   casePrice: Math.round(pricePerCup * 1000 * 100) / 100,
   doubleWall,
