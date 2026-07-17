@@ -15,7 +15,7 @@ import { Cup } from "@/components/cup";
 export const metadata: Metadata = {
   title: "Why PHA",
   description:
-    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer that's home, industrial AND marine compostable — unlike PLA, paper, or conventional plastic. Here's how it works.",
+    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer — TÜV Austria certified OK Compost HOME and OK Biodegradable MARINE, unlike PLA, paper, or conventional plastic. Here's how it works.",
 };
 
 const steps = [
@@ -92,9 +92,21 @@ export default function WhyPhaPage() {
               <em>and</em>{" "}in the ocean. That&apos;s why we build every cupcasa cup from it.
             </p>
             <div className="mt-8">
-              <Button href="/shop" variant="leaf" size="lg">
-                Shop PHA cups <ArrowRight className="w-5 h-5" />
+              <Button href="/wholesale" variant="primary" size="lg">
+                Print on PHA <ArrowRight className="w-5 h-5" />
               </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-6">
+              {["TÜV Austria · OK Compost HOME", "TÜV Austria · OK Biodegradable MARINE"].map(
+                (t) => (
+                  <span
+                    key={t}
+                    className="inline-flex items-center gap-2 rounded-full bg-leaf/12 text-leaf px-3 py-1.5 text-xs font-bold"
+                  >
+                    {t}
+                  </span>
+                )
+              )}
             </div>
           </div>
           <div className="flex justify-center gap-4">

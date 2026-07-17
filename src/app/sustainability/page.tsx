@@ -1,79 +1,84 @@
 import type { Metadata } from "next";
-import {
-  Leaf,
-  Droplets,
-  Recycle,
-  Award,
-  Sparkles,
-  ArrowRight,
-  Ban,
-} from "lucide-react";
-import { Button, Reveal, Eyebrow } from "@/components/ui";
+import { Droplets, Printer, Ban, ShieldCheck, ArrowRight } from "lucide-react";
+import { Button, Reveal } from "@/components/ui";
+import { Speckle } from "@/components/brand";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
-    "Our mission: replace single-use plastic with cups that genuinely return to nature. PHA, blank by design, certified compostable. Here's our impact and our standards.",
+    "Custom-printed PHA cups, independently certified by TÜV Austria — OK Compost HOME and OK Biodegradable MARINE. Plastic-free, PFAS-free, and designed to return to nature.",
 };
 
 const pillars = [
   {
+    icon: Printer,
+    title: "Print without the guilt",
+    text: "Full-colour custom printing on a cup that still composts. Your brand, minus the plastic.",
+  },
+  {
     icon: Droplets,
     title: "Marine-safe by default",
-    text: "Most ocean plastic outlives us. PHA biodegrades in seawater — so the worst-case ending isn't a 450-year one.",
+    text: "Most ocean plastic outlives us. PHA is certified to biodegrade in seawater — no 450-year afterlife.",
   },
   {
     icon: Ban,
-    title: "Blank = less waste",
-    text: "Unbranded cups don't get tossed when a promo ends or a logo changes. One spec, fewer dead stock pallets.",
-  },
-  {
-    icon: Recycle,
     title: "No plastic, no PFAS",
-    text: "No polyethylene lining, no forever chemicals — just a single, fully compostable material.",
+    text: "No polyethylene lining, no forever chemicals — a single, home-compostable material.",
   },
 ];
 
 const certs = [
-  { name: "Industrial compostable", body: "Designed to ASTM D6400 / EN 13432 standards" },
-  { name: "Home compostable", body: "Breaks down in backyard compost conditions" },
-  { name: "Marine biodegradable", body: "Degrades in marine environments — ASTM D6691 class" },
-  { name: "BPA & PFAS free", body: "No bisphenols, no per-/poly-fluoroalkyl substances" },
+  {
+    name: "TÜV Austria — OK Compost HOME",
+    body: "Independently certified to break down in home / backyard compost conditions.",
+    tag: "Certified",
+  },
+  {
+    name: "TÜV Austria — OK Biodegradable MARINE",
+    body: "Independently certified to biodegrade in marine environments.",
+    tag: "Certified",
+  },
+  {
+    name: "Plastic-free & PFAS-free",
+    body: "100% PHA — no polyethylene lining and no per-/poly-fluoroalkyl substances.",
+    tag: "Material",
+  },
+  {
+    name: "Plant-based",
+    body: "Brewed from renewable plant oils by microbes — not petroleum.",
+    tag: "Material",
+  },
 ];
 
 export default function SustainabilityPage() {
   return (
     <>
       {/* hero */}
-      <section className="section-pad pt-12 pb-16 relative overflow-hidden">
-        <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-leaf-bright/20 blur-3xl" />
-        <div className="relative max-w-3xl">
-          <Eyebrow color="leaf">
-            <Leaf className="w-4 h-4" /> Our mission
-          </Eyebrow>
-          <h1 className="font-display text-5xl sm:text-6xl font-bold mt-5 leading-[0.95]">
-            Good for the drink. <br />
-            <span className="text-leaf">Better for the planet.</span>
+      <section className="section-pad pt-12 pb-16">
+        <div className="max-w-3xl">
+          <span className="label-caps text-coral">Our mission</span>
+          <h1 className="font-display text-5xl sm:text-6xl mt-4 leading-[0.98]">
+            Certified to <span className="text-coral">return to nature.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            Billions of &quot;paper&quot; cups go to landfill every year because they&apos;re
-            secretly plastic-lined. We started cupcasa to make the opposite true: a cup
-            that performs like the ones you know, but actually returns to the earth.
+            cupcasa cups are custom-printed on 100% PHA and independently certified by
+            TÜV Austria to break down — at home and in the ocean. No plastic, no PFAS,
+            nothing that lingers for centuries.
           </p>
         </div>
       </section>
 
       {/* pillars */}
-      <section className="section-pad py-10">
-        <div className="grid md:grid-cols-3 gap-6">
+      <section className="section-pad py-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {pillars.map((p, i) => (
-            <Reveal key={p.title} delay={i * 100}>
-              <div className="h-full rounded-3xl bg-white/70 border border-caramel/20 p-7">
-                <div className="w-14 h-14 rounded-2xl bg-leaf/15 flex items-center justify-center mb-5">
-                  <p.icon className="w-7 h-7 text-leaf" />
+            <Reveal key={p.title} delay={i * 90}>
+              <div className="h-full">
+                <div className="w-14 h-14 rounded-2xl border-2 border-espresso/12 flex items-center justify-center mb-5">
+                  <p.icon className="w-7 h-7 text-coral" strokeWidth={1.6} />
                 </div>
-                <h3 className="font-display text-xl font-bold mb-2">{p.title}</h3>
-                <p className="text-espresso/70">{p.text}</p>
+                <h3 className="font-display text-2xl font-extrabold mb-2">{p.title}</h3>
+                <p className="text-espresso/65 leading-relaxed">{p.text}</p>
               </div>
             </Reveal>
           ))}
@@ -86,11 +91,11 @@ export default function SustainabilityPage() {
           <div className="grid sm:grid-cols-3 gap-8 text-center">
             {[
               { v: "0%", l: "petroleum plastic in our cups" },
-              { v: "3 streams", l: "home · industrial · marine compostable" },
-              { v: "100%", l: "of orders ship blank & unbranded" },
+              { v: "2", l: "TÜV Austria certifications" },
+              { v: "100%", l: "plant-based PHA" },
             ].map((s) => (
               <div key={s.l}>
-                <div className="font-display text-5xl font-bold text-leaf-bright">{s.v}</div>
+                <div className="font-display text-5xl font-extrabold text-coral">{s.v}</div>
                 <p className="text-cream/70 mt-2">{s.l}</p>
               </div>
             ))}
@@ -99,50 +104,67 @@ export default function SustainabilityPage() {
       </section>
 
       {/* certifications */}
-      <section className="section-pad py-12">
+      <section className="section-pad py-14">
         <Reveal>
-          <div className="flex items-center gap-3 mb-8">
-            <Award className="w-7 h-7 text-coral" />
-            <h2 className="font-display text-3xl sm:text-4xl font-bold">
-              Standards we build to
-            </h2>
-          </div>
+          <span className="label-caps text-coral">Independently verified</span>
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3 mb-8">
+            Certified, not just claimed.
+          </h2>
         </Reveal>
         <div className="grid sm:grid-cols-2 gap-5">
           {certs.map((c, i) => (
-            <Reveal key={c.name} delay={i * 80}>
-              <div className="flex gap-4 rounded-3xl bg-white/70 border border-caramel/20 p-6">
-                <div className="w-12 h-12 shrink-0 rounded-full bg-leaf flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-cream" />
+            <Reveal key={c.name} delay={i * 70}>
+              <div className="flex gap-4 rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6">
+                <div
+                  className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center ${
+                    c.tag === "Certified" ? "bg-leaf text-cream" : "bg-espresso/8 text-espresso"
+                  }`}
+                >
+                  <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-lg">{c.name}</h3>
-                  <p className="text-espresso/70 text-sm">{c.body}</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display font-bold text-lg leading-tight">{c.name}</h3>
+                  </div>
+                  <p className="text-espresso/65 text-sm mt-1">{c.body}</p>
+                  <span
+                    className={`inline-block mt-2 label-caps ${
+                      c.tag === "Certified" ? "text-leaf" : "text-espresso/40"
+                    }`}
+                  >
+                    {c.tag}
+                  </span>
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
-        <p className="text-xs text-espresso/50 mt-5 max-w-2xl">
-          Certification claims shown are the standards our cups are engineered to meet.
-          Replace with your specific certificate numbers and bodies (e.g. BPI, TÜV
-          Austria OK Compost) once finalised.
+        <p className="text-xs text-espresso/45 mt-5 max-w-2xl">
+          TÜV Austria OK Compost HOME and OK Biodegradable MARINE certifications apply to
+          the PHA cup material. Certificate numbers available on request.
         </p>
       </section>
 
       {/* cta */}
-      <section className="section-pad py-16 text-center">
-        <h2 className="font-display text-4xl font-bold">Join the plastic-free pour.</h2>
-        <p className="text-espresso/70 mt-4 max-w-xl mx-auto">
-          Every case you swap is thousands of cups that won&apos;t outlive us in a landfill.
-        </p>
-        <div className="flex flex-wrap gap-4 justify-center mt-8">
-          <Button href="/shop" variant="primary" size="lg">
-            Shop cups <ArrowRight className="w-5 h-5" />
-          </Button>
-          <Button href="/wholesale" variant="outline" size="lg">
-            Wholesale enquiries
-          </Button>
+      <section className="section-pad pb-8">
+        <div className="relative rounded-[2.5rem] bg-coral text-white overflow-hidden p-8 sm:p-14 text-center">
+          <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
+          <div className="relative">
+            <h2 className="font-display text-4xl sm:text-5xl font-extrabold">
+              Print better. Waste nothing.
+            </h2>
+            <p className="text-white/85 mt-4 max-w-xl mx-auto">
+              A cup your customers love to hold — and the planet doesn&apos;t have to carry.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center mt-8">
+              <Button href="/wholesale" variant="cream" size="lg">
+                Start your design <ArrowRight className="w-5 h-5" />
+              </Button>
+              <Button href="/why-pha" variant="dark" size="lg">
+                The material
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </>
