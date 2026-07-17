@@ -145,6 +145,49 @@ export default function Home() {
         </Reveal>
       </section>
 
+      {/* ---------------- MEET THE CUPCASA CUP ---------------- */}
+      <section className="section-pad py-8">
+        <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-14">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="label-caps text-coral">The signature cup</span>
+            <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3 text-cream">
+              Meet the cupcasa cup.
+            </h2>
+            <p className="text-cream/60 mt-4">
+              Our house design — the dissolving C, printed on 100% PHA and TÜV-certified
+              compostable. Here it is across all three sizes.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {[
+              { img: "/rebrand/branded-8oz.jpg", size: "8oz" },
+              { img: "/rebrand/branded-12oz.jpg", size: "12oz" },
+              { img: "/rebrand/branded-16oz.jpg", size: "16oz" },
+            ].map((c, i) => (
+              <Reveal key={c.size} delay={i * 90}>
+                <div className="group relative rounded-3xl overflow-hidden aspect-[4/5]">
+                  <Image
+                    src={c.img}
+                    alt={`${c.size} cupcasa cup with the printed C mark`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute top-4 left-4 bg-cream text-espresso text-xs font-bold px-3 py-1 rounded-full">
+                    {c.size}
+                  </span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Button href="/shop" variant="primary" size="lg">
+              Reserve yours <ArrowRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* ---------------- LIFECYCLE ---------------- */}
       <section className="section-pad py-20 text-center">
         <Reveal>
