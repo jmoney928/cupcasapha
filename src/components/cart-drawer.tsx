@@ -141,7 +141,7 @@ export function CartDrawer() {
           <div className="p-5 border-t border-caramel/25 space-y-3">
             <div className="rounded-2xl bg-coral/10 text-espresso/80 text-sm p-3 leading-snug">
               🎟️ Reserve your order with a <strong>$200 deposit</strong>. Cups are
-              arriving <strong>October 2026</strong> — we&apos;ll bill the balance when
+              arriving <strong>November 2026</strong> — we&apos;ll bill the balance when
               they ship.
             </div>
             <div className="flex justify-between text-sm text-espresso/60">
