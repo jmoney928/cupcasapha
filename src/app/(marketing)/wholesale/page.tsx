@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Package, Gift, TrendingDown, Truck, Leaf, Check } from "lucide-react";
+import { Package, Gift, TrendingDown, Truck, Leaf, Check, Printer } from "lucide-react";
 import { Reveal, Eyebrow } from "@/components/ui";
 import { LeadForm } from "@/components/lead-form";
 import { products, formatPrice } from "@/lib/products";
@@ -7,14 +7,14 @@ import { products, formatPrice } from "@/lib/products";
 export const metadata: Metadata = {
   title: "Wholesale & Bulk",
   description:
-    "Wholesale compostable PHA cups for cafés, chains and distributors. Tiered volume pricing, free samples, and dedicated support. Request a quote.",
+    "Wholesale compostable PHA cups for cafés, chains and distributors. Tiered volume pricing, free samples, and custom printing on orders of 100,000+ cups. Request a quote.",
 };
 
 const tiers = [
   { name: "Starter", range: "1–9 cases", discount: "List price", note: "Buy online instantly" },
   { name: "Café", range: "10–49 cases", discount: "Up to 8% off", note: "Best for single locations" },
-  { name: "Volume", range: "50–199 cases", discount: "Up to 15% off", note: "Multi-site & growing brands" },
-  { name: "Distributor", range: "200+ cases", discount: "Custom pricing", note: "Pallet & container freight" },
+  { name: "Volume", range: "50–199 cases", discount: "Up to 15% off", note: "Multi-site & growing brands · custom printing from 100 cases" },
+  { name: "Distributor", range: "200+ cases", discount: "Custom pricing", note: "Pallet & container freight · custom printing available" },
 ];
 
 const perks = [
@@ -37,8 +37,9 @@ export default function WholesalePage() {
             <span className="text-coral">priced for volume.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            Stock genuinely compostable cups across your whole operation. Tell us what you need and we&apos;ll send a tailored
-            quote, plus free samples to prove the quality.
+            Stock genuinely compostable cups across your whole operation — and put
+            your brand on them at 100,000 cups or more. Tell us what you need and
+            we&apos;ll send a tailored quote, plus free samples to prove the quality.
           </p>
         </div>
       </section>
@@ -78,6 +79,34 @@ export default function WholesalePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* custom printing at volume */}
+      <section className="section-pad py-6">
+        <Reveal>
+          <div className="rounded-3xl bg-espresso text-cream p-8 sm:p-10 grid md:grid-cols-[auto_1fr_auto] gap-6 items-center">
+            <div className="w-14 h-14 rounded-2xl bg-coral/20 flex items-center justify-center shrink-0">
+              <Printer className="w-7 h-7 text-coral" strokeWidth={1.6} />
+            </div>
+            <div>
+              <span className="label-caps text-coral">Custom printing · 100,000+ cups</span>
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold mt-2">
+                Your brand on the cup, at volume.
+              </h2>
+              <p className="text-cream/65 mt-2 max-w-2xl">
+                Full-colour, edge-to-edge printing with your artwork is available on orders of
+                100,000 cups or more (100 cases, any mix of sizes). Ask for it in your quote
+                request and we&apos;ll include printed pricing and lead times.
+              </p>
+            </div>
+            <a
+              href="#samples"
+              className="btn-pill bg-coral text-white px-6 py-3 text-sm hover:bg-coral-deep whitespace-nowrap"
+            >
+              Quote with printing
+            </a>
+          </div>
+        </Reveal>
       </section>
 
       {/* tiers */}
@@ -146,6 +175,7 @@ export default function WholesalePage() {
             <ul className="mt-6 space-y-3">
               {[
                 "Custom volume pricing",
+                "Custom printing on 100,000+ cups",
                 "Free samples of every size",
                 "Freight to the US & Canada",
                 "Net terms available for established accounts",
@@ -182,6 +212,12 @@ export default function WholesalePage() {
                 label: "Sizes you're interested in",
                 type: "select",
                 options: ["8oz", "12oz", "16oz", "A mix of sizes"],
+              },
+              {
+                name: "printing",
+                label: "Custom printing?",
+                type: "select",
+                options: ["No — blank cups", "Yes — 100,000+ cups with our artwork", "Not sure yet"],
               },
               { name: "message", label: "Anything else?", type: "textarea" },
             ]}

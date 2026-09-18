@@ -9,6 +9,7 @@ const LABELS: Record<string, string> = {
   phone: "Phone",
   volume: "Estimated volume",
   sizes: "Sizes of interest",
+  printing: "Custom printing",
   message: "Message",
 };
 
