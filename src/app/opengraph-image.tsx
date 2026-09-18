@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const alt = "cupcasa — made for coffee, made to disappear. Home-compostable PHA cups.";
+export const alt = "cupcasa — made for every drink, made to disappear. Home-compostable PHA cups.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -37,12 +37,12 @@ export default async function OpenGraphImage() {
           <div style={{ fontSize: 22, letterSpacing: 5, fontWeight: 700, color: "#e8735a", textTransform: "uppercase" }}>
             Home compostable · plastic-free
           </div>
-          <div style={{ display: "flex", flexDirection: "column", marginTop: 28, fontSize: 70, fontWeight: 800, lineHeight: 1.04, letterSpacing: -2.5 }}>
-            <span style={{ color: "#1a1a1a" }}>Made for coffee.</span>
+          <div style={{ display: "flex", flexDirection: "column", marginTop: 28, fontSize: 62, fontWeight: 800, lineHeight: 1.05, letterSpacing: -2 }}>
+            <span style={{ color: "#1a1a1a" }}>Made for every drink.</span>
             <span style={{ color: "#e8735a" }}>Made to disappear.</span>
           </div>
           <div style={{ marginTop: 32, fontSize: 28, color: "#45443f", fontWeight: 600 }}>
-            Fully compostable PHA cups for cafés.
+            Fully compostable PHA cups, hot or cold.
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={markSrc} alt="" width={236} height={62} style={{ marginTop: 56 }} />
