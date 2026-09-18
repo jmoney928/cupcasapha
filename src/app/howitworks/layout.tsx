@@ -5,11 +5,11 @@ import { Logo } from "@/components/brand";
 export const metadata: Metadata = {
   title: "How this cup works",
   description:
-    "You just scanned a cupcasa cup. It's made from PHA — plant-based, plastic-free, and certified to compost at home. Here's what to do with it when you're done.",
+    "You just scanned a cupcasa cup. It's paper with a plant-based PHA lining — no PE, no PLA, no microplastics — certified home compostable by DIN CERTCO. Here's what to do with it when you're done.",
   alternates: { canonical: "https://cupcasa.com/howitworks" },
   openGraph: {
     title: "This cup is made to disappear",
-    description: "Plant-based PHA, no plastic lining, certified home compostable. Here's what to do with it.",
+    description: "Plant-based PHA lining, no PE, no PLA, certified home compostable (DIN CERTCO 9P0326). Here's what to do with it.",
     url: "https://cupcasa.com/howitworks",
   },
 };

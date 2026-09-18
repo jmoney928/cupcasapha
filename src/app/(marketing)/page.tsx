@@ -11,11 +11,12 @@ import {
 import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle, Mark } from "@/components/brand";
 import { ReserveStrip } from "@/components/reserve-strip";
+import { CertBadge } from "@/components/cert-badge";
 
 const pillars = [
-  { icon: Leaf, title: "Better material", text: "100% PHA — plant-based, plastic-free, and certified compostable. No lining, no PFAS." },
+  { icon: Leaf, title: "Better material", text: "Paper lined with plant-based PHA instead of plastic. No PE, no PLA, no microplastics." },
   { icon: Layers, title: "Hot or cold", text: "Double wall in every size — hot drinks stay comfortable to hold with no sleeve, cold drinks stay cold." },
-  { icon: Recycle, title: "Returns to nature", text: "Composts at home, industrially, and in the ocean. It leaves nothing behind." },
+  { icon: Recycle, title: "Returns to nature", text: "Certified home compostable by DIN CERTCO (certificate 9P0326). No industrial facility needed." },
 ];
 
 const lifecycle = [
@@ -39,8 +40,8 @@ export default function Home() {
               <span className="text-coral">Made to disappear.</span>
             </h1>
             <p className="text-lg text-espresso/70 mt-6 max-w-md">
-              Fully compostable PHA cups for hot coffee, cold brew, smoothies and
-              everything in between — plant-based, plastic-free, and certified to return to nature.
+              Home-compostable PHA-lined cups for hot coffee, cold brew, smoothies and
+              everything in between. No PE, no PLA, no microplastics.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button href="/shop" variant="primary" size="lg">
@@ -50,7 +51,8 @@ export default function Home() {
                 Wholesale pricing
               </Button>
             </div>
-            <p className="flex items-center gap-2 text-sm text-espresso/50 mt-6">
+            <div className="mt-6"><CertBadge /></div>
+            <p className="flex items-center gap-2 text-sm text-espresso/50 mt-4">
               <Particles className="w-6 h-4 text-coral" />
               Better cup. Better future.
             </p>
@@ -77,12 +79,12 @@ export default function Home() {
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center shrink-0">
               {[
-                "Home compostable",
-                "Industrially compostable",
-                "Marine degradable",
-                "Plant-based PHA",
-                "Plastic-free",
-                "PFAS-free",
+                "Certified home compostable",
+                "DIN CERTCO 9P0326",
+                "PHA lining",
+                "No PE",
+                "No PLA",
+                "No microplastics",
                 "Double wall",
               ].map((t) => (
                 <span key={t} className="label-caps flex items-center mx-5 text-cream/80">
@@ -122,7 +124,7 @@ export default function Home() {
             </h2>
             <p className="text-cream/60 mt-4">
               8oz for espresso and small pours, 12oz for the everyday drink, 16oz for
-              smoothies, cold brew and the big iced ones. All double wall, all 100% PHA,
+              smoothies, cold brew and the big iced ones. All double wall, all PHA-lined,
               all shipped blank and ready to use.
             </p>
           </div>
@@ -199,8 +201,8 @@ export default function Home() {
               Made to disappear.
             </h2>
             <p className="text-white/85 text-lg mt-5 max-w-md">
-              Our PHA cups are plant-based, plastic-free, and designed to break
-              down naturally — leaving nothing behind.
+              A paper cup with a plant-based PHA lining, certified to break down
+              in a home compost — leaving nothing behind.
             </p>
             <div className="mt-8">
               <Button href="/why-pha" variant="cream" size="lg">

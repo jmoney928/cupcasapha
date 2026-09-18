@@ -45,7 +45,7 @@ export default function TermsPage() {
       <Clause n={3} title="Products">
         <List
           items={[
-            "Our cups are made from PHA (polyhydroxyalkanoate) and are supplied blank and unbranded.",
+            "Our cups are paper cups with a PHA (polyhydroxyalkanoate) lining and are supplied blank and unbranded.",
             "Cups are sold by the case of 1,000 units unless otherwise stated.",
             "We work to display products accurately, but colours, finishes, and dimensions may vary slightly, and your screen may not reflect exact appearance.",
             "Product availability is not guaranteed and may change without notice.",
@@ -55,7 +55,7 @@ export default function TermsPage() {
 
       <Clause n={4} title="Compostability and environmental claims">
         <p>
-          Our cups are designed to break down in home, industrial, and marine environments. However,
+          Our cups are certified home compostable (DIN CERTCO 9P0326). However,
           composting and biodegradation outcomes depend on real-world conditions and on local
           collection and processing infrastructure, which varies by region. Environmental statements
           describe the material&apos;s designed end-of-life behaviour and are not a guarantee of a
