@@ -33,7 +33,7 @@ export function SiteHeader() {
       <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2.5 px-4 font-medium tracking-tight">
         Now taking deposits — reserve your cups with{" "}
         <span className="text-coral font-semibold">$200</span> · shipping{" "}
-        <span className="font-semibold">October 2026</span>
+        <span className="font-semibold">November 2026</span>
       </div>
 
       <header
