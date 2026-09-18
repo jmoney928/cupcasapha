@@ -63,8 +63,8 @@ export function SiteFooter() {
           <div>
             <Logo variant="white" className="h-7 w-auto mb-5" />
             <p className="max-w-xs text-cream/60 leading-relaxed">
-              Fully compostable PHA cups for cafés. Made for coffee —
-              made to disappear.
+              Fully compostable PHA cups for hot and cold drinks.
+              Made for every drink — made to disappear.
             </p>
             <div className="flex gap-3 mt-6">
               <a href="https://instagram.com/cup_casa" target="_blank" rel="noopener noreferrer"

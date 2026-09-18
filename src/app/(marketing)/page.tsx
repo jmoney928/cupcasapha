@@ -14,7 +14,7 @@ import { ReserveStrip } from "@/components/reserve-strip";
 
 const pillars = [
   { icon: Leaf, title: "Better material", text: "100% PHA — plant-based, plastic-free, and certified compostable. No lining, no PFAS." },
-  { icon: Layers, title: "Built for coffee", text: "Double wall in every size, so hot drinks stay comfortable to hold with no sleeve." },
+  { icon: Layers, title: "Hot or cold", text: "Double wall in every size — hot drinks stay comfortable to hold with no sleeve, cold drinks stay cold." },
   { icon: Recycle, title: "Returns to nature", text: "Composts at home, industrially, and in the ocean. It leaves nothing behind." },
 ];
 
@@ -34,13 +34,13 @@ export default function Home() {
           <div>
             <span className="label-caps text-coral">Home compostable · plastic-free</span>
             <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4">
-              Made for coffee.
+              Made for every drink.
               <br />
               <span className="text-coral">Made to disappear.</span>
             </h1>
             <p className="text-lg text-espresso/70 mt-6 max-w-md">
-              Fully compostable PHA cups for cafés — plant-based, plastic-free,
-              and certified to return to nature.
+              Fully compostable PHA cups for hot coffee, cold brew, smoothies and
+              everything in between — plant-based, plastic-free, and certified to return to nature.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button href="/shop" variant="primary" size="lg">
@@ -121,8 +121,9 @@ export default function Home() {
               One cup for every pour.
             </h2>
             <p className="text-cream/60 mt-4">
-              8oz for espresso drinks, 12oz for the everyday latte, 16oz for the big
-              iced ones. All double wall, all 100% PHA, all shipped blank and ready to use.
+              8oz for espresso and small pours, 12oz for the everyday drink, 16oz for
+              smoothies, cold brew and the big iced ones. All double wall, all 100% PHA,
+              all shipped blank and ready to use.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
@@ -193,7 +194,7 @@ export default function Home() {
           <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
           <div className="relative max-w-xl">
             <h2 className="font-display text-4xl sm:text-6xl font-extrabold leading-[0.98]">
-              Made for coffee.
+              Made for every drink.
               <br />
               Made to disappear.
             </h2>
