@@ -1,0 +1,28 @@
+# Supabase CLI config (only the values we change from defaults).
+project_id = "cupcasapha"
+
+[api]
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = false          # seeding is done by `npm run seed` (needs auth users)
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback", "https://cups.cupcasa.com/auth/callback"]
+enable_signup = false    # accounts are created by invitation only
+
+[auth.email]
+enable_signup = true          # email provider ON (magic link + password); new signups are blocked by [auth].enable_signup
+enable_confirmations = false
+
+# Adds app_metadata.user_role to every access token (see 0002_functions.sql).
+# On hosted Supabase enable the same hook under Authentication → Hooks → Customize Access Token.
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"
