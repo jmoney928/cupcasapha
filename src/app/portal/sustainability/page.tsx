@@ -1,7 +1,7 @@
 import { getPortalContext } from "@/lib/auth/cafe-context";
 import { Card, PageHeader, StatTile } from "@/components/app/ui";
 import { num, fullDate } from "@/lib/format";
-import { CERT, certVerifyUrl } from "@/lib/certs";
+import { CERT } from "@/lib/certs";
 
 export const metadata = { title: "Impact" };
 
@@ -19,7 +19,7 @@ export default async function SustainabilityPage() {
       <div className="grid gap-3 sm:grid-cols-3">
         <StatTile label="PHA cups supplied" value={num(cups)} tone="green" hint={first ? `since ${fullDate(first)}` : "no deliveries yet"} />
         <StatTile label="Cases delivered" value={num(cases)} />
-        <StatTile label="Certification" value={`DIN CERTCO ${CERT.number}`} hint="Certified home compostable · tap to verify" href={certVerifyUrl} />
+        <StatTile label="Certification" value={`DIN CERTCO ${CERT.number}`} hint="Certified home compostable" />
       </div>
       <Card className="mt-4" title="What this means">
         <p className="text-sm text-cocoa">Every cup above is paper lined with PHA instead of PE or PLA, certified home compostable by DIN CERTCO (TÜV Rheinland group), so it can go in home compost rather than landfill. We don’t estimate carbon or plastic “saved” because those figures depend on what you’d have used otherwise and how the cup is disposed of. If you need numbers for a report, email hello@cupcasa.com and we’ll share the certification documents.</p>
