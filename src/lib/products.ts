@@ -10,8 +10,6 @@ export type Product = {
   caseCount: number;
   casePrice: number; // pricePerCup * caseCount
   doubleWall: boolean;
-  printed: boolean;
-  variantLabel: string; // "Blank" | "Custom printed"
   blurb: string;
   description: string;
   bestFor: string[];
@@ -62,47 +60,39 @@ const base: Base[] = [
   },
 ];
 
-function build(b: Base, printed: boolean): Product {
-  const pricePerCup = printed ? Math.round((b.pricePerCup + 0.05) * 100) / 100 : b.pricePerCup;
+function build(b: Base): Product {
+  const pricePerCup = b.pricePerCup;
   return {
-    slug: printed ? `${b.oz}oz-pha-cup-printed` : `${b.oz}oz-pha-cup`,
-    name: `${b.oz}oz PHA Cup — ${printed ? "Custom Printed" : "Blank"}`,
+    slug: `${b.oz}oz-pha-cup`,
+    name: `${b.oz}oz PHA Cup`,
     shortName: b.shortName,
     size: `${b.oz}oz`,
     ozLabel: `${b.oz} oz`,
     oz: b.oz,
     pricePerCup,
-    image: printed ? `/rebrand/branded-${b.oz}oz.jpg` : `/products/${b.oz}oz-pha-cup.png`,
+    image: `/products/${b.oz}oz-pha-cup.png`,
     caseCount: 1000,
     casePrice: Math.round(pricePerCup * 1000 * 100) / 100,
     doubleWall: true,
-    printed,
-    variantLabel: printed ? "Custom printed" : "Blank",
     blurb: b.blurb,
-    description: printed
-      ? `${b.description} Printed edge-to-edge with your artwork in food-safe inks.`
-      : b.description,
+    description: b.description,
     bestFor: b.bestFor,
     accent: b.accent,
     specs: [
       { label: "Capacity", value: `${b.oz} oz` },
       { label: "Material", value: "100% PHA (polyhydroxyalkanoate)" },
       { label: "Wall", value: "Double wall (no sleeve needed)" },
-      { label: "Branding", value: printed ? "Custom printed with your design" : "Blank / unbranded" },
+      { label: "Finish", value: "Blank / unbranded" },
       { label: "Case count", value: "1,000 cups" },
       { label: "Certified", value: "TÜV Austria — OK Compost HOME · OK Biodegradable MARINE" },
     ],
   };
 }
 
-// Blank variants first, then custom-printed.
-export const products: Product[] = [
-  ...base.map((b) => build(b, false)),
-  ...base.map((b) => build(b, true)),
-];
+export const products: Product[] = base.map(build);
 
-export const blankProducts = products.filter((p) => !p.printed);
-export const printedProducts = products.filter((p) => p.printed);
+/** All cups ship blank; kept as an alias for components that list the range. */
+export const blankProducts = products;
 
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
 

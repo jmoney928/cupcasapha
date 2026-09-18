@@ -74,10 +74,10 @@ export function SiteHeader() {
               )}
             </button>
             <Link
-              href="/wholesale"
+              href="/shop"
               className="btn-pill hidden sm:inline-flex bg-coral text-white px-5 py-2.5 text-sm hover:bg-coral-deep"
             >
-              Start your design
+              Reserve cups
               <Particles className="w-5 h-3 text-white/90" />
             </Link>
             <button
@@ -103,11 +103,11 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              href="/wholesale"
+              href="/shop"
               onClick={() => setMobileOpen(false)}
               className="btn-pill bg-coral text-white px-5 py-3 mt-2 hover:bg-coral-deep"
             >
-              Start your design
+              Reserve cups
             </Link>
           </div>
         )}

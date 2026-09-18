@@ -63,7 +63,7 @@ export function SiteFooter() {
           <div>
             <Logo variant="white" className="h-7 w-auto mb-5" />
             <p className="max-w-xs text-cream/60 leading-relaxed">
-              Custom-printed, fully compostable PHA cups. Printed to be seen —
+              Fully compostable PHA cups for cafés. Made for coffee —
               made to disappear.
             </p>
             <div className="flex gap-3 mt-6">

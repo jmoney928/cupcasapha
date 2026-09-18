@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Package, Gift, TrendingDown, Truck, Leaf, Check } from "lucide-react";
 import { Reveal, Eyebrow } from "@/components/ui";
 import { LeadForm } from "@/components/lead-form";
-import { blankProducts, printedProducts, formatPrice } from "@/lib/products";
+import { products, formatPrice } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Wholesale & Bulk",
   description:
-    "Wholesale PHA cups for cafés, chains and distributors — blank or custom-printed (+$0.05/cup). Tiered volume pricing, free samples, and dedicated support. Request a quote.",
+    "Wholesale compostable PHA cups for cafés, chains and distributors. Tiered volume pricing, free samples, and dedicated support. Request a quote.",
 };
 
 const tiers = [
@@ -37,8 +37,7 @@ export default function WholesalePage() {
             <span className="text-coral">priced for volume.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            Stock genuinely compostable cups — blank, or custom-printed with your brand —
-            across your whole operation. Tell us what you need and we&apos;ll send a tailored
+            Stock genuinely compostable cups across your whole operation. Tell us what you need and we&apos;ll send a tailored
             quote, plus free samples to prove the quality.
           </p>
         </div>
@@ -49,52 +48,35 @@ export default function WholesalePage() {
         <div className="mb-6">
           <span className="label-caps text-coral">Per-cup pricing</span>
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-2">
-            Blank, or printed with your brand.
+            Simple list pricing.
           </h2>
           <p className="text-espresso/60 mt-2 max-w-xl">
-            Every size is double-wall, sold by the case of 1,000. Custom printing adds a
-            flat <strong className="text-coral">+$0.05/cup</strong> — full-colour, your
-            artwork, edge-to-edge.
+            Every size is double-wall and ships blank, sold by the case of 1,000.
+            Volume tiers below bring the per-cup price down from here.
           </p>
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
-          {blankProducts.map((blank, i) => {
-            const printed = printedProducts[i];
-            return (
-              <div
-                key={blank.slug}
-                className="rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6"
-              >
-                <div className="flex items-baseline justify-between">
-                  <p className="font-display text-2xl font-extrabold">{blank.size}</p>
-                  <span className="label-caps text-espresso/40">Double wall</span>
-                </div>
-                <div className="mt-5 space-y-2.5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-espresso/70">Blank</span>
-                    <span className="font-display font-bold">
-                      {formatPrice(blank.pricePerCup)}
-                      <span className="text-espresso/50 text-sm font-normal">/cup</span>
-                    </span>
-                  </div>
-                  <div className="flex items-baseline justify-between border-t border-espresso/8 pt-2.5">
-                    <span className="text-espresso/70">
-                      Custom printed{" "}
-                      <span className="text-coral text-xs font-bold">+$0.05</span>
-                    </span>
-                    <span className="font-display font-bold text-coral">
-                      {formatPrice(printed.pricePerCup)}
-                      <span className="text-coral/60 text-sm font-normal">/cup</span>
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-espresso/45 mt-4">
-                  {formatPrice(blank.casePrice)} blank ·{" "}
-                  {formatPrice(printed.casePrice)} printed / case
-                </p>
+          {products.map((p) => (
+            <div
+              key={p.slug}
+              className="rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6"
+            >
+              <div className="flex items-baseline justify-between">
+                <p className="font-display text-2xl font-extrabold">{p.size}</p>
+                <span className="label-caps text-espresso/40">Double wall</span>
               </div>
-            );
-          })}
+              <div className="mt-5 flex items-baseline justify-between">
+                <span className="text-espresso/70">{p.shortName}</span>
+                <span className="font-display font-bold text-coral">
+                  {formatPrice(p.pricePerCup)}
+                  <span className="text-coral/60 text-sm font-normal">/cup</span>
+                </span>
+              </div>
+              <p className="text-xs text-espresso/45 mt-4">
+                {formatPrice(p.casePrice)} per case of {p.caseCount.toLocaleString()}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 

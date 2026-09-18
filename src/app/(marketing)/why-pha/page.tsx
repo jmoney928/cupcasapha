@@ -92,8 +92,8 @@ export default function WhyPhaPage() {
               <em>and</em>{" "}in the ocean. That&apos;s why we build every cupcasa cup from it.
             </p>
             <div className="mt-8">
-              <Button href="/wholesale" variant="primary" size="lg">
-                Print on PHA <ArrowRight className="w-5 h-5" />
+              <Button href="/shop" variant="primary" size="lg">
+                Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-6">

@@ -1,20 +1,20 @@
 import Image from "next/image";
 import {
-  Printer,
   Leaf,
   Recycle,
   ArrowRight,
   Sprout,
   CupSoda,
   Coffee,
+  Layers,
 } from "lucide-react";
 import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle, Mark } from "@/components/brand";
 import { ReserveStrip } from "@/components/reserve-strip";
 
 const pillars = [
-  { icon: Printer, title: "Beautifully printed", text: "Your artwork, printed edge-to-edge in vivid, food-safe inks. Small runs to full pallets." },
   { icon: Leaf, title: "Better material", text: "100% PHA — plant-based, plastic-free, and certified compostable. No lining, no PFAS." },
+  { icon: Layers, title: "Built for coffee", text: "Double wall in every size, so hot drinks stay comfortable to hold with no sleeve." },
   { icon: Recycle, title: "Returns to nature", text: "Composts at home, industrially, and in the ocean. It leaves nothing behind." },
 ];
 
@@ -32,27 +32,27 @@ export default function Home() {
       <section className="section-pad pt-12 sm:pt-16 pb-16 relative overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
-            <span className="label-caps text-coral">Custom-printed · compostable</span>
+            <span className="label-caps text-coral">Home compostable · plastic-free</span>
             <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4">
-              Printed to be seen.
+              Made for coffee.
               <br />
               <span className="text-coral">Made to disappear.</span>
             </h1>
             <p className="text-lg text-espresso/70 mt-6 max-w-md">
-              Custom-printed PHA cups for cafés and brands — beautifully printed,
-              made from better material, and designed to return to nature.
+              Fully compostable PHA cups for cafés — plant-based, plastic-free,
+              and certified to return to nature.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
-              <Button href="/wholesale" variant="primary" size="lg">
-                Start your design <ArrowRight className="w-5 h-5" />
+              <Button href="/shop" variant="primary" size="lg">
+                Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
-              <Button href="/shop" variant="outline" size="lg">
-                Order cups
+              <Button href="/wholesale" variant="outline" size="lg">
+                Wholesale pricing
               </Button>
             </div>
             <p className="flex items-center gap-2 text-sm text-espresso/50 mt-6">
               <Particles className="w-6 h-4 text-coral" />
-              Your design. Our cup. A better future.
+              Better cup. Better future.
             </p>
           </div>
 
@@ -60,7 +60,7 @@ export default function Home() {
             <div className="relative rounded-[2rem] overflow-hidden aspect-[4/5] sm:aspect-square shadow-[0_30px_60px_rgba(26,26,26,0.15)]">
               <Image
                 src="/rebrand/hero-cup.png"
-                alt="A cream cupcasa cup with the coral dissolve print"
+                alt="A cream cupcasa PHA cup outdoors"
                 fill
                 priority
                 sizes="(max-width:1024px) 100vw, 50vw"
@@ -77,13 +77,13 @@ export default function Home() {
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center shrink-0">
               {[
-                "Custom printed",
                 "Home compostable",
                 "Industrially compostable",
                 "Marine degradable",
                 "Plant-based PHA",
                 "Plastic-free",
                 "PFAS-free",
+                "Double wall",
               ].map((t) => (
                 <span key={t} className="label-caps flex items-center mx-5 text-cream/80">
                   {t}
@@ -112,63 +112,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- YOUR DESIGN. OUR CUP. ---------------- */}
-      <section className="section-pad py-8">
-        <Reveal>
-          <div className="rounded-[2.5rem] bg-cream-deep/60 border border-espresso/8 p-8 sm:p-12">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="label-caps text-coral">Your design. Our cup.</span>
-              <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3">
-                A better future in every cup.
-              </h2>
-              <p className="text-espresso/65 mt-4">
-                From a single-colour logo to full-wrap illustration — if you can design
-                it, we can print it on a cup that composts.
-              </p>
-            </div>
-            <div className="relative rounded-3xl overflow-hidden bg-cream">
-              <Image
-                src="/rebrand/printed-cups.png"
-                alt="Four custom-printed cupcasa cup designs"
-                width={831}
-                height={159}
-                className="w-full h-auto"
-              />
-            </div>
-            <div className="text-center mt-8">
-              <Button href="/wholesale" variant="dark" size="lg">
-                Start your design <ArrowRight className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* ---------------- MEET THE CUPCASA CUP ---------------- */}
+      {/* ---------------- THE CUPS ---------------- */}
       <section className="section-pad py-8">
         <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-14">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="label-caps text-coral">Custom printing in action</span>
+            <span className="label-caps text-coral">Three sizes</span>
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3 text-cream">
-              Picture your brand here.
+              One cup for every pour.
             </h2>
             <p className="text-cream/60 mt-4">
-              Every cup is printed to order. These show our own mark as an example —
-              full-colour, edge-to-edge on 100% PHA, in all three sizes. Your design
-              goes in its place.
+              8oz for espresso drinks, 12oz for the everyday latte, 16oz for the big
+              iced ones. All double wall, all 100% PHA, all shipped blank and ready to use.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { img: "/rebrand/branded-8oz.jpg", size: "8oz" },
-              { img: "/rebrand/branded-12oz.jpg", size: "12oz" },
-              { img: "/rebrand/branded-16oz.jpg", size: "16oz" },
+              { img: "/products/8oz-pha-cup.png", size: "8oz", name: "The Espresso" },
+              { img: "/products/12oz-pha-cup.png", size: "12oz", name: "The Everyday" },
+              { img: "/products/16oz-pha-cup.png", size: "16oz", name: "The Big One" },
             ].map((c, i) => (
               <Reveal key={c.size} delay={i * 90}>
-                <div className="group relative rounded-3xl overflow-hidden aspect-[4/5]">
+                <a href={`/shop/${c.size}-pha-cup`} className="group relative block rounded-3xl overflow-hidden aspect-[4/5] bg-cream">
                   <Image
                     src={c.img}
-                    alt={`${c.size} cupcasa cup with the printed C mark`}
+                    alt={`${c.size} cupcasa PHA cup`}
                     fill
                     sizes="(max-width: 640px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -176,16 +143,16 @@ export default function Home() {
                   <span className="absolute top-4 left-4 bg-cream text-espresso text-xs font-bold px-3 py-1 rounded-full">
                     {c.size}
                   </span>
-                </div>
+                  <span className="absolute bottom-4 left-4 bg-espresso/80 text-cream text-xs font-bold px-3 py-1 rounded-full">
+                    {c.name}
+                  </span>
+                </a>
               </Reveal>
             ))}
           </div>
-          <p className="text-center text-cream/40 text-xs mt-6">
-            Example design shown (the cupcasa mark). Your artwork goes here.
-          </p>
           <div className="text-center mt-8">
-            <Button href="/wholesale" variant="primary" size="lg">
-              Start your design <ArrowRight className="w-5 h-5" />
+            <Button href="/shop" variant="primary" size="lg">
+              Shop the cups <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
         </div>
@@ -226,12 +193,12 @@ export default function Home() {
           <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
           <div className="relative max-w-xl">
             <h2 className="font-display text-4xl sm:text-6xl font-extrabold leading-[0.98]">
-              Printed to be seen.
+              Made for coffee.
               <br />
               Made to disappear.
             </h2>
             <p className="text-white/85 text-lg mt-5 max-w-md">
-              Our PHA cups are custom-printed with your brand and designed to break
+              Our PHA cups are plant-based, plastic-free, and designed to break
               down naturally — leaving nothing behind.
             </p>
             <div className="mt-8">
@@ -269,14 +236,14 @@ export default function Home() {
           <div className="relative max-w-2xl mx-auto">
             <Mark variant="white" className="h-12 w-auto mx-auto mb-6" />
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold">
-              Ready to print better?
+              Ready to switch?
             </h2>
             <p className="text-cream/70 text-lg mt-4">
-              Beautifully printed. Better material. Returns to nature.
+              Better material. Returns to nature. Nothing left behind.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
-              <Button href="/wholesale" variant="primary" size="lg">
-                Start your design <ArrowRight className="w-5 h-5" />
+              <Button href="/shop" variant="primary" size="lg">
+                Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/contact" variant="cream" size="lg">
                 Talk to us

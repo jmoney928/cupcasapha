@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Droplets, Printer, Ban, ShieldCheck, ArrowRight } from "lucide-react";
+import { Droplets, Ban, ShieldCheck, ArrowRight, Sprout } from "lucide-react";
 import { Button, Reveal } from "@/components/ui";
 import { Speckle } from "@/components/brand";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
-    "Custom-printed PHA cups, independently certified by TÜV Austria — OK Compost HOME and OK Biodegradable MARINE. Plastic-free, PFAS-free, and designed to return to nature.",
+    "PHA cups independently certified by TÜV Austria — OK Compost HOME and OK Biodegradable MARINE. Plastic-free, PFAS-free, and designed to return to nature.",
 };
 
 const pillars = [
   {
-    icon: Printer,
-    title: "Print without the guilt",
-    text: "Full-colour custom printing on a cup that still composts. Your brand, minus the plastic.",
+    icon: Sprout,
+    title: "Compostable at home",
+    text: "No industrial facility required. Certified to break down in a backyard compost, not just in theory.",
   },
   {
     icon: Droplets,
@@ -61,7 +61,7 @@ export default function SustainabilityPage() {
             Certified to <span className="text-coral">return to nature.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            cupcasa cups are custom-printed on 100% PHA and independently certified by
+            cupcasa cups are made from 100% PHA and independently certified by
             TÜV Austria to break down — at home and in the ocean. No plastic, no PFAS,
             nothing that lingers for centuries.
           </p>
@@ -151,14 +151,14 @@ export default function SustainabilityPage() {
           <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
           <div className="relative">
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold">
-              Print better. Waste nothing.
+              Better cup. Waste nothing.
             </h2>
             <p className="text-white/85 mt-4 max-w-xl mx-auto">
               A cup your customers love to hold — and the planet doesn&apos;t have to carry.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
-              <Button href="/wholesale" variant="cream" size="lg">
-                Start your design <ArrowRight className="w-5 h-5" />
+              <Button href="/shop" variant="cream" size="lg">
+                Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/why-pha" variant="dark" size="lg">
                 The material
