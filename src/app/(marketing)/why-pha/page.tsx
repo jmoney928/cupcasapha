@@ -16,7 +16,7 @@ import { MATERIAL_SHORT } from "@/lib/certs";
 export const metadata: Metadata = {
   title: "Why PHA",
   description:
-    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer that lines our paper cups instead of PE or PLA — certified home compostable by DIN CERTCO (9P0326). Here's how it works.",
+    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer that lines our paper cups instead of PE or PLA — certified home compostable by DIN CERTCO (9R0050). Here's how it works.",
 };
 
 const steps = [
