@@ -16,7 +16,7 @@ import { CertBadge } from "@/components/cert-badge";
 const pillars = [
   { icon: Leaf, title: "Better material", text: "Paper lined with plant-based PHA instead of plastic. No PE, no PLA, no microplastics." },
   { icon: Layers, title: "Hot or cold", text: "Double wall in every size — hot drinks stay comfortable to hold with no sleeve, cold drinks stay cold." },
-  { icon: Recycle, title: "Returns to nature", text: "The PHA lining is certified home compostable by DIN CERTCO (9R0050). No industrial facility needed." },
+  { icon: Recycle, title: "Returns to nature", text: "Certified home compostable by DIN CERTCO (certificate 9P0326). No industrial facility needed." },
 ];
 
 const lifecycle = [
@@ -79,8 +79,8 @@ export default function Home() {
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center shrink-0">
               {[
-                "Home-compostable PHA lining",
-                "DIN CERTCO 9R0050",
+                "Certified home compostable",
+                "DIN CERTCO 9P0326",
                 "PHA lining",
                 "No PE",
                 "No PLA",
@@ -201,7 +201,7 @@ export default function Home() {
               Made to disappear.
             </h2>
             <p className="text-white/85 text-lg mt-5 max-w-md">
-              A paper cup with a plant-based PHA lining certified to break down
+              A paper cup with a plant-based PHA lining, certified to break down
               in a home compost — leaving nothing behind.
             </p>
             <div className="mt-8">

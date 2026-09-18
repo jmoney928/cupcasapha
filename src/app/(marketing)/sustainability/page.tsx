@@ -3,19 +3,19 @@ import { Ban, ShieldCheck, ArrowRight, Sprout, Search, Leaf } from "lucide-react
 import { Button, Reveal } from "@/components/ui";
 import { Speckle } from "@/components/brand";
 import { CertBadge } from "@/components/cert-badge";
-import { CERT, OTHER_CERTS, CERT_HOLDER, CERT_VALID_UNTIL, certVerifyUrl, MATERIAL_CLAIM } from "@/lib/certs";
+import { CERT, RESIN_CERTS, RESIN_CERT_HOLDER, RESIN_CERT_VALID_UNTIL, RESIN_REGISTER_URL, MATERIAL_CLAIM } from "@/lib/certs";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
-    "Paper cups with a PHA lining certified home compostable by DIN CERTCO (TÜV Rheinland group), certificate 9R0050. No PE, no PLA, no microplastics.",
+    "PHA-lined paper cups certified home compostable by DIN CERTCO (TÜV Rheinland group), certificate 9P0326. No PE, no PLA, no microplastics.",
 };
 
 const pillars = [
   {
     icon: Sprout,
     title: "Compostable at home",
-    text: "No industrial facility required. The PHA lining is certified to break down in a backyard compost, not just in theory.",
+    text: "No industrial facility required. Certified to break down in a backyard compost, not just in theory.",
   },
   {
     icon: Ban,
@@ -25,23 +25,22 @@ const pillars = [
   {
     icon: Search,
     title: "Verifiable, not just claimed",
-    text: `Certificate ${CERT.number} is issued by DIN CERTCO and listed on its public register, valid to ${CERT_VALID_UNTIL}. Look it up yourself.`,
+    text: `Certificate ${CERT.number} is issued by DIN CERTCO, part of the TÜV Rheinland group. The lining material carries its own public registrations as well.`,
   },
 ];
 
 const certs = [
   {
     name: `${CERT.title} — DIN CERTCO ${CERT.number}`,
-    body: `The PHA lining material is certified by DIN CERTCO (TÜV Rheinland group) for home and garden composting. Holder: ${CERT_HOLDER}. Valid to ${CERT_VALID_UNTIL}.`,
+    body: "The cup is independently certified by DIN CERTCO (TÜV Rheinland group) to break down in home and garden compost conditions.",
     tag: "Certified",
-    href: certVerifyUrl,
     icon: ShieldCheck,
   },
   {
-    name: `${OTHER_CERTS[0].title} — DIN CERTCO ${OTHER_CERTS[0].number}`,
-    body: `${OTHER_CERTS[0].scheme}. Also holds the Seedling mark, DIN CERTCO ${OTHER_CERTS[1].number}.`,
-    tag: "Certified",
-    href: OTHER_CERTS[0].entryUrl,
+    name: `PHA lining resin — DIN CERTCO ${RESIN_CERTS[0].number}`,
+    body: `The lining material itself (${RESIN_CERT_HOLDER}) holds DIN CERTCO registrations for home & garden composting (${RESIN_CERTS[0].number}), industrial composting (${RESIN_CERTS[1].number}) and the Seedling mark (${RESIN_CERTS[2].number}), valid to ${RESIN_CERT_VALID_UNTIL}.`,
+    tag: "Material",
+    href: RESIN_REGISTER_URL,
     icon: Leaf,
   },
   {
@@ -69,7 +68,7 @@ export default function SustainabilityPage() {
             Certified to <span className="text-coral">return to nature.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            cupcasa cups are paper with a plant-based PHA lining that is independently certified
+            cupcasa cups are paper with a plant-based PHA lining, independently certified
             home compostable by DIN CERTCO, part of the TÜV Rheinland group. No PE, no PLA,
             no microplastics — nothing that lingers for centuries.
           </p>
@@ -100,7 +99,7 @@ export default function SustainabilityPage() {
           <div className="grid sm:grid-cols-3 gap-8 text-center">
             {[
               { v: "0%", l: "PE or PLA in the lining" },
-              { v: CERT.number, l: "DIN CERTCO certificate, home-compostable lining" },
+              { v: CERT.number, l: "DIN CERTCO certificate, home compostable" },
               { v: "100%", l: "plant-based PHA lining" },
             ].map((s) => (
               <div key={s.l}>
@@ -148,9 +147,8 @@ export default function SustainabilityPage() {
           ))}
         </div>
         <p className="text-xs text-espresso/45 mt-5 max-w-2xl">
-          Certificates cover the PHA lining material and are held by its manufacturer, {CERT_HOLDER}. They are
-          issued by DIN CERTCO, part of the TÜV Rheinland group, and listed on its public register:{" "}
-          <a href={CERT.registerUrl} target="_blank" rel="noopener noreferrer" className="underline">all three entries</a>.
+          Certificates are issued by DIN CERTCO, part of the TÜV Rheinland group. Certificate documents are
+          available on request at hello@cupcasa.com.
         </p>
       </section>
 

@@ -34,7 +34,7 @@ const base: Base[] = [
     shortName: "The Espresso",
     blurb: "Perfect for espresso, cortados & small cold pours.",
     description:
-      "Our 8oz double-wall PHA cup is the everyday workhorse — sized for espresso drinks, small coffees and tasting pours. The insulated double wall keeps hands comfortable without a sleeve, and its PHA lining is certified home compostable.",
+      "Our 8oz double-wall PHA cup is the everyday workhorse — sized for espresso drinks, small coffees and tasting pours. The insulated double wall keeps hands comfortable without a sleeve, and it is certified home compostable.",
     bestFor: ["Espresso & cortado", "Small hot drinks", "Sampling & tastings"],
     accent: "coral",
   },
@@ -44,7 +44,7 @@ const base: Base[] = [
     shortName: "The Everyday",
     blurb: "The go-to size for lattes, drip & iced coffee.",
     description:
-      "The 12oz is the café standard — roomy enough for a proper latte or a generous drip, light enough to keep your unit economics happy. Its double wall means no sleeve needed, and its PHA lining is certified home compostable.",
+      "The 12oz is the café standard — roomy enough for a proper latte or a generous drip, light enough to keep your unit economics happy. Its double wall means no sleeve needed, and it is certified home compostable.",
     bestFor: ["Lattes & cappuccinos", "Drip coffee", "Iced coffee"],
     accent: "caramel",
   },
@@ -84,7 +84,7 @@ function build(b: Base): Product {
       { label: "Wall", value: "Double wall (no sleeve needed)" },
       { label: "Finish", value: "Blank / unbranded" },
       { label: "Case count", value: "1,000 cups" },
-      { label: "Certified", value: "PHA lining home compostable — DIN CERTCO 9R0050 (TÜV Rheinland group)" },
+      { label: "Certified", value: "Home compostable — DIN CERTCO 9P0326 (TÜV Rheinland group)" },
     ],
   };
 }
