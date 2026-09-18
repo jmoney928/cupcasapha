@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · cupcasa",
   },
   description:
-    "Fully compostable PHA cups for hot and cold drinks — plant-based, plastic-free, and certified to break down at home and in the ocean. Made for every drink, made to disappear.",
+    "Home-compostable PHA-lined paper cups for hot and cold drinks — certified by DIN CERTCO (9P0326). No PE, no PLA, no microplastics. Made for every drink, made to disappear.",
   keywords: [
     "compostable coffee cups",
     "PHA cups",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "cupcasa — Made for every drink. Made to disappear.",
     description:
-      "Fully compostable PHA cups. Plant-based, plastic-free, certified to return to nature.",
+      "PHA-lined paper cups certified home compostable (DIN CERTCO 9P0326). No PE, no PLA, no microplastics.",
     type: "website",
     url: "https://cupcasa.com",
   },

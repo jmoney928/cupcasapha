@@ -3,7 +3,6 @@ import {
   Leaf,
   FlaskConical,
   Sprout,
-  Waves,
   Factory,
   Check,
   X,
@@ -11,11 +10,13 @@ import {
 } from "lucide-react";
 import { Button, Reveal, Eyebrow } from "@/components/ui";
 import { Cup } from "@/components/cup";
+import { CertBadge } from "@/components/cert-badge";
+import { MATERIAL_SHORT } from "@/lib/certs";
 
 export const metadata: Metadata = {
   title: "Why PHA",
   description:
-    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer — TÜV Austria certified OK Compost HOME and OK Biodegradable MARINE, unlike PLA, paper, or conventional plastic. Here's how it works.",
+    "What is PHA? Polyhydroxyalkanoate is a plant-based biopolymer that lines our paper cups instead of PE or PLA — certified home compostable by DIN CERTCO (9P0326). Here's how it works.",
 };
 
 const steps = [
@@ -32,12 +33,12 @@ const steps = [
   {
     icon: Leaf,
     title: "Shaped into cups",
-    text: "The biopolymer is harvested and formed into sturdy, food-safe cups. No plastic lining, no PFAS.",
+    text: "The biopolymer becomes the lining of a sturdy paper cup — where PE or PLA would normally go.",
   },
   {
-    icon: Waves,
+    icon: Sprout,
     title: "Returns to nature",
-    text: "When discarded, microbes recognise PHA as food and digest it — in soil, compost, or seawater. No microplastics left behind.",
+    text: "When composted, microbes recognise PHA as food and digest it. No microplastics left behind.",
   },
 ];
 
@@ -45,9 +46,7 @@ const rows = [
   { feature: "Made from renewable plants", pha: true, pla: true, paper: "lining", plastic: false },
   { feature: "Home compostable", pha: true, pla: false, paper: false, plastic: false },
   { feature: "Industrial compostable", pha: true, pla: true, paper: "lining", plastic: false },
-  { feature: "Marine degradable", pha: true, pla: false, paper: false, plastic: false },
-  { feature: "Soil biodegradable", pha: true, pla: false, paper: false, plastic: false },
-  { feature: "No plastic lining / PFAS", pha: true, pla: true, paper: false, plastic: false },
+  { feature: "No PE or PLA lining", pha: true, pla: false, paper: false, plastic: false },
   { feature: "Leaves no microplastics", pha: true, pla: "partial", paper: false, plastic: false },
 ];
 
@@ -88,25 +87,19 @@ export default function WhyPhaPage() {
             <p className="text-lg text-espresso/70 mt-6 max-w-lg">
               PHA — polyhydroxyalkanoate — is a biopolymer that microbes make from
               plants — and that other microbes eat when you&apos;re done with it. It&apos;s the
-              rare material that&apos;s truly compostable at home, industrially,{" "}
-              <em>and</em>{" "}in the ocean. That&apos;s why we build every cupcasa cup from it.
+              rare lining material that&apos;s certified compostable <em>at home</em>, not just in
+              an industrial facility. That&apos;s why we line every cupcasa cup with it.
             </p>
             <div className="mt-8">
               <Button href="/shop" variant="primary" size="lg">
                 Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-6">
-              {["TÜV Austria · OK Compost HOME", "TÜV Austria · OK Biodegradable MARINE"].map(
-                (t) => (
-                  <span
-                    key={t}
-                    className="inline-flex items-center gap-2 rounded-full bg-leaf/12 text-leaf px-3 py-1.5 text-xs font-bold"
-                  >
-                    {t}
-                  </span>
-                )
-              )}
+            <div className="flex flex-wrap items-center gap-2 mt-6">
+              <CertBadge size="sm" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-leaf/12 text-leaf px-3 py-1.5 text-xs font-bold">
+                {MATERIAL_SHORT}
+              </span>
             </div>
           </div>
           <div className="flex justify-center gap-4">
@@ -194,7 +187,7 @@ export default function WhyPhaPage() {
             {[
               { icon: Sprout, t: "Home compost bin", d: "Toss it in your backyard compost — it breaks down with food scraps." },
               { icon: Factory, t: "Industrial / commercial", d: "Fits standard commercial composting collection where available." },
-              { icon: Waves, t: "Worst case: it escapes", d: "Even if it ends up in waterways, PHA biodegrades — it won't linger for centuries." },
+              { icon: Leaf, t: "No microplastics", d: "The PHA lining is digested by microbes — nothing fragments into plastic that lingers for centuries." },
             ].map((c) => (
               <div key={c.t} className="bg-cream/10 rounded-3xl p-6">
                 <div className="w-12 h-12 rounded-2xl bg-leaf flex items-center justify-center mb-4">

@@ -34,7 +34,7 @@ const base: Base[] = [
     shortName: "The Espresso",
     blurb: "Perfect for espresso, cortados & small cold pours.",
     description:
-      "Our 8oz double-wall PHA cup is the everyday workhorse — sized for espresso drinks, small coffees and tasting pours. The insulated double wall keeps hands comfortable without a sleeve, and it composts at home and in the ocean.",
+      "Our 8oz double-wall PHA cup is the everyday workhorse — sized for espresso drinks, small coffees and tasting pours. The insulated double wall keeps hands comfortable without a sleeve, and it is certified home compostable.",
     bestFor: ["Espresso & cortado", "Small hot drinks", "Sampling & tastings"],
     accent: "coral",
   },
@@ -44,7 +44,7 @@ const base: Base[] = [
     shortName: "The Everyday",
     blurb: "The go-to size for lattes, drip & iced coffee.",
     description:
-      "The 12oz is the café standard — roomy enough for a proper latte or a generous drip, light enough to keep your unit economics happy. Its double wall means no sleeve needed, and it's fully PHA and certified compostable.",
+      "The 12oz is the café standard — roomy enough for a proper latte or a generous drip, light enough to keep your unit economics happy. Its double wall means no sleeve needed, and it's PHA-lined and certified home compostable.",
     bestFor: ["Lattes & cappuccinos", "Drip coffee", "Iced coffee"],
     accent: "caramel",
   },
@@ -54,7 +54,7 @@ const base: Base[] = [
     shortName: "The Big One",
     blurb: "The biggest pour — for hot lattes & large iced drinks.",
     description:
-      "Our flagship 16oz holds heat (and keeps hands comfortable) without a cardboard sleeve thanks to its double wall — less waste, lower cost, cleaner look. Built from 100% PHA for hot lattes, large iced drinks and everything in between.",
+      "Our flagship 16oz holds heat (and keeps hands comfortable) without a cardboard sleeve thanks to its double wall — less waste, lower cost, cleaner look. Paper with a PHA lining for hot lattes, large iced drinks and everything in between.",
     bestFor: ["Large lattes", "Big iced drinks", "Smoothies & cold brew"],
     accent: "leaf",
   },
@@ -80,11 +80,11 @@ function build(b: Base): Product {
     accent: b.accent,
     specs: [
       { label: "Capacity", value: `${b.oz} oz` },
-      { label: "Material", value: "100% PHA (polyhydroxyalkanoate)" },
+      { label: "Material", value: "Paper with PHA lining — no PE, no PLA, no microplastics" },
       { label: "Wall", value: "Double wall (no sleeve needed)" },
       { label: "Finish", value: "Blank / unbranded" },
       { label: "Case count", value: "1,000 cups" },
-      { label: "Certified", value: "TÜV Austria — OK Compost HOME · OK Biodegradable MARINE" },
+      { label: "Certified", value: "Home compostable — DIN CERTCO 9P0326 (TÜV Rheinland group)" },
     ],
   };
 }

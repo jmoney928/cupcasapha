@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { Leaf, Truck, Recycle, Layers } from "lucide-react";
 import { products } from "@/lib/products";
+import { CERT_SHORT, MATERIAL_SHORT } from "@/lib/certs";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Shop PHA Cups",
   description:
-    "Fully compostable, unbranded PHA cups in 8oz, 12oz and 16oz. Double wall, sold by the case of 1,000. Reserve with a $200 deposit.",
+    "Home-compostable PHA-lined paper cups in 8oz, 12oz and 16oz — DIN CERTCO certified, no PE, no PLA. Double wall, sold by the case of 1,000. Reserve with a $200 deposit.",
 };
 
 const perks = [
   { icon: Truck, text: "Ships by the case of 1,000" },
-  { icon: Leaf, text: "TÜV certified — home & marine compostable" },
-  { icon: Recycle, text: "100% plastic-free PHA" },
+  { icon: Leaf, text: CERT_SHORT },
+  { icon: Recycle, text: MATERIAL_SHORT },
   { icon: Layers, text: "Double wall — no sleeve needed" },
 ];
 
@@ -24,7 +25,7 @@ export default function ShopPage() {
         <span className="label-caps text-coral">The shop</span>
         <h1 className="font-display text-5xl sm:text-6xl mt-4">Pick your cups.</h1>
         <p className="text-lg text-espresso/70 mt-4 max-w-xl mx-auto">
-          Blank, unbranded, 100% PHA — sold by the case of 1,000. Reserve now
+          Blank, unbranded, PHA-lined paper — sold by the case of 1,000. Reserve now
           with a <strong>$200 deposit</strong> — cups arriving{" "}
           <strong>November 2026</strong>. Need volume?{" "}
           <a href="/wholesale" className="text-coral font-semibold underline">Go wholesale</a>.

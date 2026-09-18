@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { Droplets, Ban, ShieldCheck, ArrowRight, Sprout } from "lucide-react";
+import { Ban, ShieldCheck, ArrowRight, Sprout, Search, Leaf } from "lucide-react";
 import { Button, Reveal } from "@/components/ui";
 import { Speckle } from "@/components/brand";
+import { CertBadge } from "@/components/cert-badge";
+import { CERT, LINING_CERT, certVerifyUrl, MATERIAL_CLAIM } from "@/lib/certs";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
-    "PHA cups independently certified by TÜV Austria — OK Compost HOME and OK Biodegradable MARINE. Plastic-free, PFAS-free, and designed to return to nature.",
+    "PHA-lined paper cups certified home compostable by DIN CERTCO (TÜV Rheinland group), certificate 9P0326. No PE, no PLA, no microplastics.",
 };
 
 const pillars = [
@@ -16,37 +18,43 @@ const pillars = [
     text: "No industrial facility required. Certified to break down in a backyard compost, not just in theory.",
   },
   {
-    icon: Droplets,
-    title: "Marine-safe by default",
-    text: "Most ocean plastic outlives us. PHA is certified to biodegrade in seawater — no 450-year afterlife.",
+    icon: Ban,
+    title: "No PE, no PLA, no microplastics",
+    text: "The lining is PHA — a material microbes make and microbes eat — instead of a plastic film that never really goes away.",
   },
   {
-    icon: Ban,
-    title: "No plastic, no PFAS",
-    text: "No polyethylene lining, no forever chemicals — a single, home-compostable material.",
+    icon: Search,
+    title: "Verifiable, not just claimed",
+    text: `Certificate ${CERT.number} is issued by DIN CERTCO and listed on their public register. Look it up yourself.`,
   },
 ];
 
 const certs = [
   {
-    name: "TÜV Austria — OK Compost HOME",
-    body: "Independently certified to break down in home / backyard compost conditions.",
+    name: `${CERT.title} — DIN CERTCO ${CERT.number}`,
+    body: "Independently certified by DIN CERTCO (TÜV Rheinland group) to break down in home and garden compost conditions.",
     tag: "Certified",
+    href: certVerifyUrl,
+    icon: ShieldCheck,
   },
   {
-    name: "TÜV Austria — OK Biodegradable MARINE",
-    body: "Independently certified to biodegrade in marine environments.",
-    tag: "Certified",
-  },
-  {
-    name: "Plastic-free & PFAS-free",
-    body: "100% PHA — no polyethylene lining and no per-/poly-fluoroalkyl substances.",
+    name: `PHA lining material — DIN CERTCO ${LINING_CERT.number}`,
+    body: `The PHA resin itself (${LINING_CERT.holder}) holds its own registration for home and garden composting.`,
     tag: "Material",
+    href: LINING_CERT.url,
+    icon: Leaf,
   },
   {
-    name: "Plant-based",
-    body: "Brewed from renewable plant oils by microbes — not petroleum.",
+    name: MATERIAL_CLAIM,
+    body: "Paper cup, PHA lining. No polyethylene, no PLA — nothing that fragments into microplastics.",
     tag: "Material",
+    icon: Ban,
+  },
+  {
+    name: "Plant-based lining",
+    body: "PHA is brewed from renewable plant oils by microbes — not petroleum.",
+    tag: "Material",
+    icon: Sprout,
   },
 ];
 
@@ -61,10 +69,11 @@ export default function SustainabilityPage() {
             Certified to <span className="text-coral">return to nature.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            cupcasa cups are made from 100% PHA and independently certified by
-            TÜV Austria to break down — at home and in the ocean. No plastic, no PFAS,
-            nothing that lingers for centuries.
+            cupcasa cups are paper with a plant-based PHA lining, independently certified
+            home compostable by DIN CERTCO, part of the TÜV Rheinland group. No PE, no PLA,
+            no microplastics — nothing that lingers for centuries.
           </p>
+          <div className="mt-6"><CertBadge /></div>
         </div>
       </section>
 
@@ -85,17 +94,17 @@ export default function SustainabilityPage() {
         </div>
       </section>
 
-      {/* impact stat band */}
+      {/* stat band */}
       <section className="section-pad py-12">
         <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-14">
           <div className="grid sm:grid-cols-3 gap-8 text-center">
             {[
-              { v: "0%", l: "petroleum plastic in our cups" },
-              { v: "2", l: "TÜV Austria certifications" },
-              { v: "100%", l: "plant-based PHA" },
+              { v: "0%", l: "PE or PLA in the lining" },
+              { v: CERT.number, l: "DIN CERTCO certificate, home compostable" },
+              { v: "100%", l: "plant-based PHA lining" },
             ].map((s) => (
               <div key={s.l}>
-                <div className="font-display text-5xl font-extrabold text-coral">{s.v}</div>
+                <div className="font-display text-5xl font-extrabold text-coral tabular-nums">{s.v}</div>
                 <p className="text-cream/70 mt-2">{s.l}</p>
               </div>
             ))}
@@ -114,34 +123,35 @@ export default function SustainabilityPage() {
         <div className="grid sm:grid-cols-2 gap-5">
           {certs.map((c, i) => (
             <Reveal key={c.name} delay={i * 70}>
-              <div className="flex gap-4 rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6">
+              <div className="flex gap-4 rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6 h-full">
                 <div
                   className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center ${
                     c.tag === "Certified" ? "bg-leaf text-cream" : "bg-espresso/8 text-espresso"
                   }`}
                 >
-                  <ShieldCheck className="w-6 h-6" />
+                  <c.icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-display font-bold text-lg leading-tight">{c.name}</h3>
-                  </div>
+                  <h3 className="font-display font-bold text-lg leading-tight">{c.name}</h3>
                   <p className="text-espresso/65 text-sm mt-1">{c.body}</p>
-                  <span
-                    className={`inline-block mt-2 label-caps ${
-                      c.tag === "Certified" ? "text-leaf" : "text-espresso/40"
-                    }`}
-                  >
-                    {c.tag}
-                  </span>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className={`label-caps ${c.tag === "Certified" ? "text-leaf" : "text-espresso/40"}`}>{c.tag}</span>
+                    {c.href && (
+                      <a href={c.href} target="_blank" rel="noopener noreferrer" className="text-xs font-bold underline text-espresso/70 hover:text-espresso">
+                        View on the DIN CERTCO register →
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
         <p className="text-xs text-espresso/45 mt-5 max-w-2xl">
-          TÜV Austria OK Compost HOME and OK Biodegradable MARINE certifications apply to
-          the PHA cup material. Certificate numbers available on request.
+          Certificates are issued by DIN CERTCO, part of the TÜV Rheinland group, and listed on its
+          public register at{" "}
+          <a href={CERT.registerUrl} target="_blank" rel="noopener noreferrer" className="underline">dincertco.tuv.com</a>.
+          Search for {CERT.number} to see the current entry and validity date.
         </p>
       </section>
 

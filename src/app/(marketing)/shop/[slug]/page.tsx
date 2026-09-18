@@ -6,14 +6,15 @@ import {
   ArrowLeft,
   Leaf,
   Check,
-  Waves,
   Sprout,
-  Factory,
+  Ban,
+  Leaf as LeafIcon,
   PackageCheck,
 } from "lucide-react";
 import { products, getProduct } from "@/lib/products";
 import { AddToCart } from "@/components/add-to-cart";
 import { Button, Eyebrow } from "@/components/ui";
+import { CertBadge } from "@/components/cert-badge";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -40,9 +41,9 @@ const bg: Record<string, string> = {
 };
 
 const lifecycle = [
-  { icon: Sprout, label: "Home compost" },
-  { icon: Factory, label: "Industrial" },
-  { icon: Waves, label: "Marine" },
+  { icon: Sprout, label: "Home compostable" },
+  { icon: LeafIcon, label: "PHA lining" },
+  { icon: Ban, label: "No PE · no PLA" },
 ];
 
 export default async function ProductPage({
@@ -104,6 +105,8 @@ export default async function ProductPage({
                 </span>
               ))}
             </div>
+
+            <div className="mt-4"><CertBadge size="sm" /></div>
 
             <div className="my-7 h-px bg-caramel/20" />
 

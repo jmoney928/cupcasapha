@@ -4,6 +4,8 @@ import { ArrowRight, Sprout, Recycle, Leaf, Coffee, CupSoda, XCircle, CheckCircl
 import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle } from "@/components/brand";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { CertBadge } from "@/components/cert-badge";
+import { CERT, certVerifyUrl } from "@/lib/certs";
 
 const dispose = [
   {
@@ -34,17 +36,17 @@ const lifecycle = [
 ];
 
 const compare = [
-  { name: "Regular paper cup", lining: "Polyethylene plastic lining", home: false, industrial: false, marine: false, note: "Ends up in landfill — the plastic film makes it hard to recycle or compost." },
-  { name: "“Compostable” PLA cup", lining: "Corn-plastic (PLA) lining", home: false, industrial: true, marine: false, note: "Only breaks down in hot industrial composters, which most places don't have." },
-  { name: "This cup (PHA)", lining: "100% PHA — no lining at all", home: true, industrial: true, marine: true, note: "Certified for home compost, industrial compost, and even the ocean.", highlight: true },
+  { name: "Regular paper cup", lining: "Polyethylene (PE) plastic lining", home: false, industrial: false, clean: false, note: "Ends up in landfill — the plastic film makes it hard to recycle or compost." },
+  { name: "“Compostable” PLA cup", lining: "Corn-plastic (PLA) lining", home: false, industrial: true, clean: false, note: "Only breaks down in hot industrial composters, which most places don’t have." },
+  { name: "This cup (PHA)", lining: "Paper with a PHA lining — no PE, no PLA", home: true, industrial: true, clean: true, note: "Certified home compostable by DIN CERTCO. Microbes eat the lining; nothing plastic is left.", highlight: true },
 ];
 
 const faqs = [
   { q: "What is PHA?", a: "Polyhydroxyalkanoate. It's a material that microbes naturally make and store as energy, produced today by fermenting plant oils. Because it's something nature already makes, nature already knows how to take it apart." },
-  { q: "Is it safe to drink from?", a: "Yes. It's food-safe, and there's no plastic lining or PFAS (“forever chemicals”) in it, which is more than most paper cups can say." },
+  { q: "Is it safe to drink from?", a: "Yes. It’s food-safe. The lining is PHA, not polyethylene or PLA, so there’s no conventional plastic in contact with your drink." },
   { q: "Can I put it in the recycling instead?", a: "Please don't. Cups of any kind contaminate paper recycling. Compost or green bin is the right home for this one." },
   { q: "How long does it take to break down?", a: "Certified home-compost conditions: months, not centuries. Exact time depends on heat, moisture and how active your compost is." },
-  { q: "Why do you say “certified”?", a: "TÜV Austria, an independent lab, tested this exact material and awarded OK Compost HOME and OK Biodegradable MARINE. We only claim what's been tested." },
+  { q: "Why do you say “certified”?", a: "DIN CERTCO, an independent certifier in the TÜV Rheinland group, tested the cup and issued certificate 9P0326 for home compostability. The number is public, so you can check it on their register rather than take our word for it." },
   { q: "Can I get these for my café?", a: "Yes. Cups are sold by the case of 1,000, and wholesale pricing is available for volume." },
 ];
 
@@ -62,7 +64,7 @@ export default function HowItWorksPage() {
               <span className="text-coral">made to disappear.</span>
             </h1>
             <p className="text-lg text-espresso/70 mt-5 max-w-md">
-              No plastic lining. No forever chemicals. It’s made from PHA, a material
+              No PE. No PLA. No microplastics. It’s a paper cup lined with PHA, a material
               microbes make from plants, and it’s certified to compost right in a
               backyard bin.
             </p>
@@ -71,7 +73,8 @@ export default function HowItWorksPage() {
                 What do I do with it? <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
-            <p className="flex items-center gap-2 text-sm text-espresso/50 mt-6">
+            <div className="mt-6"><CertBadge /></div>
+            <p className="flex items-center gap-2 text-sm text-espresso/50 mt-4">
               <Particles className="w-6 h-4 text-coral" />
               Made for every drink. Made to disappear.
             </p>
@@ -167,7 +170,7 @@ export default function HowItWorksPage() {
               <h3 className="font-display text-xl font-extrabold">{c.name}</h3>
               <p className={`text-sm mt-1 ${c.highlight ? "text-cream/70" : "text-espresso/60"}`}>{c.lining}</p>
               <ul className="mt-4 space-y-2 text-sm">
-                {[["Home compost", c.home], ["Industrial compost", c.industrial], ["Breaks down in the ocean", c.marine]].map(([label, ok]) => (
+                {[["Home compost", c.home], ["Industrial compost", c.industrial], ["No microplastics left behind", c.clean]].map(([label, ok]) => (
                   <li key={String(label)} className="flex items-center gap-2">
                     {ok ? <CheckCircle2 className={`w-5 h-5 ${c.highlight ? "text-cream" : "text-leaf"}`} /> : <XCircle className="w-5 h-5 text-coral/70" />}
                     <span className={ok ? "" : c.highlight ? "text-cream/60" : "text-espresso/50 line-through"}>{label}</span>
@@ -179,8 +182,8 @@ export default function HowItWorksPage() {
           ))}
         </div>
         <p className="text-xs text-espresso/50 mt-4 max-w-2xl">
-          Certified by TÜV Austria: OK Compost HOME and OK Biodegradable MARINE. Marine certification
-          is about what happens if a cup escapes into the environment, not an invitation to throw it in the sea.
+          Certified home compostable by DIN CERTCO (TÜV Rheinland group), certificate{" "}
+          <a href={certVerifyUrl} target="_blank" rel="noopener noreferrer" className="underline">{CERT.number}</a>. Verify it on the public register.
         </p>
       </section>
 
@@ -234,7 +237,7 @@ export default function HowItWorksPage() {
       </section>
 
       <p className="section-pad pt-4 pb-10 text-center text-xs text-espresso/40">
-        Thanks for scanning. Now go enjoy your drink. <Link href="/sustainability" className="underline">Read the certifications →</Link>
+        Thanks for scanning. Now go enjoy your drink. <Link href="/sustainability" className="underline">Read the certification →</Link>
       </p>
     </>
   );
