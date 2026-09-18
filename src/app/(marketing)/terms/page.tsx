@@ -55,7 +55,7 @@ export default function TermsPage() {
 
       <Clause n={4} title="Compostability and environmental claims">
         <p>
-          Our cups are certified home compostable (DIN CERTCO 9P0326). However,
+          The PHA lining of our cups is certified home compostable (DIN CERTCO 9R0050). However,
           composting and biodegradation outcomes depend on real-world conditions and on local
           collection and processing infrastructure, which varies by region. Environmental statements
           describe the material&apos;s designed end-of-life behaviour and are not a guarantee of a

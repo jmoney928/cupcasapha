@@ -8,7 +8,7 @@ import { Reveal } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Shop PHA Cups",
   description:
-    "Home-compostable PHA-lined paper cups in 8oz, 12oz and 16oz — DIN CERTCO certified, no PE, no PLA. Double wall, sold by the case of 1,000. Reserve with a $200 deposit.",
+    "PHA-lined paper cups in 8oz, 12oz and 16oz — lining certified home compostable by DIN CERTCO, no PE, no PLA. Double wall, sold by the case of 1,000. Reserve with a $200 deposit.",
 };
 
 const perks = [

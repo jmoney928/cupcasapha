@@ -3,7 +3,7 @@ import { ShieldCheck, ExternalLink } from "lucide-react";
 import { CERT, certVerifyUrl } from "@/lib/certs";
 
 /**
- * "Certified home compostable — DIN CERTCO 9P0326", linked to the public register.
+ * "Home-compostable lining · DIN CERTCO 9R0050", linked straight to the public register entry.
  * Shows the DIN-Geprüft mark once CERT.logoSrc is set; a shield icon stands in until then.
  */
 export function CertBadge({ variant = "light", size = "md" }: { variant?: "light" | "dark"; size?: "sm" | "md" }) {
@@ -24,7 +24,7 @@ export function CertBadge({ variant = "light", size = "md" }: { variant?: "light
         <ShieldCheck style={{ width: icon, height: icon }} className="shrink-0" />
       )}
       <span>
-        {CERT.title} · DIN CERTCO <span className="tabular-nums">{CERT.number}</span>
+        {CERT.short} · DIN CERTCO <span className="tabular-nums">{CERT.number}</span>
       </span>
       <ExternalLink className="w-3.5 h-3.5 opacity-60" aria-hidden />
     </a>
