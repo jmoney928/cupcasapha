@@ -127,3 +127,29 @@ It stubs the tiny bit of Supabase the migrations depend on (`auth.users`, `auth.
 - admins can; the audit log records actor and role;
 - `anon` has no access;
 - delivering an order adds stock and advances the linked reorder; the engine suggests correct case counts and never duplicates an open reorder.
+
+### Reorder engine and cron (step 5)
+
+The maths lives in Postgres (`refresh_cafe_stock`, `run_reorder_engine`, `expire_sms_prompts`); the side effects
+live in the app:
+
+| Route | Schedule (pg_cron, UTC) | What it does |
+| --- | --- | --- |
+| `POST /api/cron/nightly` | 07:15 daily | expire unanswered texts → suggest reorders → auto-ship cafés are charged, SMS cafés get one approval text, others wait in the queue → any approved reorders go to payment |
+| `POST /api/cron/weekly-count` | Mon 13:00 | texts opted-in cafés one size at a time: "roughly how many sleeves…" |
+
+Both require `Authorization: Bearer $CRON_SECRET`. pg_cron sends it via Vault (see `0004_cron.sql`); Vercel Cron
+sends the same header automatically when `CRON_SECRET` is set. Staff can also press **Run nightly now** and
+**Send count texts** on `/admin`.
+
+Payment (`src/lib/stripe/charge.ts`): card cafés → off-session PaymentIntent on the saved card; declines or
+authentication-required → the reorder is marked `failed`, a 24-hour hosted payment link is created and texted,
+and it shows under *Failed payments*. Net-30 cafés → a Stripe Invoice with 30-day terms. Without
+`STRIPE_SECRET_KEY` the reorder stays `approved` and staff record payment with *Create order*.
+
+Local test without Twilio/Stripe:
+
+```bash
+npm run seed
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/nightly
+```

@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireStaff, requireAdmin } from "@/lib/auth/admin-context";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { publicEnv } from "@/lib/env";
+import { publicEnv, stripeConfigured } from "@/lib/env";
+import { processReorderPayment } from "@/lib/stripe/charge";
+import { createOrderFromReorder, loadReorder } from "@/lib/orders";
+import { runNightly } from "@/lib/engine/nightly";
+import { runWeeklyCount } from "@/lib/engine/weekly-count";
 
 const uuid = z.string().uuid();
 type Msg = { ok?: string; error?: string };
@@ -117,34 +121,59 @@ export async function staffRespondReorder(formData: FormData) {
   const { error } = await supabase.rpc("respond_to_reorder", { p_reorder: p.data.reorder_id, p_approve: p.data.decision === "approve", p_via: "staff" });
   if (error) flash(p.data.back, { error: error.message });
   await supabase.rpc("audit_event", { p_action: p.data.decision === "approve" ? "reorder.approved_on_behalf" : "reorder.declined_on_behalf", p_entity: "reorders", p_entity_id: p.data.reorder_id, p_diff: undefined });
+  if (p.data.decision === "decline") { revalidatePath("/admin", "layout"); flash(p.data.back, { ok: "Declined (logged)." }); }
+
+  // approved → straight to payment when Stripe is configured
+  if (stripeConfigured()) {
+    const res = await processReorderPayment(createAdminClient(), p.data.reorder_id, "staff");
+    revalidatePath("/admin", "layout");
+    if (res.ok) flash("/admin/fulfillment", { ok: res.kind === "charged" ? "Approved and charged. Order queued for shipping." : "Approved and invoiced (net 30). Order queued for shipping." });
+    flash(p.data.back, { error: `Approved, but payment failed (${res.reason}). ${res.paymentLink ? "A payment link was created for the café." : ""}` });
+  }
   revalidatePath("/admin", "layout");
-  flash(p.data.back, { ok: p.data.decision === "approve" ? "Approved on the café's behalf (logged)." : "Declined (logged)." });
+  flash(p.data.back, { ok: "Approved on the café's behalf (logged). Stripe isn't configured, so use 'Create order' to record payment manually." });
 }
 
 /**
- * Turn an approved reorder into an order. Card charging / Stripe invoicing is wired in step 6;
- * until then this creates the order as paid (card) or invoiced (net30) so fulfilment can be tested.
+ * Takes an approved reorder to an order. With Stripe configured this charges the card / sends the
+ * invoice; without it, the order is recorded as paid (card) or invoiced (net30) for manual handling.
  */
 export async function fulfillReorder(formData: FormData) {
   const { supabase, user } = await requireStaff();
   const p = z.object({ reorder_id: uuid, back: z.string().startsWith("/").default("/admin/reorders") }).safeParse(Object.fromEntries(formData));
   if (!p.success) flash("/admin/reorders", { error: "Invalid request." });
-  const { data: r } = await supabase.from("reorders").select("*, cafe:cafes(*), product:products(*)").eq("id", p.data.reorder_id).single();
-  if (!r || !r.cafe || !r.product) flash(p.data.back, { error: "Reorder not found." });
+  const admin = createAdminClient();
+  const r = await loadReorder(admin, p.data.reorder_id).catch(() => null);
+  if (!r) flash(p.data.back, { error: "Reorder not found." });
   if (r.status !== "approved") flash(p.data.back, { error: `Reorder is ${r.status}, not approved.` });
 
-  const status = r.cafe.payment_terms === "net30" ? "invoiced" : "paid";
-  const { data: order, error } = await supabase.from("orders").insert({
-    cafe_id: r.cafe_id, reorder_id: r.id, status,
-    subtotal_cents: r.subtotal_cents, tax_cents: r.tax_cents, total_cents: r.amount_cents,
-    ship_to: { name: r.cafe.name, address_line1: r.cafe.address_line1, address_line2: r.cafe.address_line2, city: r.cafe.city, province: r.cafe.province, postal_code: r.cafe.postal_code },
-    created_by: user.id,
-  }).select("id").single();
-  if (error) flash(p.data.back, { error: error.message });
-  await supabase.from("order_items").insert({ order_id: order!.id, product_id: r.product_id, cases: r.cases, units: r.cases * r.product.units_per_case, unit_price_cents: r.product.price_per_case_cents, line_total_cents: r.subtotal_cents });
-  await supabase.from("reorders").update({ status: r.cafe.payment_terms === "net30" ? "invoiced" : "charged" }).eq("id", r.id);
+  if (stripeConfigured()) {
+    const res = await processReorderPayment(admin, r.id, "staff");
+    revalidatePath("/admin", "layout");
+    if (!res.ok) flash(p.data.back, { error: `Payment failed: ${res.reason}. ${res.paymentLink ? "A payment link was created for the café." : ""}` });
+    redirect(`/admin/fulfillment?ok=${encodeURIComponent(res.kind === "charged" ? "Charged and queued for shipping." : "Invoiced (net 30) and queued for shipping.")}`);
+  }
+  await createOrderFromReorder(admin, r, { status: r.cafe.payment_terms === "net30" ? "invoiced" : "paid", created_by: user.id });
+  await supabase.rpc("audit_event", { p_action: "order.created_manually", p_entity: "reorders", p_entity_id: r.id, p_diff: undefined });
   revalidatePath("/admin", "layout");
-  redirect(`/admin/fulfillment?ok=${encodeURIComponent("Order created and queued for shipping.")}`);
+  redirect(`/admin/fulfillment?ok=${encodeURIComponent("Order created (recorded manually — Stripe not configured) and queued for shipping.")}`);
+}
+
+/* ----------------------------- engine (staff) ----------------------------- */
+export async function runNightlyNow() {
+  const { supabase } = await requireStaff();
+  const s = await runNightly();
+  await supabase.rpc("audit_event", { p_action: "engine.nightly_run_manually", p_entity: "cron_runs", p_entity_id: "manual", p_diff: s as unknown as undefined });
+  revalidatePath("/admin", "layout");
+  flash("/admin", s.errors.length ? { error: `Nightly ran with errors: ${s.errors.join("; ")}` } : { ok: `Nightly ran: ${s.reorders_created} suggested, ${s.sms_sent} texts, ${s.auto_charged} charged, ${s.invoiced} invoiced, ${s.payment_failed} failed, ${s.awaiting_stripe} awaiting manual payment, ${s.left_suggested} left for manual follow-up.` });
+}
+
+export async function runWeeklyCountNow() {
+  const { supabase } = await requireStaff();
+  const s = await runWeeklyCount();
+  await supabase.rpc("audit_event", { p_action: "engine.weekly_count_run_manually", p_entity: "cron_runs", p_entity_id: "manual", p_diff: s as unknown as undefined });
+  revalidatePath("/admin", "layout");
+  flash("/admin", s.errors.length ? { error: `Weekly count ran with errors: ${s.errors.join("; ")}` } : { ok: `Weekly count: ${s.sms_sent} texts sent to ${s.cafes} cafés${s.skipped.length ? ` (skipped: ${s.skipped.join(", ")})` : ""}.` });
 }
 
 /* ----------------------------- fulfilment (staff) ----------------------------- */

@@ -8,6 +8,7 @@ import { CAFE_COOKIE, getPortalContext } from "@/lib/auth/cafe-context";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripeConfigured, publicEnv } from "@/lib/env";
 import { createBillingPortalSession, createCardSetupSession } from "@/lib/stripe/customers";
+import { processReorderPayment } from "@/lib/stripe/charge";
 
 const uuid = z.string().uuid();
 type Msg = { ok?: string; error?: string };
@@ -53,9 +54,8 @@ export async function requestReorder(formData: FormData) {
   const { supabase } = await ctxFor(p.data.cafe_id);
   const { data, error } = await supabase.rpc("request_reorder", { p_cafe: p.data.cafe_id, p_product: p.data.product_id, p_cases: p.data.cases });
   if (error) back("/portal", { error: error.message });
-  // Payment happens in the reorder pipeline (step 6). Until then the request sits as "approved" for staff.
   revalidatePath("/portal", "layout");
-  redirect(`/portal/reorders?ok=${encodeURIComponent(`Reorder for ${data!.cases} case${data!.cases > 1 ? "s" : ""} placed. We'll confirm shortly.`)}`);
+  await settlePayment(data!.id, `Reorder for ${data!.cases} case${data!.cases > 1 ? "s" : ""} placed.`);
 }
 
 const respondSchema = z.object({ reorder_id: uuid, decision: z.enum(["approve", "decline"]) });
@@ -66,7 +66,18 @@ export async function respondReorder(formData: FormData) {
   const { error } = await supabase.rpc("respond_to_reorder", { p_reorder: p.data.reorder_id, p_approve: p.data.decision === "approve", p_via: "portal" });
   if (error) back("/portal/reorders", { error: error.message });
   revalidatePath("/portal", "layout");
-  back("/portal/reorders", { ok: p.data.decision === "approve" ? "Approved. We'll process your order." : "Skipped. We'll check in again in a week." });
+  if (p.data.decision === "decline") back("/portal/reorders", { ok: "Skipped. We'll check in again in a week." });
+  await settlePayment(p.data.reorder_id, "Approved.");
+}
+
+/** After an in-app approval: charge the saved card / send the invoice right away. Declines go to a hosted payment page. */
+async function settlePayment(reorderId: string, prefix: string): Promise<never> {
+  if (!stripeConfigured()) back("/portal/reorders", { ok: `${prefix} We'll confirm your order shortly.` });
+  const res = await processReorderPayment(createAdminClient(), reorderId, "portal");
+  revalidatePath("/portal", "layout");
+  if (res.ok) back("/portal/reorders", { ok: res.kind === "charged" ? `${prefix} Your card was charged and the order is being prepared.` : `${prefix} An invoice is on its way to your email (net 30) and the order is being prepared.` });
+  if (res.paymentLink) redirect(res.paymentLink);
+  back("/portal/reorders", { error: `${prefix} We couldn't take payment (${res.reason}). Please add or update your card in Settings and approve again.` });
 }
 
 const settingsSchema = z.object({

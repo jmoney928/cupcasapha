@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth/admin-context";
-import { StatTile, Card, Badge, EmptyState, PageHeader } from "@/components/app/ui";
+import { StatTile, Card, Badge, EmptyState, PageHeader, Flash } from "@/components/app/ui";
+import { SubmitButton } from "@/components/app/submit-button";
+import { runNightlyNow, runWeeklyCountNow } from "./actions";
 import { cad, num, daysOfCover, sizeLabel, relative, startOfMonthIso } from "@/lib/format";
 
 export const metadata = { title: "Overview" };
 
-export default async function AdminOverview() {
+export default async function AdminOverview({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const sp = await searchParams;
   const { supabase } = await requireStaff();
 
   const [atRisk, awaiting, failed, toShip, revenue, lastRun] = await Promise.all([
@@ -22,9 +25,18 @@ export default async function AdminOverview() {
 
   return (
     <>
-      <PageHeader title="Overview">
-        {lastRun.data ? `Last engine run ${relative(lastRun.data.started_at)}${lastRun.data.error ? " (failed)" : ""}` : "Engine has not run yet."}
+      <PageHeader
+        title="Overview"
+        action={
+          <>
+            <form action={runNightlyNow}><SubmitButton size="sm" variant="dark" confirm="Run the nightly reorder engine now? This may text cafés and charge cards.">Run nightly now</SubmitButton></form>
+            <form action={runWeeklyCountNow}><SubmitButton size="sm" variant="outline" confirm="Send the weekly stock-count texts now?">Send count texts</SubmitButton></form>
+          </>
+        }
+      >
+        {lastRun.data ? `Last engine run (${lastRun.data.job}) ${relative(lastRun.data.started_at)}${lastRun.data.error ? " — with errors" : ""}` : "Engine has not run yet."}
       </PageHeader>
+      <Flash ok={sp.ok} error={sp.error} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <StatTile label="At risk of stockout" value={risk.length} tone={risk.length ? "red" : "green"} href="/admin/cafes" />
         <StatTile label="Awaiting approval" value={awaiting.data?.length ?? 0} tone={awaiting.data?.length ? "amber" : "default"} href="/admin/reorders?status=pending" />

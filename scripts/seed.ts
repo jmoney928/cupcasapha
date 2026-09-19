@@ -46,6 +46,8 @@ async function main() {
     { sku: "PHA-12", name: "12oz PHA Cup", size_oz: 12, printed: false, price_per_case_cents: 22000, sort_order: 2 },
     { sku: "PHA-16", name: "16oz PHA Cup", size_oz: 16, printed: false, price_per_case_cents: 24000, sort_order: 3 },
   ];
+  // retire SKUs that are no longer part of the seed (e.g. old printed variants)
+  await db.from("products").update({ active: false }).not("sku", "in", `(${skus.map((s) => `"${s.sku}"`).join(",")})`);
   const { data: products, error: pErr } = await db.from("products").upsert(skus.map((s) => ({ ...s, units_per_case: 1000, units_per_sleeve: 50, active: true })), { onConflict: "sku" }).select("id, sku");
   fail(pErr, "products");
   const P = Object.fromEntries(products!.map((p) => [p.sku, p.id]));
@@ -53,6 +55,7 @@ async function main() {
   console.log("▸ cafés (replacing previous seed)");
   const names = ["Northside Roasters", "Bloom Café", "Common Grounds"];
   const { data: old } = await db.from("cafes").select("id").in("name", names);
+  await db.from("sms_messages").delete().like("twilio_sid", "SMseed%");
   if (old?.length) {
     const ids = old.map((c) => c.id);
     await db.from("orders").delete().in("cafe_id", ids);
