@@ -29,6 +29,7 @@ const cols = [
     links: [
       { href: "/why-pha", label: "The material" },
       { href: "/sustainability", label: "Sustainability" },
+      { href: "/find-us", label: "Find us" },
       { href: "/about", label: "About cupcasa" },
     ],
   },

@@ -10,6 +10,8 @@ const LABELS: Record<string, string> = {
   volume: "Estimated volume",
   sizes: "Sizes of interest",
   printing: "Custom printing",
+  cafe: "Café to nominate",
+  cafe_city: "Café city",
   message: "Message",
 };
 
