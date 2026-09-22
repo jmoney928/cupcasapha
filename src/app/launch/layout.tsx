@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   title: "For Cafés",
   description:
     "The first certified home-compostable, microplastic-free coffee cup in Canada. 98% of Victoria coffee drinkers surveyed said they'd pay more for it. Become a launch café.",
-  alternates: { canonical: "https://cupcasa.com/for-cafes" },
+  alternates: { canonical: "https://cupcasa.com/launch" },
   openGraph: {
     title: "98% of coffee drinkers said they'd pay more for this cup. | Cup Casa",
     description: "Certified home-compostable, microplastic-free cups. Become a Victoria launch café.",
-    url: "https://cupcasa.com/for-cafes",
+    url: "https://cupcasa.com/launch",
   },
 };
 
