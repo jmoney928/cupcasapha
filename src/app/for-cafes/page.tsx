@@ -108,9 +108,9 @@ export default function ForCafesPage() {
           <p className={s.lede}>We’re placing the first container with a small group of launch cafés. Spots are limited to what’s on the boat.</p>
           <div className={s.pricing}>
             <div>
-              <div className={s.priceRow}><div className={s.size}><b>8oz</b> <span>· The Espresso</span></div><div className={s.case}>$100 / case of 500</div><div className={s.per}>20¢</div></div>
-              <div className={s.priceRow}><div className={s.size}><b>12oz</b> <span>· The Everyday</span></div><div className={s.case}>$110 / case of 500</div><div className={s.per}>22¢</div></div>
-              <div className={s.priceRow}><div className={s.size}><b>16oz</b> <span>· The Big One</span></div><div className={s.case}>$120 / case of 500</div><div className={s.per}>24¢</div></div>
+              <div className={s.priceRow}><div className={s.size}><b>8oz</b> <span>· The Espresso</span></div><div className={s.case}>$200 / case of 1,000</div><div className={s.per}>20¢</div></div>
+              <div className={s.priceRow}><div className={s.size}><b>12oz</b> <span>· The Everyday</span></div><div className={s.case}>$220 / case of 1,000</div><div className={s.per}>22¢</div></div>
+              <div className={s.priceRow}><div className={s.size}><b>16oz</b> <span>· The Big One</span></div><div className={s.case}>$240 / case of 1,000</div><div className={s.per}>24¢</div></div>
               <p className={s.note}>Prices in CAD before tax. We deliver to your café.</p>
             </div>
             <div>
