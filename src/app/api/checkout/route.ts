@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     "http://localhost:3000";
 
   // Flat $200 reservation deposit — regardless of sizes/quantities in the cart.
-  // Cups are arriving November 2026; the balance is settled when they ship.
+  // Cups are arriving December 2026; the balance is settled when they ship.
   const DEPOSIT_CAD = 200;
 
   const reserved = items
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
         unit_amount: DEPOSIT_CAD * 100,
         product_data: {
           name: "cupcasa — Reservation Deposit",
-          description: `$${DEPOSIT_CAD} deposit to reserve your order. Cups arriving November 2026.${
+          description: `$${DEPOSIT_CAD} deposit to reserve your order. Cups arriving December 2026.${
             reserved ? ` Reserving: ${reserved}.` : ""
           }`,
         },
