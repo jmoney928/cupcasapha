@@ -218,7 +218,7 @@ export default function Home() {
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
-              <span className="label-caps text-coral">Reserve now · shipping Nov 2026</span>
+              <span className="label-caps text-coral">Reserve now · shipping Dec 2026</span>
               <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3">
                 Three sizes. One deposit.
               </h2>

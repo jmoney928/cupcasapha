@@ -65,7 +65,7 @@ export function AddToCart({ product }: { product: Product }) {
         )}
       </button>
       <p className="text-xs text-espresso/60 text-center">
-        Reserve today with a <strong>$200 deposit</strong> — cups arriving November 2026.
+        Reserve today with a <strong>$200 deposit</strong> — cups arriving December 2026.
       </p>
     </div>
   );
