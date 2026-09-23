@@ -23,7 +23,7 @@ export default function ForCafesPage() {
         <div className={s.wrap}>
           <div className={s.eyebrow}>For cafés · Made to disappear</div>
           <h1>98% of coffee drinkers said they’d pay more for this cup.<span className={s.accent}>Most cafés can’t offer it yet.</span></h1>
-          <p className={s.lede}>Cup Casa is a Victoria company bringing the first certified home-compostable, microplastic-free coffee cup to Canada. We hold the exclusive Canadian rights, our first container lands in November, and we’re choosing a small group of launch cafés to serve it first.</p>
+          <p className={s.lede}>Cup Casa is a Victoria company bringing the first certified home-compostable, microplastic-free coffee cup to Canada. We hold the exclusive Canadian rights, our first container lands in December, and we’re choosing a small group of launch cafés to serve it first.</p>
           <div className={s.ctas}>
             <a className={`${s.btn} ${s.btnCoral}`} href="#contact">Become a launch café</a>
             <a className={`${s.btn} ${s.btnGhost}`} href="#pricing">See pricing</a>
@@ -131,7 +131,7 @@ export default function ForCafesPage() {
             <div className={s.step}><h4>1. Meet</h4><p>15 minutes at your café, whenever works for you.</p></div>
             <div className={s.step}><h4>2. Sample</h4><p>We bring cups and lids for you to hold, fill, and try.</p></div>
             <div className={s.step}><h4>3. Reserve</h4><p>A $100 deposit holds your first case and comes off your order.</p></div>
-            <div className={s.step}><h4>4. Receive</h4><p>Cups land in November and we deliver them to you.</p></div>
+            <div className={s.step}><h4>4. Receive</h4><p>Cups land in December and we deliver them to you.</p></div>
           </div>
           <div className={s.ctas}>
             <a className={`${s.btn} ${s.btnCoral}`} href="#contact">Become a launch café</a>
