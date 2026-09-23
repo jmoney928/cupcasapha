@@ -153,3 +153,23 @@ Local test without Twilio/Stripe:
 npm run seed
 curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/nightly
 ```
+
+### SMS and payment webhooks (step 6)
+
+| Webhook | Verification | Handles |
+| --- | --- | --- |
+| `POST /api/webhooks/twilio` | `X-Twilio-Signature` (HMAC-SHA1 of URL + sorted params) | YES / NO / a number / STOP / START / HELP; anything else is flagged in the admin inbox |
+| `POST /api/webhooks/stripe` | `stripe-signature` | `payment_intent.succeeded` / `.payment_failed`, `checkout.session.completed` (card saved + recovery links), `invoice.paid` / `.payment_failed`, plus the existing marketing order email |
+
+Both are idempotent: Twilio replays are matched on `MessageSid` (unique in `sms_messages`), Stripe replays on
+`event.id` (`stripe_events` table). The Twilio route always answers 200 with empty TwiML once the signature is
+valid, so a retry can never double-charge; replies go out through the REST API and are recorded like any other
+message. Behind a proxy, set `TWILIO_WEBHOOK_URL` to the exact public URL Twilio calls.
+
+**What a YES does:** approves every reorder in the open prompt → charges the saved card (or sends the net-30
+invoice) → texts a confirmation. A decline or authentication-required reply texts a 24-hour payment link instead
+and flags the reorder under *Failed payments*.
+
+**Local testing without a Twilio account:** set `TWILIO_DRY_RUN=1` and messages are recorded in `sms_messages`
+and logged to the console instead of being sent. `scripts/dev-session-cookie.mjs` signs in as a seeded user for
+curl-based checks.

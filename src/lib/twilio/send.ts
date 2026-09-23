@@ -13,6 +13,16 @@ export async function sendSms(db: SupabaseClient<Database>, cafeId: string, body
   if (!cafe?.phone) throw new Error("Café has no phone number");
   if (!env.TWILIO_ACCOUNT_SID || !env.TWILIO_AUTH_TOKEN) throw new Error("Twilio not configured");
 
+  // Local development: record the message without calling Twilio. Never set this in production.
+  if (process.env.TWILIO_DRY_RUN === "1") {
+    const { data } = await db.from("sms_messages").insert({
+      cafe_id: cafe.id, direction: "outbound", from_phone: env.TWILIO_FROM_NUMBER ?? "dry-run", to_phone: cafe.phone,
+      body, twilio_sid: `DRYRUN${crypto.randomUUID().replace(/-/g, "").slice(0, 26)}`, status: "dry_run",
+    }).select("id").single();
+    console.info(`[sms dry-run → ${cafe.phone}] ${body}`);
+    return data!.id;
+  }
+
   const params = new URLSearchParams({ To: cafe.phone, Body: body });
   if (env.TWILIO_MESSAGING_SERVICE_SID) params.set("MessagingServiceSid", env.TWILIO_MESSAGING_SERVICE_SID);
   else if (env.TWILIO_FROM_NUMBER) params.set("From", env.TWILIO_FROM_NUMBER);

@@ -37,7 +37,5 @@ export const shippedSms = (o: { order_number: string; carrier: string | null; tr
 export const helpSms = () =>
   `Cup Casa cup replenishment. Reply YES/NO to a reorder text, or a number to a stock check. STOP to opt out. Questions: hello@cupcasa.com`;
 
-export const stopSms = () => `You're opted out of Cup Casa texts. Reply START to opt back in.`;
-
 export const unrecognizedSms = () =>
   `Sorry, we didn't catch that. Reply YES or NO to a reorder text, or a number for a stock check. Reply HELP for options.`;

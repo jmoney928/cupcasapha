@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { handlePortalStripeEvent, PORTAL_EVENTS } from "@/lib/stripe/handlers";
 
 // Stripe needs the raw request body to verify the signature.
 export const dynamic = "force-dynamic";
@@ -29,17 +31,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    try {
-      await notifyOrder(stripe, session);
-    } catch (err) {
-      // Don't make Stripe retry forever over an email hiccup — log and ack.
-      console.error("Order notification failed:", err);
-    }
+  // Idempotency: record the event id first; a replay short-circuits here.
+  const db = createAdminClient();
+  const { error: claimErr } = await db.from("stripe_events").insert({ id: event.id, type: event.type });
+  if (claimErr) {
+    if (claimErr.code === "23505") return NextResponse.json({ received: true, duplicate: true });
+    console.error("stripe_events insert failed:", claimErr.message); // keep processing rather than drop the event
   }
 
-  return NextResponse.json({ received: true });
+  const notes: string[] = [];
+  try {
+    if (PORTAL_EVENTS.has(event.type)) notes.push(await handlePortalStripeEvent(event));
+
+    // Marketing-site checkout (no reorder metadata) still emails the team.
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      if (!session.metadata?.reorder_id && session.mode !== "setup") {
+        try {
+          await notifyOrder(stripe, session);
+          notes.push("order email sent");
+        } catch (err) {
+          // Don't make Stripe retry forever over an email hiccup — log and ack.
+          console.error("Order notification failed:", err);
+        }
+      }
+    }
+    await db.from("stripe_events").update({ processed_at: new Date().toISOString() }).eq("id", event.id);
+  } catch (err) {
+    const message = (err as Error).message;
+    console.error("stripe webhook handler failed:", message);
+    await db.from("stripe_events").update({ error: message }).eq("id", event.id);
+    return NextResponse.json({ error: "handler failed" }, { status: 500 }); // let Stripe retry
+  }
+
+  return NextResponse.json({ received: true, notes });
 }
 
 async function notifyOrder(stripe: Stripe, session: Stripe.Checkout.Session) {

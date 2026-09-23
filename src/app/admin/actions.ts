@@ -10,6 +10,9 @@ import { processReorderPayment } from "@/lib/stripe/charge";
 import { createOrderFromReorder, loadReorder } from "@/lib/orders";
 import { runNightly } from "@/lib/engine/nightly";
 import { runWeeklyCount } from "@/lib/engine/weekly-count";
+import { twilioConfigured } from "@/lib/env";
+import { sendSms } from "@/lib/twilio/send";
+import { shippedSms } from "@/lib/twilio/templates";
 
 const uuid = z.string().uuid();
 type Msg = { ok?: string; error?: string };
@@ -181,11 +184,26 @@ export async function markShipped(formData: FormData) {
   const { supabase } = await requireStaff();
   const p = z.object({ order_id: uuid, carrier: z.string().trim().max(60), tracking_number: z.string().trim().min(1).max(80) }).safeParse(Object.fromEntries(formData));
   if (!p.success) flash("/admin/fulfillment", { error: "Tracking number is required." });
-  const { error } = await supabase.from("orders").update({ status: "shipped", carrier: p.data.carrier || null, tracking_number: p.data.tracking_number }).eq("id", p.data.order_id);
-  if (error) flash("/admin/fulfillment", { error: error.message });
-  // The "shipped" SMS to the café is sent by the Twilio module (step 6).
+  const { data: order, error } = await supabase
+    .from("orders")
+    .update({ status: "shipped", carrier: p.data.carrier || null, tracking_number: p.data.tracking_number })
+    .eq("id", p.data.order_id)
+    .select("order_number, carrier, tracking_number, cafe:cafes(id, sms_opt_in, phone)")
+    .single();
+  if (error || !order) flash("/admin/fulfillment", { error: error?.message ?? "Order not found." });
+
+  // Tell the café it's on the way (best effort — never block the status change on Twilio).
+  let note = "Marked shipped.";
+  if (order.cafe?.sms_opt_in && order.cafe.phone && twilioConfigured()) {
+    try {
+      await sendSms(createAdminClient(), order.cafe.id, shippedSms(order));
+      note = "Marked shipped and texted the café their tracking number.";
+    } catch (e) {
+      note = `Marked shipped, but the text failed: ${(e as Error).message}`;
+    }
+  }
   revalidatePath("/admin", "layout");
-  flash("/admin/fulfillment", { ok: "Marked shipped." });
+  flash("/admin/fulfillment", { ok: note });
 }
 
 export async function markDelivered(formData: FormData) {
