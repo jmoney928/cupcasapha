@@ -78,78 +78,12 @@ page and the PDF reframe rather than printing a red number. The arithmetic is ne
 Preview the PDF while editing the template (development only):
 `/api/dev/pdf/roi` and `/api/dev/pdf/roi-loss`.
 
-### Module 5 — Compliance Center: WorkSafe binder ✅
+### Modules 5–7 — moved into the portal
 
-Gated asset at `/compliance`. Works with zero customers and no database.
+The WHMIS binder, claims kit, bin signage, health self-audit, grants list and brand kit generator are
+Cup Casa OS tools, not public lead magnets: they come with the cups and are never sold separately.
+They live on the `portal-admin` branch at `/portal/tools/*`, with their API routes behind a session.
 
-| Piece | Where |
-| --- | --- |
-| SDS registry (JSON, not PDFs) | `content/sds/registry.json` |
-| Registry loader, BC 3-year review rule | `src/lib/compliance/sds.ts` |
-| Café hazards + orientation topics | `src/lib/compliance/hazards.ts` |
-| Mandatory disclaimer | `src/lib/compliance/disclaimer.ts` |
-| Binder PDF (9 sections) | `src/lib/pdf/worksafe-binder.tsx` |
-| QR generation | `src/lib/compliance/binder.ts` |
-| Generate + email (gated) | `src/app/api/compliance/binder/route.tsx` |
-| Nightly link check | `src/app/api/cron/sds-check/route.ts`, scheduled in `vercel.json` |
-
-**Sheets are indexed, never mirrored.** Each product carries the manufacturer's SDS page, plus a direct
-link only where a human has confirmed it is the sheet for that exact product. Products we can't link
-(bleach, sanitizer, dish detergent — brand varies by café) still appear on the hazard inventory, with
-a line telling the café who to ask. They never see a dead link: broken ones alert us, not them.
-
-**The BC three-year review rule** is the hook. Every binder is stamped with its own review date.
-
-### Module 6 — Compliance Center: claims, signage, health, grants ✅
-
-All four live on the same page, under one sentence: the paperwork a café is supposed to have.
-
-| Tool | Route | Notes |
-| --- | --- | --- |
-| WHMIS binder | `POST /api/compliance/binder` | 9 sections, QR-coded SDS index |
-| Claims & greenwashing kit | `POST /api/compliance/claims` | approved language, claims to avoid, substantiation page |
-| Bin signage | `POST /api/compliance/signage` | BOH poster, bin decals, staff briefing |
-| Health self-audit | `POST /api/compliance/audit` | Island Health / BC Food Premises walk-round |
-| Grants | rendered on the page | `content/grants.json`, auto-hidden after two unverified quarters |
-
-Content and data live in `content/` and `src/lib/compliance/`; PDF templates share `src/lib/pdf/theme.ts`.
-Each document carries the disclaimer that actually applies to it (`DISCLAIMERS` in
-`src/lib/compliance/disclaimer.ts`), not one generic line.
-
-**The bin signage tells the truth about the green bin.** The CRD organics programme does not accept
-compostable containers, so the signage says to compost at home and explicitly not to use the green
-bin. Claiming otherwise would be a greenwashing exposure for Cup Casa, not just the café.
-
-**Nothing asserts a per-municipality accept list.** `content/municipalities.json` carries verified
-municipal links and the regional position; we don't restate rules we can't keep current.
-
-Preview without filling the form (development only): `/api/dev/pdf/binder`.
-
-⚠️ **Before any of this is promoted**: the WorkSafe content needs a BC safety consultant's review pass
-and the claims kit needs a lawyer's, both recorded per the spec's `content_versions.reviewed_by`.
-The page says so in plain language today.
-
-### Module 7 — Brand kit generator ✅
-
-`/brand`. Upload a logo, pick a colour and one of six templates, download the set. Stateless: nothing
-is stored, so account #100 costs no more labour than account #1.
-
-| Piece | Where |
-| --- | --- |
-| Logo analysis (resolution, palette, mono) | `src/lib/brand/analyze.ts` — sharp |
-| Six templates | `src/lib/brand/templates.tsx` |
-| JSX → SVG → PNG | `src/lib/brand/render.ts` — satori + resvg, no headless browser |
-| Print pieces at trim with bleed + crop marks | `src/lib/pdf/brand-print.tsx` |
-| Dielines as data | `src/lib/brand/dielines.ts` |
-| Upload / generate | `src/app/api/brand/analyze`, `src/app/api/brand/kit` (ZIP) |
-
-Ships: three Instagram assets, a menu chip, window decal, till card, A-frame poster, and the
-single-colour logo — zipped with a README naming each trim size.
-
-**Sleeves are deliberately absent.** A sleeve has its own trim, seam allowance and cone warp.
-`DIELINES.sleeve12.confirmed` is `false` until the supplier sends theirs in writing; generating
-against a guessed dieline is how you print 5,000 unusable sleeves. Set the numbers and flip the flag
-and the template slots in.
-
-`satori`, `sharp` and `@resvg/resvg-js` are in `serverExternalPackages` — Turbopack can't bundle the
-native binaries or the harfbuzz wasm.
+The public site keeps the overview at `/os` and the switch calculator at `/calculator` — the spec is
+explicit that the calculator stays public and indexable, because it is the tool that closes deals
+before anyone is a customer. `/compliance` and `/brand` redirect to `/os`.

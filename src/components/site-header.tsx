@@ -12,8 +12,7 @@ const nav = [
   { href: "/why-pha", label: "The Material" },
   { href: "/sustainability", label: "Sustainability" },
   { href: "/calculator", label: "Calculator" },
-  { href: "/compliance", label: "Free binder" },
-  { href: "/brand", label: "Brand kit" },
+  { href: "/os", label: "Cup Casa OS" },
   { href: "/wholesale", label: "Custom & Wholesale" },
   { href: "/about", label: "About" },
 ];
