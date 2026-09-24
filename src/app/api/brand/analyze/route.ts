@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/auth/api-guard";
+
 import { analyzeLogo } from "@/lib/brand/analyze";
 
 export const runtime = "nodejs";
@@ -10,6 +12,9 @@ const ACCEPTED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "app
 
 /** Upload a logo, get back a palette, a print-readiness verdict and a mono version. */
 export async function POST(request: Request) {
+  if (!(await requireApiSession())) {
+    return NextResponse.json({ error: "Cup Casa OS is included with cup orders. Sign in to use it." }, { status: 401 });
+  }
   let form: FormData;
   try {
     form = await request.formData();

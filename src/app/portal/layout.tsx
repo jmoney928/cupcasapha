@@ -11,6 +11,8 @@ const items: NavItem[] = [
   { href: "/portal", label: "Stock", icon: "🥤", exact: true },
   { href: "/portal/reorders", label: "Reorders", icon: "🔁" },
   { href: "/portal/orders", label: "Orders", icon: "📦" },
+  { href: "/portal/tools/compliance", label: "Compliance", icon: "🛡️" },
+  { href: "/portal/tools/brand", label: "Brand", icon: "🎨" },
   { href: "/portal/settings", label: "Settings", icon: "⚙️" },
 ];
 

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/auth/api-guard";
+
 import { z } from "zod";
 import JSZip from "jszip";
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -31,6 +33,9 @@ const schema = z.object({
  * The sleeve is absent by design: it needs the supplier's dieline in writing before anything prints.
  */
 export async function POST(request: Request) {
+  if (!(await requireApiSession())) {
+    return NextResponse.json({ error: "Cup Casa OS is included with cup orders. Sign in to use it." }, { status: 401 });
+  }
   let body: unknown;
   try {
     body = await request.json();

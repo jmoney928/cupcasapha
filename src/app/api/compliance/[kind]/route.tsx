@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/auth/api-guard";
+
 import { z } from "zod";
 import { Resend } from "resend";
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -77,6 +79,9 @@ const META: Record<DocKind, { title: string; filename: string; subject: (cafe: s
  * immediately even if the email is slow.
  */
 export async function POST(request: Request, { params }: { params: Promise<{ kind: string }> }) {
+  if (!(await requireApiSession())) {
+    return NextResponse.json({ error: "Cup Casa OS is included with cup orders. Sign in to use it." }, { status: 401 });
+  }
   const { kind } = await params;
   if (!(kind in schemas)) return NextResponse.json({ error: "Unknown document." }, { status: 404 });
   const docKind = kind as DocKind;
