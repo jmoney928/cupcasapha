@@ -128,3 +128,28 @@ Preview without filling the form (development only): `/api/dev/pdf/binder`.
 ⚠️ **Before any of this is promoted**: the WorkSafe content needs a BC safety consultant's review pass
 and the claims kit needs a lawyer's, both recorded per the spec's `content_versions.reviewed_by`.
 The page says so in plain language today.
+
+### Module 7 — Brand kit generator ✅
+
+`/brand`. Upload a logo, pick a colour and one of six templates, download the set. Stateless: nothing
+is stored, so account #100 costs no more labour than account #1.
+
+| Piece | Where |
+| --- | --- |
+| Logo analysis (resolution, palette, mono) | `src/lib/brand/analyze.ts` — sharp |
+| Six templates | `src/lib/brand/templates.tsx` |
+| JSX → SVG → PNG | `src/lib/brand/render.ts` — satori + resvg, no headless browser |
+| Print pieces at trim with bleed + crop marks | `src/lib/pdf/brand-print.tsx` |
+| Dielines as data | `src/lib/brand/dielines.ts` |
+| Upload / generate | `src/app/api/brand/analyze`, `src/app/api/brand/kit` (ZIP) |
+
+Ships: three Instagram assets, a menu chip, window decal, till card, A-frame poster, and the
+single-colour logo — zipped with a README naming each trim size.
+
+**Sleeves are deliberately absent.** A sleeve has its own trim, seam allowance and cone warp.
+`DIELINES.sleeve12.confirmed` is `false` until the supplier sends theirs in writing; generating
+against a guessed dieline is how you print 5,000 unusable sleeves. Set the numbers and flip the flag
+and the template slots in.
+
+`satori`, `sharp` and `@resvg/resvg-js` are in `serverExternalPackages` — Turbopack can't bundle the
+native binaries or the harfbuzz wasm.

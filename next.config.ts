@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Native modules Turbopack cannot bundle; they load at runtime on the Node runtime instead.
+  serverExternalPackages: ["@resvg/resvg-js", "sharp", "satori"],
   async redirects() {
     return [
       // QR codes point at /howitworks; catch hand-typed variants.

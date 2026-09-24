@@ -31,6 +31,7 @@ const cols = [
       { href: "/sustainability", label: "Sustainability" },
       { href: "/calculator", label: "Switch calculator" },
       { href: "/compliance", label: "Free WHMIS binder" },
+      { href: "/brand", label: "Free brand kit" },
       { href: "/about", label: "About cupcasa" },
     ],
   },

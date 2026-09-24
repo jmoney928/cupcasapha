@@ -13,6 +13,7 @@ const nav = [
   { href: "/sustainability", label: "Sustainability" },
   { href: "/calculator", label: "Calculator" },
   { href: "/compliance", label: "Free binder" },
+  { href: "/brand", label: "Brand kit" },
   { href: "/wholesale", label: "Custom & Wholesale" },
   { href: "/about", label: "About" },
 ];
