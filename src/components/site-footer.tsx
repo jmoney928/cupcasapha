@@ -30,6 +30,7 @@ const cols = [
       { href: "/why-pha", label: "The material" },
       { href: "/sustainability", label: "Sustainability" },
       { href: "/calculator", label: "Switch calculator" },
+      { href: "/compliance", label: "Free WHMIS binder" },
       { href: "/about", label: "About cupcasa" },
     ],
   },

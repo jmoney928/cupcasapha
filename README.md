@@ -77,3 +77,30 @@ page and the PDF reframe rather than printing a red number. The arithmetic is ne
 
 Preview the PDF while editing the template (development only):
 `/api/dev/pdf/roi` and `/api/dev/pdf/roi-loss`.
+
+### Module 5 — Compliance Center: WorkSafe binder ✅
+
+Gated asset at `/compliance`. Works with zero customers and no database.
+
+| Piece | Where |
+| --- | --- |
+| SDS registry (JSON, not PDFs) | `content/sds/registry.json` |
+| Registry loader, BC 3-year review rule | `src/lib/compliance/sds.ts` |
+| Café hazards + orientation topics | `src/lib/compliance/hazards.ts` |
+| Mandatory disclaimer | `src/lib/compliance/disclaimer.ts` |
+| Binder PDF (9 sections) | `src/lib/pdf/worksafe-binder.tsx` |
+| QR generation | `src/lib/compliance/binder.ts` |
+| Generate + email (gated) | `src/app/api/compliance/binder/route.tsx` |
+| Nightly link check | `src/app/api/cron/sds-check/route.ts`, scheduled in `vercel.json` |
+
+**Sheets are indexed, never mirrored.** Each product carries the manufacturer's SDS page, plus a direct
+link only where a human has confirmed it is the sheet for that exact product. Products we can't link
+(bleach, sanitizer, dish detergent — brand varies by café) still appear on the hazard inventory, with
+a line telling the café who to ask. They never see a dead link: broken ones alert us, not them.
+
+**The BC three-year review rule** is the hook. Every binder is stamped with its own review date.
+
+Preview without filling the form (development only): `/api/dev/pdf/binder`.
+
+⚠️ **Before this is promoted anywhere**: the content needs its review pass by a BC safety consultant,
+recorded per the spec's `content_versions.reviewed_by`. The page says so in plain language today.
