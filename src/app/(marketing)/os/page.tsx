@@ -105,7 +105,7 @@ export default function OsPage() {
           </h2>
           <p className="text-espresso/70 mt-3">
             Every part of this exists to make you more money per cup than we cost you. If a tool doesn&apos;t do
-            that, it isn&apos;t here.
+            that, it isn&apos;t here. Tap any of them for the detail.
           </p>
         </div>
 
@@ -127,14 +127,31 @@ export default function OsPage() {
                   </div>
                   <ul className="grid gap-3 sm:grid-cols-2 mt-6">
                     {modules.map((m) => (
-                      <li key={m.id} className="rounded-2xl bg-cream/50 p-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-display font-extrabold">{m.name}</span>
-                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${statusChip(m.status)}`}>
-                            {STATUS_LABELS[m.status]}
-                          </span>
-                        </div>
-                        <p className="text-sm text-espresso/65 mt-1">{m.blurb}</p>
+                      <li key={m.id}>
+                        <details className="group rounded-2xl bg-cream/50 transition-colors open:bg-cream/80 sm:h-full">
+                          <summary className="flex cursor-pointer list-none items-start gap-3 p-4">
+                            <span className="min-w-0 flex-1">
+                              <span className="flex flex-wrap items-center gap-2">
+                                <span className="font-display font-extrabold">{m.name}</span>
+                                <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${statusChip(m.status)}`}>
+                                  {STATUS_LABELS[m.status]}
+                                </span>
+                              </span>
+                              <span className="mt-1 block text-sm text-espresso/65">{m.blurb}</span>
+                            </span>
+                            <span
+                              aria-hidden
+                              className="mt-0.5 shrink-0 text-xl leading-none text-coral transition-transform duration-200 group-open:rotate-45"
+                            >
+                              +
+                            </span>
+                          </summary>
+                          <div className="px-4 pb-4 -mt-1">
+                            <p className="border-t border-espresso/10 pt-3 text-sm leading-relaxed text-espresso/75">
+                              {m.detail}
+                            </p>
+                          </div>
+                        </details>
                       </li>
                     ))}
                   </ul>
