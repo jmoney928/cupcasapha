@@ -26,6 +26,7 @@ export default function ForCafesPage() {
           <p className={s.lede}>Cup Casa is a Victoria company bringing the first certified home-compostable, microplastic-free coffee cup to Canada. We hold the exclusive Canadian rights, our first container lands in December, and we’re choosing a small group of launch cafés to serve it first.</p>
           <div className={s.ctas}>
             <a className={`${s.btn} ${s.btnCoral}`} href="#contact">Become a launch café</a>
+            <a className={`${s.btn} ${s.btnGhost}`} href="/calculator">Work out your numbers</a>
             <a className={`${s.btn} ${s.btnGhost}`} href="#pricing">See pricing</a>
           </div>
           <div className={s.stats}>
@@ -112,6 +113,9 @@ export default function ForCafesPage() {
               <div className={s.priceRow}><div className={s.size}><b>12oz</b> <span>· The Everyday</span></div><div className={s.case}>$220 / case of 1,000</div><div className={s.per}>22¢</div></div>
               <div className={s.priceRow}><div className={s.size}><b>16oz</b> <span>· The Big One</span></div><div className={s.case}>$240 / case of 1,000</div><div className={s.per}>24¢</div></div>
               <p className={s.note}>Prices in CAD before tax. We deliver to your café.</p>
+              <p className={s.note}>
+                <a href="/calculator" style={{ fontWeight: 700 }}>Work out what the switch is worth to you →</a>
+              </p>
             </div>
             <div>
               <div className={s.eyebrow}>What launch cafés get</div>

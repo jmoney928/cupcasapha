@@ -1,0 +1,60 @@
+{
+  "$comment": "Grants a BC café may qualify for. Every row carries verifiedAt and the funder's own URL. Anything unverified for two quarters is hidden rather than shown stale — a café that misses a deadline on our bad data is the one failure mode here that actually costs them money. See docs/SPEC.md, 'Grants and rebates database'.",
+  "grants": [
+    {
+      "id": "canada-summer-jobs",
+      "name": "Canada Summer Jobs",
+      "funder": "Government of Canada",
+      "amountRange": "Up to 50% of provincial minimum wage per student (small businesses)",
+      "purpose": "hiring",
+      "deadlineKind": "annual",
+      "eligibility": ["50 or fewer employees", "Hiring youth aged 15–30", "Job is 6–16 weeks"],
+      "url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
+      "verifiedAt": "2026-09-24"
+    },
+    {
+      "id": "futurpreneur",
+      "name": "Futurpreneur start-up financing + mentoring",
+      "funder": "Futurpreneur Canada",
+      "amountRange": "Up to $60,000 combined with BDC",
+      "purpose": "startup",
+      "deadlineKind": "rolling",
+      "eligibility": ["Owner aged 18–39", "Business under 12 months old or pre-launch"],
+      "url": "https://futurpreneur.ca/en/",
+      "verifiedAt": "2026-09-24"
+    },
+    {
+      "id": "cebc-energy",
+      "name": "CleanBC Business energy-efficiency rebates",
+      "funder": "CleanBC / BC Hydro / FortisBC",
+      "amountRange": "Varies by measure — refrigeration, lighting, HVAC",
+      "purpose": "energy",
+      "deadlineKind": "rolling",
+      "eligibility": ["BC Hydro or FortisBC commercial account", "Qualifying equipment upgrade"],
+      "url": "https://betterbuildingsbc.ca/",
+      "verifiedAt": "2026-09-24"
+    },
+    {
+      "id": "canexport",
+      "name": "CanExport SMEs",
+      "funder": "Global Affairs Canada",
+      "amountRange": "Up to $50,000 (50% cost share)",
+      "purpose": "export",
+      "deadlineKind": "rolling",
+      "eligibility": ["Incorporated in Canada", "1–500 employees", "Developing a new export market"],
+      "url": "https://www.tradecommissioner.gc.ca/funding-financement/canexport/sme-pme/index.aspx",
+      "verifiedAt": "2026-09-24"
+    },
+    {
+      "id": "wage-subsidy-students",
+      "name": "Student Work Placement Program wage subsidy",
+      "funder": "Government of Canada (via delivery partners)",
+      "amountRange": "Up to 50% of wages, to $5,000 (70%/$7,000 for under-represented students)",
+      "purpose": "hiring",
+      "deadlineKind": "rolling",
+      "eligibility": ["Hiring a post-secondary student into a paid placement"],
+      "url": "https://www.canada.ca/en/employment-social-development/programs/student-work-placement-program.html",
+      "verifiedAt": "2026-09-24"
+    }
+  ]
+}
