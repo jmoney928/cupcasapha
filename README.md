@@ -44,3 +44,36 @@ Single source of truth: [`src/lib/products.ts`](src/lib/products.ts). All sold b
 - Plug in real certification numbers/bodies on `/sustainability`
 - Connect `api/lead` to an email or CRM provider
 - Add the production Stripe key and configure the `cups.cupcasa.com` domain
+
+---
+
+## Cup Casa OS
+
+Full spec: [`docs/SPEC.md`](docs/SPEC.md). Built in the order the spec sets out, not all at once.
+
+### Module 1 — Switch ROI calculator ✅
+
+Public, no auth, no database. `/calculator`.
+
+| Piece | Where |
+| --- | --- |
+| Formulas (pure, unit-tested) | `src/lib/calc/roi.ts`, `src/lib/calc/money.ts` |
+| Tests — run `npm test` | `src/lib/calc/roi.test.ts` (26 cases) |
+| Cup prices | `src/lib/calc/catalog.ts`, sourced from the catalogue, never hard-coded |
+| Survey figures + method note | `src/lib/calc/survey.ts` |
+| UI | `src/components/calculator/switch-calculator.tsx` |
+| Emailed breakdown PDF | `src/lib/pdf/roi-breakdown.tsx` |
+| Lead capture | `src/app/api/calculator/lead/route.tsx` |
+
+Money is integer cents throughout `lib/calc`; `toCents` converts through the decimal string so
+`0.145` rounds to 15¢ rather than 14¢, and throws rather than silently yielding 0.
+
+**Acceptance rate.** The spec's table says the headline defaults to 1.0, and its standing rule says
+never to model above the measured figure. Those conflict, so the default is the measured **0.98**
+(163 of 167), with the conservative 0.90 behind a checkbox. `calculateRoi` clamps anything higher.
+
+**Losses are shown, not hidden.** When the honest answer is negative, `isNetLoss` is set and both the
+page and the PDF reframe rather than printing a red number. The arithmetic is never adjusted.
+
+Preview the PDF while editing the template (development only):
+`/api/dev/pdf/roi` and `/api/dev/pdf/roi-loss`.
