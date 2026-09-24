@@ -100,7 +100,31 @@ a line telling the café who to ask. They never see a dead link: broken ones ale
 
 **The BC three-year review rule** is the hook. Every binder is stamped with its own review date.
 
+### Module 6 — Compliance Center: claims, signage, health, grants ✅
+
+All four live on the same page, under one sentence: the paperwork a café is supposed to have.
+
+| Tool | Route | Notes |
+| --- | --- | --- |
+| WHMIS binder | `POST /api/compliance/binder` | 9 sections, QR-coded SDS index |
+| Claims & greenwashing kit | `POST /api/compliance/claims` | approved language, claims to avoid, substantiation page |
+| Bin signage | `POST /api/compliance/signage` | BOH poster, bin decals, staff briefing |
+| Health self-audit | `POST /api/compliance/audit` | Island Health / BC Food Premises walk-round |
+| Grants | rendered on the page | `content/grants.json`, auto-hidden after two unverified quarters |
+
+Content and data live in `content/` and `src/lib/compliance/`; PDF templates share `src/lib/pdf/theme.ts`.
+Each document carries the disclaimer that actually applies to it (`DISCLAIMERS` in
+`src/lib/compliance/disclaimer.ts`), not one generic line.
+
+**The bin signage tells the truth about the green bin.** The CRD organics programme does not accept
+compostable containers, so the signage says to compost at home and explicitly not to use the green
+bin. Claiming otherwise would be a greenwashing exposure for Cup Casa, not just the café.
+
+**Nothing asserts a per-municipality accept list.** `content/municipalities.json` carries verified
+municipal links and the regional position; we don't restate rules we can't keep current.
+
 Preview without filling the form (development only): `/api/dev/pdf/binder`.
 
-⚠️ **Before this is promoted anywhere**: the content needs its review pass by a BC safety consultant,
-recorded per the spec's `content_versions.reviewed_by`. The page says so in plain language today.
+⚠️ **Before any of this is promoted**: the WorkSafe content needs a BC safety consultant's review pass
+and the claims kit needs a lawyer's, both recorded per the spec's `content_versions.reviewed_by`.
+The page says so in plain language today.

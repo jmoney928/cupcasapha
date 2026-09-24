@@ -1,0 +1,18 @@
+{
+  "$comment": "CRD municipalities for bin signage. We deliberately do NOT assert a per-municipality accept list for compostable cups: the CRD organics programme does not accept non-fibrous compostable containers, and municipal rules change. Signage states what the cup IS (certified home compostable) and links the municipality's own current programme. Getting this wrong is a greenwashing exposure for Cup Casa, not just for the café — see docs/SPEC.md, 'Bin signage generator'.",
+  "verifiedAt": "2026-09-24",
+  "regionalProgramme": {
+    "name": "CRD kitchen scraps / organics",
+    "url": "https://www.crd.ca/environment/reducing-waste/organics",
+    "acceptsCompostableContainers": false,
+    "note": "The regional organics programme is built for food scraps and soiled paper. Non-fibrous items marketed as compostable — containers, cutlery, cups — are not part of it, and are pulled out at the sorting line."
+  },
+  "municipalities": [
+    { "id": "victoria", "name": "Victoria", "url": "https://www.victoria.ca", "healthAuthority": "Island Health" },
+    { "id": "saanich", "name": "Saanich", "url": "https://www.saanich.ca", "healthAuthority": "Island Health" },
+    { "id": "oak-bay", "name": "Oak Bay", "url": "https://www.oakbay.ca", "healthAuthority": "Island Health" },
+    { "id": "esquimalt", "name": "Esquimalt", "url": "https://www.esquimalt.ca/2bins", "healthAuthority": "Island Health" },
+    { "id": "view-royal", "name": "View Royal", "url": "https://www.viewroyal.ca", "healthAuthority": "Island Health" },
+    { "id": "other-crd", "name": "Elsewhere in the CRD", "url": "https://www.crd.ca/programs-services/garbage-recycling", "healthAuthority": "Island Health" }
+  ]
+}

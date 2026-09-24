@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ClipboardCheck, FileWarning, Link2, QrCode, Users } from "lucide-react";
+import { AlertTriangle, ClipboardCheck, FileWarning, Link2, QrCode, Users, MessageSquareWarning, Trash2, Stethoscope, Coins } from "lucide-react";
 import { Reveal } from "@/components/ui";
 import { BinderBuilder } from "@/components/compliance/binder-builder";
+import { QuickGenerate } from "@/components/compliance/quick-generate";
+import { GrantsList } from "@/components/compliance/grants-list";
+import { regionalProgramme } from "@/lib/compliance/municipalities";
 import { WORKSAFE_SOURCES, REVIEW_PENDING_NOTE } from "@/lib/compliance/disclaimer";
 import { SDS_REVIEW_YEARS } from "@/lib/compliance/sds";
 
@@ -35,9 +38,9 @@ export default function CompliancePage() {
             The paperwork your café is <span className="text-coral">supposed to have.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-5">
-            Every hazardous product in your shop needs a safety data sheet your staff can actually reach, and every
-            new hire needs a documented orientation. Most cafés have neither. Tick what you keep on site and we&apos;ll
-            build the binder — about two minutes, no charge.
+            Every hazardous product needs a safety data sheet your staff can reach. Every new hire needs a documented
+            orientation. Every &quot;compostable&quot; claim on your menu needs something behind it. Most cafés have none
+            of it. Generate the lot below — a couple of minutes each, no charge.
           </p>
         </div>
       </section>
@@ -60,6 +63,60 @@ export default function CompliancePage() {
         <BinderBuilder />
       </section>
 
+      <section className="section-pad py-10" id="more">
+        <div className="mb-6">
+          <span className="label-caps text-coral">Three more, same deal</span>
+          <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-2">The rest of the paperwork.</h2>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-3">
+          <div className="rounded-3xl border border-espresso/10 bg-white/70 p-5 flex flex-col">
+            <MessageSquareWarning className="h-6 w-6 text-coral" strokeWidth={1.6} />
+            <h3 className="font-display text-lg font-extrabold mt-3">Claims &amp; greenwashing kit</h3>
+            <p className="text-sm text-espresso/65 mt-1 flex-1">
+              Exactly what you can say about a compostable cup, what you can&apos;t, and a substantiation page to hand
+              anyone who asks. Written against the Competition Act&apos;s testing requirement.
+            </p>
+            <QuickGenerate kind="claims" cta="Get the claims kit" />
+          </div>
+
+          <div className="rounded-3xl border border-espresso/10 bg-white/70 p-5 flex flex-col">
+            <Trash2 className="h-6 w-6 text-coral" strokeWidth={1.6} />
+            <h3 className="font-display text-lg font-extrabold mt-3">Bin signage</h3>
+            <p className="text-sm text-espresso/65 mt-1 flex-1">
+              Back-of-house poster, customer bin decals, and a staff briefing on what to say. Honest about the green
+              bin: the regional organics programme doesn&apos;t take compostable containers.
+            </p>
+            <QuickGenerate kind="signage" cta="Get the signage" needsMunicipality />
+          </div>
+
+          <div className="rounded-3xl border border-espresso/10 bg-white/70 p-5 flex flex-col">
+            <Stethoscope className="h-6 w-6 text-coral" strokeWidth={1.6} />
+            <h3 className="font-display text-lg font-extrabold mt-3">Health self-audit</h3>
+            <p className="text-sm text-espresso/65 mt-1 flex-1">
+              The walk-round Island Health does, as a checklist you can do first. Temperatures, handwashing, sanitizer,
+              storage, pests, staff certification.
+            </p>
+            <QuickGenerate kind="audit" cta="Get the self-audit" />
+          </div>
+        </div>
+      </section>
+
+      <section className="section-pad py-10">
+        <div className="rounded-[2.5rem] bg-cream-deep/60 border border-espresso/8 p-8 sm:p-10">
+          <div className="flex items-start gap-4 mb-5">
+            <Coins className="h-7 w-7 text-coral shrink-0" strokeWidth={1.6} />
+            <div>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold">Money you might be leaving on the table.</h2>
+              <p className="text-espresso/70 mt-2">
+                Grants and rebates a BC café can actually apply for. Each one links to the funder&apos;s own page and
+                carries the date we last checked it.
+              </p>
+            </div>
+          </div>
+          <GrantsList />
+        </div>
+      </section>
+
       <section className="section-pad py-10">
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-[2.5rem] bg-cream-deep/60 border border-espresso/8 p-8">
@@ -69,6 +126,9 @@ export default function CompliancePage() {
               A safety data sheet photocopied into a binder is out of date the moment the manufacturer revises it, and
               you&apos;d have no way of knowing. Your binder carries a QR code per product that opens the manufacturer&apos;s
               own current sheet. We check those links nightly and fix them at our end, so you never open a dead one.
+            </p>
+            <p className="text-espresso/70 mt-3 text-sm">
+              The same honesty applies to the bin signage: {regionalProgramme.acceptsCompostableContainers ? "" : "the regional organics programme does not accept compostable containers, so our signage says so rather than pretending otherwise."}
             </p>
           </div>
           <div className="rounded-[2.5rem] bg-espresso text-cream p-8">
