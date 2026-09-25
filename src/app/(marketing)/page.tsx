@@ -12,6 +12,13 @@ import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle, Mark } from "@/components/brand";
 import { ReserveStrip } from "@/components/reserve-strip";
 import { CertBadge } from "@/components/cert-badge";
+import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
+
+const heroSlides: HeroSlide[] = [
+  { src: "/hero/cafe.jpg", alt: "Three cupcasa cups upturned on a café counter beside an espresso and scattered coffee beans" },
+  { src: "/hero/coastal.jpg", alt: "Three cupcasa cups resting against driftwood on a pebble beach, forested headland behind" },
+  { src: "/hero/compost.jpg", alt: "Three cupcasa cups lying on mossy forest floor among fallen leaves and new seedlings" },
+];
 
 const pillars = [
   { icon: Leaf, title: "Better material", text: "Paper lined with plant-based PHA instead of plastic. No PE, no PLA, no microplastics." },
@@ -59,16 +66,7 @@ export default function Home() {
           </div>
 
           <Reveal>
-            <div className="relative rounded-[2rem] overflow-hidden aspect-[4/5] sm:aspect-square shadow-[0_30px_60px_rgba(26,26,26,0.15)]">
-              <Image
-                src="/rebrand/hero-cup.png"
-                alt="A cream cupcasa PHA cup outdoors"
-                fill
-                priority
-                sizes="(max-width:1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
+            <HeroSlideshow slides={heroSlides} />
           </Reveal>
         </div>
       </section>
