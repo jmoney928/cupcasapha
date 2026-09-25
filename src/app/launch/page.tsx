@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand";
+import { EmailLink } from "@/components/launch/email-link";
 import s from "./for-cafes.module.css";
 
 const EMAIL = "hello@cupcasa.com";
@@ -150,12 +151,12 @@ export default function ForCafesPage() {
             <h2>Give us a call or an email.</h2>
             <p>Ask for Jack or Sulli. We’ll come to you.</p>
             <div className={s.ctas}>
-              <a className={`${s.btn} ${s.btnCoral}`} href={mailto}>Email us</a>
+              <EmailLink email={EMAIL} href={mailto} className={`${s.btn} ${s.btnCoral}`}>Email us</EmailLink>
               <a className={`${s.btn} ${s.btnGhost}`} href={`tel:${PHONE_1.tel}`}>Call {PHONE_1.display}</a>
             </div>
           </div>
           <div className={s.details}>
-            <a className={s.mail} href={mailto}>{EMAIL}</a><br />
+            <EmailLink email={EMAIL} href={mailto} className={s.mail}>{EMAIL}</EmailLink><br />
             <a href={`tel:${PHONE_1.tel}`}>{PHONE_1.display}</a> · <a href={`tel:${PHONE_2.tel}`}>{PHONE_2.display}</a><br />
             <a href={IG} target="_blank" rel="noopener noreferrer">@cup_casa</a>
           </div>
