@@ -1,0 +1,300 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { Pause, Play, RotateCw } from "lucide-react";
+import { sleeveDieline } from "@/lib/sleeve/dielines";
+import { layout } from "@/lib/sleeve/geometry";
+import type { SleeveDoc } from "@/lib/sleeve/doc";
+import { renderDoc, type Measurer } from "@/lib/sleeve/render-doc";
+import {
+  affineFromTriangles, cupRadius, shadeAt, sheetPointAtTurn, surfacePoint, visibleSpans, TILT,
+  type CupView,
+} from "@/lib/sleeve/wrap3d";
+
+const W = 320;
+const H = 400;
+const PAD = { top: 20, bottom: 24, x: 26 };
+const SLICES = 120;
+const SPIN = 0.35; // radians a second
+
+const PAPER = "#efe9dd";
+const PAPER_DARK = "#c9c0b1";
+const LID = "#d9d2c4";
+
+/**
+ * A turning preview of the cup with the sleeve on it.
+ *
+ * The band is drawn by cutting the flat artwork into thin wedges and mapping each onto its slice
+ * of the cone, so it is the real file bending round a real cup rather than a picture stretched
+ * over a cylinder. The cup's own dimensions come from the dieline.
+ */
+export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer }) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const texture = useRef<HTMLImageElement | null>(null);
+  const rotation = useRef(0);
+  const dragging = useRef<{ x: number; from: number } | null>(null);
+  const [spinning, setSpinning] = useState(true);
+  const [ready, setReady] = useState(false);
+
+  /* Rasterise the artwork when it settles, not on every keystroke. */
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const svg = renderDoc(doc, { guides: false, measure, idPrefix: "tx" });
+      const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+      const img = new Image();
+      img.onload = () => {
+        texture.current = img;
+        setReady(true);
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => URL.revokeObjectURL(url);
+      img.src = url;
+    }, 220);
+    return () => clearTimeout(id);
+  }, [doc, measure]);
+
+  useEffect(() => {
+    const el = canvas.current;
+    if (!el) return;
+    const ctx = el.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    el.width = W * dpr;
+    el.height = H * dpr;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let frame = 0;
+    let last = performance.now();
+
+    const loop = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      if (spinning && !reduced && !dragging.current) rotation.current += SPIN * dt;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(ctx, doc, texture.current, rotation.current);
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(frame);
+  }, [doc, spinning, ready]);
+
+  function onDown(e: React.PointerEvent) {
+    dragging.current = { x: e.clientX, from: rotation.current };
+    try {
+      (e.target as Element).setPointerCapture?.(e.pointerId);
+    } catch {}
+  }
+  function onMove(e: React.PointerEvent) {
+    if (!dragging.current) return;
+    /* A drag across the width of the cup turns it about half way round. */
+    rotation.current = dragging.current.from + ((e.clientX - dragging.current.x) / W) * Math.PI * 2;
+  }
+  const onUp = () => {
+    dragging.current = null;
+  };
+
+  return (
+    <div className="rounded-3xl bg-cream-deep/40 border border-espresso/8 p-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="label-caps text-espresso/50">On the cup</p>
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSpinning((s) => !s)}
+            title={spinning ? "Pause" : "Spin"}
+            className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral"
+          >
+            {spinning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              rotation.current = 0;
+            }}
+            title="Face front"
+            className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral"
+          >
+            <RotateCw className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+      <canvas
+        ref={canvas}
+        style={{ width: "100%", maxWidth: W, aspectRatio: `${W} / ${H}` }}
+        className="mx-auto block cursor-grab active:cursor-grabbing touch-none"
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+        aria-label="Your sleeve on the cup — drag to turn it"
+      />
+      <p className="text-xs text-espresso/50 text-center mt-1">Drag to turn it.</p>
+    </div>
+  );
+}
+
+function viewFor(doc: SleeveDoc): CupView {
+  const d = sleeveDieline(doc.size);
+  const rt = d.cup.topDia / 2;
+  const rb = d.cup.baseDia / 2;
+  /* Room for the cup, the two foreshortened ellipses, and the lid sitting on top. */
+  const lidMm = 7;
+  const byHeight = (H - PAD.top - PAD.bottom) / (d.cup.height + (rt + rb) * TILT + lidMm);
+  const byWidth = (W - PAD.x * 2) / (rt * 2 * 1.06);
+  const scale = Math.min(byHeight, byWidth);
+  return {
+    scale,
+    tilt: TILT,
+    cx: W / 2,
+    baseY: PAD.top + (lidMm + rt * TILT + d.cup.height) * scale,
+  };
+}
+
+function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageElement | null, rot: number) {
+  const d = sleeveDieline(doc.size);
+  const view = viewFor(doc);
+  const { cx, baseY, scale, tilt } = view;
+  const rb = cupRadius(d, 0) * scale;
+  const rt = cupRadius(d, d.cup.height) * scale;
+  const topY = baseY - d.cup.height * scale;
+
+  ctx.clearRect(0, 0, W, H);
+
+  /* A soft contact shadow, so the cup sits on something. */
+  const shadow = ctx.createRadialGradient(cx, baseY + rb * tilt, 1, cx, baseY + rb * tilt, rb * 1.7);
+  shadow.addColorStop(0, "rgba(26,26,26,0.20)");
+  shadow.addColorStop(1, "rgba(26,26,26,0)");
+  ctx.fillStyle = shadow;
+  ctx.beginPath();
+  ctx.ellipse(cx, baseY + rb * tilt * 0.9, rb * 1.7, rb * tilt * 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* Cup body: the cone, lit from the left so it reads as round. */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx - rt, topY);
+  ctx.ellipse(cx, topY, rt, rt * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.lineTo(cx + rb, baseY);
+  ctx.ellipse(cx, baseY, rb, rb * tilt, 0, 0, Math.PI);
+  ctx.closePath();
+  const body = ctx.createLinearGradient(cx - rt, 0, cx + rt, 0);
+  body.addColorStop(0, PAPER_DARK);
+  body.addColorStop(0.32, PAPER);
+  body.addColorStop(0.72, PAPER);
+  body.addColorStop(1, PAPER_DARK);
+  ctx.fillStyle = body;
+  ctx.fill();
+  ctx.restore();
+
+  if (tex) drawBand(ctx, doc, view, tex, rot);
+
+  /* Lid last, since it overlaps the rim. */
+  const lidR = rt * 1.03;
+  const lidH = 7 * scale;
+  ctx.fillStyle = LID;
+  ctx.beginPath();
+  ctx.ellipse(cx, topY, lidR, lidR * tilt, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(cx - lidR, topY - lidH, lidR * 2, lidH);
+  ctx.beginPath();
+  ctx.ellipse(cx, topY - lidH, lidR, lidR * tilt, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const lidShade = ctx.createLinearGradient(cx - lidR, 0, cx + lidR, 0);
+  lidShade.addColorStop(0, "rgba(26,26,26,0.22)");
+  lidShade.addColorStop(0.35, "rgba(26,26,26,0)");
+  lidShade.addColorStop(0.72, "rgba(26,26,26,0)");
+  lidShade.addColorStop(1, "rgba(26,26,26,0.22)");
+  ctx.fillStyle = lidShade;
+  ctx.fillRect(cx - lidR, topY - lidH, lidR * 2, lidH + lidR * tilt);
+  /* The drinking hole, so it reads as a lid rather than a disc. */
+  ctx.fillStyle = "rgba(26,26,26,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(cx, topY - lidH - lidR * tilt * 0.35, lidR * 0.22, lidR * tilt * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawBand(
+  ctx: CanvasRenderingContext2D,
+  doc: SleeveDoc,
+  view: CupView,
+  tex: HTMLImageElement,
+  rot: number
+) {
+  const d = sleeveDieline(doc.size);
+  const { cx, baseY, scale, tilt } = view;
+  const hFrom = d.bandOnCup.from;
+  const hTo = d.bandOnCup.to;
+  const rTop = cupRadius(d, hTo) * scale;
+  const rBot = cupRadius(d, hFrom) * scale;
+  const yTop = baseY - hTo * scale;
+  const yBot = baseY - hFrom * scale;
+
+  /* The sheet's viewBox is in millimetres; the raster is some number of pixels across the same. */
+  const sheet = layout(d);
+  const pxPerMmX = tex.naturalWidth / sheet.width;
+  const pxPerMmY = tex.naturalHeight / sheet.height;
+
+  ctx.save();
+  /* Clip to the visible face of the band so no slice spills past its edges. */
+  ctx.beginPath();
+  ctx.ellipse(cx, yTop, rTop, rTop * tilt, 0, 0, Math.PI);
+  ctx.lineTo(cx - rBot, yBot);
+  ctx.ellipse(cx, yBot, rBot, rBot * tilt, 0, Math.PI, 0, true);
+  ctx.closePath();
+  ctx.clip();
+
+  const spans = visibleSpans(rot);
+  const toPx = (p: { x: number; y: number }) => ({ x: p.x * pxPerMmX, y: p.y * pxPerMmY });
+
+  for (const span of spans) {
+    const base = Math.floor((span.from + rot) / (2 * Math.PI));
+    const steps = Math.max(2, Math.round((SLICES * (span.to - span.from)) / Math.PI));
+    for (let i = 0; i < steps; i++) {
+      const p0 = span.from + ((span.to - span.from) * i) / steps;
+      const p1 = span.from + ((span.to - span.from) * (i + 1)) / steps;
+      const t0 = (p0 + rot) / (2 * Math.PI) - base;
+      const t1 = (p1 + rot) / (2 * Math.PI) - base;
+
+      const s1 = toPx(sheetPointAtTurn(d, t0, hTo));
+      const s2 = toPx(sheetPointAtTurn(d, t1, hTo));
+      const s3 = toPx(sheetPointAtTurn(d, t0, hFrom));
+      const d1 = surfacePoint(d, view, p0, hTo);
+      const d2 = surfacePoint(d, view, p1, hTo);
+      const d3 = surfacePoint(d, view, p0, hFrom);
+
+      const m = affineFromTriangles(s1, s2, s3, d1, d2, d3);
+      if (!m) continue;
+
+      ctx.save();
+      /* Clip to this wedge, then draw the whole sheet through the transform that lands it here. */
+      ctx.beginPath();
+      const d4 = surfacePoint(d, view, p1, hFrom);
+      const pad = 0.6;
+      ctx.moveTo(d1.x - pad, d1.y - pad);
+      ctx.lineTo(d2.x + pad, d2.y - pad);
+      ctx.lineTo(d4.x + pad, d4.y + pad);
+      ctx.lineTo(d3.x - pad, d3.y + pad);
+      ctx.closePath();
+      ctx.clip();
+      ctx.transform(m.a, m.b, m.c, m.d, m.e, m.f);
+      ctx.drawImage(tex, 0, 0);
+      ctx.restore();
+
+      /* Shade the wedge by how far it has turned away, which is what makes it look round. */
+      const lit = shadeAt((p0 + p1) / 2);
+      const dark = 0.42 * (1 - lit);
+      if (dark > 0.005) {
+        ctx.fillStyle = `rgba(26,26,26,${dark.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.moveTo(d1.x, d1.y);
+        ctx.lineTo(d2.x, d2.y);
+        ctx.lineTo(d4.x, d4.y);
+        ctx.lineTo(d3.x, d3.y);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+}

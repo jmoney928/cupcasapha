@@ -9,6 +9,7 @@ import {
 } from "@/lib/sleeve/doc";
 import { insideSafeArea, renderDoc, sleeveFileName } from "@/lib/sleeve/render-doc";
 import { SleeveCanvas } from "./canvas";
+import { CupPreview } from "./cup-preview";
 import { Panel } from "./panel";
 import { Row, Swatches } from "./controls";
 import { useMeasure } from "./use-measure";
@@ -272,7 +273,8 @@ export function SleeveEditor() {
           />
         </div>
 
-        <div className="rounded-3xl bg-white/60 border border-caramel/20 p-4 space-y-4 lg:sticky lg:top-24">
+        <div className="space-y-4 lg:sticky lg:top-24">
+          <div className="rounded-3xl bg-white/60 border border-caramel/20 p-4 space-y-4">
           <Row label="Sleeve colour">
             <Swatches value={doc.background} onChange={(v) => commit((cur) => ({ ...cur, background: v }))} />
           </Row>
@@ -293,6 +295,8 @@ export function SleeveEditor() {
             }}
             onReorder={(to) => selectedId && commit((cur) => reorder(cur, selectedId, to))}
           />
+          </div>
+          <CupPreview doc={doc} measure={measure} />
         </div>
       </div>
 
