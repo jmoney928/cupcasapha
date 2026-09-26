@@ -16,9 +16,9 @@ import { cafeRows, CAFE_OFFER } from "@/lib/cafe-offer";
 import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
 
 const heroSlides: HeroSlide[] = [
-  { src: "/hero/cafe.jpg", alt: "Three cupcasa cups upturned on a café counter beside an espresso and scattered coffee beans" },
-  { src: "/hero/coastal.jpg", alt: "Three cupcasa cups resting against driftwood on a pebble beach, forested headland behind" },
-  { src: "/hero/compost.jpg", alt: "Three cupcasa cups lying on mossy forest floor among fallen leaves and new seedlings" },
+  { src: "/hero/cafe.jpg", alt: "Three cupcasa cups upturned on a sunlit wooden counter, their printed bases reading Made to disappear, with coffee beans and an espresso behind" },
+  { src: "/hero/coastal.jpg", alt: "Three cupcasa cups lying against driftwood on a pebble beach, printed bases to the camera, a forested headland in the mist behind" },
+  { src: "/hero/compost.jpg", alt: "Three cupcasa cups lying on dark soil among moss, fallen maple leaves and seedlings, printed bases to the camera" },
 ];
 
 const pillars = [
