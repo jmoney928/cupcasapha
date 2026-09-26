@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SleeveDesigner } from "@/components/sleeve/designer";
+import { SleeveEditor } from "@/components/sleeve/editor";
 import { SLEEVE_DIELINES } from "@/lib/sleeve/dielines";
 import { Eyebrow } from "@/components/ui";
 import { Palette } from "lucide-react";
@@ -25,9 +25,9 @@ export default function SleevePage() {
             <span className="text-coral">in about a minute.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            This draws on the real sleeve dieline — the same curved band our printer cuts — so what
-            you download is ready to print rather than a mock-up. Every pack in the shop comes with
-            sleeves printed from a file like this one.
+            Add text, your logo and shapes, move them around, and download a print-ready file. It
+            all sits on the real sleeve dieline — the same curved band our printer cuts — so what
+            comes out is ready to print rather than a mock-up.
           </p>
           <p className="text-sm text-espresso/55 mt-4">
             Nothing is uploaded. Your logo stays on your own machine and the file is built in your
@@ -37,7 +37,7 @@ export default function SleevePage() {
       </section>
 
       <section className="section-pad pb-12">
-        <SleeveDesigner />
+        <SleeveEditor />
       </section>
 
       <section className="section-pad pb-16">

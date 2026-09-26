@@ -1,0 +1,295 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Circle, Download, ImageUp, Minus, Redo2, Square, Type, Undo2 } from "lucide-react";
+import { SLEEVE_SIZES, sleeveDieline, type CupSize } from "@/lib/sleeve/dielines";
+import {
+  add, byId, duplicate, emptyDoc, newImage, newShape, newText, remove, reorder, resize, update,
+  type SleeveDoc, type SleeveElement,
+} from "@/lib/sleeve/doc";
+import { renderDoc, sleeveFileName } from "@/lib/sleeve/render-doc";
+import { SleeveCanvas } from "./canvas";
+import { Panel } from "./panel";
+import { Row, Swatches } from "./controls";
+import { useMeasure } from "./use-measure";
+
+const MAX_LOGO_BYTES = 3 * 1024 * 1024;
+const MAX_HISTORY = 60;
+
+/**
+ * The sleeve editor. Everything runs here in the browser: nothing is uploaded, and the download is
+ * produced by the same function that draws the canvas, so what is on screen is what goes to press.
+ */
+export function SleeveEditor() {
+  const [doc, setDoc] = useState<SleeveDoc>(() => emptyDoc(12));
+  const [past, setPast] = useState<SleeveDoc[]>([]);
+  const [future, setFuture] = useState<SleeveDoc[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showGuides, setShowGuides] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const measure = useMeasure();
+
+  /** Snapshot before a change, so undo has something to go back to. */
+  const commit = useCallback((next: SleeveDoc | ((d: SleeveDoc) => SleeveDoc)) => {
+    setDoc((current) => {
+      const value = typeof next === "function" ? next(current) : next;
+      if (value === current) return current;
+      setPast((p) => [...p, current].slice(-MAX_HISTORY));
+      setFuture([]);
+      return value;
+    });
+  }, []);
+
+  /** During a drag: the document moves, history does not. */
+  const live = useCallback((next: SleeveDoc) => setDoc(next), []);
+  const dragStart = useRef<SleeveDoc | null>(null);
+
+  const beginGesture = useCallback(() => {
+    dragStart.current = doc;
+  }, [doc]);
+
+  const endGesture = useCallback(() => {
+    const before = dragStart.current;
+    dragStart.current = null;
+    if (before && before !== doc) {
+      setPast((p) => [...p, before].slice(-MAX_HISTORY));
+      setFuture([]);
+    }
+  }, [doc]);
+
+  const undo = useCallback(() => {
+    setPast((p) => {
+      if (!p.length) return p;
+      setDoc((current) => {
+        setFuture((f) => [current, ...f].slice(0, MAX_HISTORY));
+        return p[p.length - 1];
+      });
+      return p.slice(0, -1);
+    });
+  }, []);
+
+  const redo = useCallback(() => {
+    setFuture((f) => {
+      if (!f.length) return f;
+      setDoc((current) => {
+        setPast((p) => [...p, current].slice(-MAX_HISTORY));
+        return f[0];
+      });
+      return f.slice(1);
+    });
+  }, []);
+
+  const selected = selectedId ? byId(doc, selectedId) ?? null : null;
+
+  const patch = (p: Partial<SleeveElement>) => selectedId && commit((d) => update(d, selectedId, p));
+
+  function addText() {
+    const el = newText(doc.size);
+    commit((d) => add(d, el));
+    setSelectedId(el.id);
+  }
+
+  function addShape(shape: "rect" | "ellipse" | "line") {
+    const el = newShape(doc.size, shape);
+    commit((d) => add(d, el));
+    setSelectedId(el.id);
+  }
+
+  async function onFile(file: File) {
+    setError(null);
+    if (!/^image\/(png|jpeg|svg\+xml|webp|gif)$/.test(file.type)) {
+      setError("PNG, JPG, SVG, WebP or GIF, please.");
+      return;
+    }
+    if (file.size > MAX_LOGO_BYTES) {
+      setError("That file is over 3MB — a smaller one will print just as well.");
+      return;
+    }
+    const dataUrl = await new Promise<string | null>((resolve) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = () => resolve(null);
+      r.readAsDataURL(file);
+    });
+    if (!dataUrl) {
+      setError("That file couldn't be read. Try another.");
+      return;
+    }
+    /* Measured before it lands, so an uploaded logo is never stretched to fit. */
+    const aspect = await new Promise<number>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1);
+      img.onerror = () => resolve(1);
+      img.src = dataUrl;
+    });
+    const el = newImage(doc.size, dataUrl, aspect);
+    commit((d) => add(d, el));
+    setSelectedId(el.id);
+  }
+
+  function download() {
+    /* Guides are for the screen; the press gets artwork and crop marks only. */
+    const svg = renderDoc(doc, { guides: false, measure, idPrefix: "p" });
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = sleeveFileName(doc);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /* Shortcuts, but never while someone is typing into a field. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (document.activeElement?.tagName ?? "").toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      const meta = e.metaKey || e.ctrlKey;
+      if (meta && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        e.shiftKey ? redo() : undo();
+        return;
+      }
+      if (!selectedId) return;
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        commit((d) => remove(d, selectedId));
+        setSelectedId(null);
+        return;
+      }
+      const step = e.shiftKey ? 5 : 1;
+      const nudge: Record<string, [number, number]> = {
+        ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step],
+      };
+      const move = nudge[e.key];
+      if (move) {
+        e.preventDefault();
+        const el = byId(doc, selectedId);
+        if (el) commit((d) => update(d, selectedId, { x: el.x + move[0], y: el.y + move[1] }));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [commit, doc, redo, selectedId, undo]);
+
+  const d = sleeveDieline(doc.size);
+
+  return (
+    <div className="space-y-4">
+      {/* toolbar */}
+      <div className="flex flex-wrap items-center gap-2 rounded-3xl bg-cream-deep/50 border border-espresso/8 p-3">
+        <div className="flex gap-1.5">
+          {SLEEVE_SIZES.map((size) => (
+            <button
+              key={size}
+              type="button"
+              onClick={() => commit((cur) => resize(cur, size as CupSize))}
+              aria-pressed={doc.size === size}
+              className={`btn-pill px-4 py-2 text-sm border-2 ${
+                doc.size === size ? "border-coral bg-coral text-white" : "border-espresso/12 hover:border-espresso/35"
+              }`}
+            >
+              {size}oz
+            </button>
+          ))}
+        </div>
+
+        <span className="w-px h-7 bg-espresso/10 mx-1" />
+
+        <button type="button" onClick={addText} className="btn-pill px-4 py-2 text-sm border-2 border-espresso/12 hover:border-coral">
+          <Type className="w-4 h-4" /> Text
+        </button>
+        <button type="button" onClick={() => fileInput.current?.click()} className="btn-pill px-4 py-2 text-sm border-2 border-espresso/12 hover:border-coral">
+          <ImageUp className="w-4 h-4" /> Image
+        </button>
+        <button type="button" onClick={() => addShape("rect")} title="Rectangle" className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral">
+          <Square className="w-4 h-4" />
+        </button>
+        <button type="button" onClick={() => addShape("ellipse")} title="Ellipse" className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral">
+          <Circle className="w-4 h-4" />
+        </button>
+        <button type="button" onClick={() => addShape("line")} title="Line" className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral">
+          <Minus className="w-4 h-4" />
+        </button>
+
+        <span className="w-px h-7 bg-espresso/10 mx-1" />
+
+        <button type="button" onClick={undo} disabled={!past.length} title="Undo"
+          className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral disabled:opacity-35">
+          <Undo2 className="w-4 h-4" />
+        </button>
+        <button type="button" onClick={redo} disabled={!future.length} title="Redo"
+          className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral disabled:opacity-35">
+          <Redo2 className="w-4 h-4" />
+        </button>
+
+        <label className="flex items-center gap-2 text-sm font-semibold text-espresso/70 ml-auto">
+          <input type="checkbox" checked={showGuides} onChange={(e) => setShowGuides(e.target.checked)} className="w-4 h-4 accent-[#e8735a]" />
+          Guides
+        </label>
+        <button type="button" onClick={download} className="btn-pill px-5 py-2.5 text-sm bg-coral text-white hover:bg-coral-deep">
+          <Download className="w-4 h-4" /> Download
+        </button>
+      </div>
+
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+        className="sr-only"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void onFile(f);
+          e.target.value = "";
+        }}
+      />
+
+      {error && <p className="text-sm text-coral font-semibold">{error}</p>}
+
+      <div className="grid lg:grid-cols-[1fr_20rem] gap-4 items-start">
+        <div className="rounded-3xl bg-cream-deep/40 border border-espresso/8 p-4" onPointerDownCapture={beginGesture}>
+          <SleeveCanvas
+            doc={doc}
+            selectedId={selectedId}
+            measure={measure}
+            showGuides={showGuides}
+            onSelect={setSelectedId}
+            onChange={live}
+            onCommit={endGesture}
+          />
+        </div>
+
+        <div className="rounded-3xl bg-white/60 border border-caramel/20 p-4 space-y-4 lg:sticky lg:top-24">
+          <Row label="Sleeve colour">
+            <Swatches value={doc.background} onChange={(v) => commit((cur) => ({ ...cur, background: v }))} />
+          </Row>
+          <div className="h-px bg-caramel/25" />
+          <Panel
+            el={selected}
+            onPatch={patch}
+            onDuplicate={() => {
+              if (!selectedId) return;
+              const { doc: next, id } = duplicate(doc, selectedId);
+              commit(next);
+              setSelectedId(id);
+            }}
+            onDelete={() => {
+              if (!selectedId) return;
+              commit((cur) => remove(cur, selectedId));
+              setSelectedId(null);
+            }}
+            onReorder={(to) => selectedId && commit((cur) => reorder(cur, selectedId, to))}
+          />
+        </div>
+      </div>
+
+      <p className="text-xs text-espresso/55">
+        {d.label} · print area {Math.round(d.arcBottom)} × {d.bandHeight} mm · {d.bleed} mm bleed · {d.glueLap.width} mm
+        glue lap. Drag to move, corners to resize, the dot above to rotate. Arrow keys nudge, ⌘Z undoes.
+      </p>
+    </div>
+  );
+}
