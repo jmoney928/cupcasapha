@@ -37,10 +37,11 @@ export default function Home() {
   return (
     <>
       {/* ---------------- HERO ---------------- */}
-      <section className="relative isolate overflow-hidden flex items-end sm:items-center min-h-[78svh] sm:min-h-0 sm:h-[min(80svh,740px)]">
+      {/* Pulled up under the transparent header (h-16/h-18 plus its 1px border), heights adding it back. */}
+      <section className="relative isolate overflow-hidden flex items-end sm:items-center -mt-[65px] sm:-mt-[73px] min-h-[calc(78svh+65px)] sm:min-h-[calc(min(80svh,740px)+73px)]">
         <HeroSlideshow slides={heroSlides} />
 
-        <div className="section-pad w-full pt-12 pb-16 sm:py-0">
+        <div className="section-pad w-full pt-28 pb-16 sm:pt-[73px] sm:pb-0">
           <Reveal className="max-w-xl">
             <span className="label-caps text-coral">Home compostable · plastic-free</span>
             <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4 text-cream">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -21,6 +22,15 @@ export function SiteHeader() {
   const [open, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { count, setOpen } = useCart();
+  const pathname = usePathname();
+
+  /*
+   * Only the homepage has a dark photo behind the header, so it is the only page where a
+   * transparent bar is readable. Everywhere else the page starts on cream and a see-through
+   * header with cream text would vanish. Opening the mobile menu drops the overlay too, because
+   * the panel below it is solid cream.
+   */
+  const overlay = pathname === "/" && !scrolled && !open;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -39,15 +49,31 @@ export function SiteHeader() {
       </div>
 
       <header
+        /*
+         * globals.css sets `* { border-color }` unlayered, which outranks Tailwind's layered
+         * `border-transparent`, so the bottom border has to be cleared inline. Its 1px width
+         * stays, keeping the header box — and the hero's negative margin — a constant height.
+         */
+        style={overlay ? { borderBottomColor: "transparent" } : undefined}
         className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-cream/85 backdrop-blur-md border-b border-espresso/10"
-            : "bg-cream border-b border-transparent"
+          overlay
+            ? "bg-transparent border-b border-transparent"
+            : scrolled
+              ? "bg-cream/85 backdrop-blur-md border-b border-espresso/10"
+              : "bg-cream border-b border-transparent"
         }`}
       >
         <div className="section-pad flex items-center justify-between h-16 sm:h-18">
           <Link href="/" className="flex items-center shrink-0" aria-label="cupcasa home">
-            <Logo variant="black" priority className="h-8 sm:h-10 w-auto" />
+            <span className="relative block">
+              <Logo variant="black" priority className="h-8 sm:h-10 w-auto" />
+              <Logo
+                variant="white"
+                className={`h-8 sm:h-10 w-auto absolute inset-0 transition-opacity duration-300 ${
+                  overlay ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
@@ -55,7 +81,11 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3.5 py-2 rounded-full text-sm font-semibold text-espresso/70 hover:text-espresso hover:bg-cream-deep transition-colors"
+                className={`px-3.5 py-2 rounded-full text-sm font-semibold transition-colors ${
+                  overlay
+                    ? "text-cream/85 hover:text-cream hover:bg-cream/15"
+                    : "text-espresso/70 hover:text-espresso hover:bg-cream-deep"
+                }`}
               >
                 {item.label}
               </Link>
@@ -66,9 +96,11 @@ export function SiteHeader() {
             <button
               onClick={() => setOpen(true)}
               aria-label="Open cart"
-              className="relative p-2.5 rounded-full hover:bg-cream-deep transition-colors"
+              className={`relative p-2.5 rounded-full transition-colors ${
+                overlay ? "hover:bg-cream/15" : "hover:bg-cream-deep"
+              }`}
             >
-              <ShoppingBag className="w-5 h-5 text-espresso" />
+              <ShoppingBag className={`w-5 h-5 ${overlay ? "text-cream" : "text-espresso"}`} />
               {count > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-coral text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {count}
@@ -85,7 +117,9 @@ export function SiteHeader() {
             <button
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="lg:hidden p-2.5 rounded-full hover:bg-cream-deep"
+              className={`lg:hidden p-2.5 rounded-full transition-colors ${
+                overlay ? "text-cream hover:bg-cream/15" : "hover:bg-cream-deep"
+              }`}
             >
               {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
