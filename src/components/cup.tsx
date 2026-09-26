@@ -1,6 +1,5 @@
 type CupProps = {
   tone?: "coral" | "caramel" | "leaf" | "cream" | "sky";
-  doubleWall?: boolean;
   label?: string;
   className?: string;
 };
@@ -19,7 +18,6 @@ const tones: Record<
 /** Stylized, brand-colored to-go cup illustration. */
 export function Cup({
   tone = "caramel",
-  doubleWall = false,
   label,
   className = "",
 }: CupProps) {
@@ -42,15 +40,8 @@ export function Cup({
       />
       {/* sip rim */}
       <path d="M34 56 L166 56 L162 70 L38 70 Z" fill={c.band} opacity="0.6" />
-      {/* center band */}
+      {/* sleeve */}
       <path d="M44 120 L156 120 L150 168 L50 168 Z" fill={c.band} />
-      {/* double wall ridges */}
-      {doubleWall && (
-        <>
-          <path d="M40 92 L160 92 L159 100 L41 100 Z" fill={c.band} opacity="0.45" />
-          <path d="M46 184 L154 184 L153 192 L47 192 Z" fill={c.band} opacity="0.45" />
-        </>
-      )}
       {/* leaf mark */}
       <path
         d="M100 132 c-10 0 -18 8 -18 18 c10 0 18 -8 18 -18 Z"
