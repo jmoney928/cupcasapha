@@ -74,7 +74,7 @@ function TextControls({ el, onPatch }: { el: TextElement; onPatch: Patch }) {
         rows={2}
         className="w-full rounded-2xl border-2 border-espresso/12 bg-white/80 px-3 py-2 focus:border-coral focus:outline-none"
       />
-      <p className="text-xs text-espresso/45 -mt-1">Enter starts a new line.</p>
+      <p className="text-xs text-espresso/45 -mt-1">Wraps to the box width below. Enter forces a break.</p>
 
       <Row label="Font">
         <select
@@ -90,6 +90,10 @@ function TextControls({ el, onPatch }: { el: TextElement; onPatch: Patch }) {
 
       <Row label="Size">
         <Num value={el.fontSize} onChange={(v) => onPatch({ fontSize: v })} min={2} max={90} step={0.5} suffix="mm" />
+      </Row>
+
+      <Row label="Box width">
+        <Num value={el.width} onChange={(v) => onPatch({ width: v })} min={6} max={400} suffix="mm" />
       </Row>
 
       <Row label="Style">

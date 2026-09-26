@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { SLEEVE_SIZES, sleeveDieline } from "./dielines";
 import { layout } from "./geometry";
+
+const layoutFor = (size: 8 | 12 | 16) => layout(sleeveDieline(size));
 import { add, centreOf, duplicate, emptyDoc, newShape, newText, remove, reorder, resize, update } from "./doc";
 import type { SleeveDoc, TextElement } from "./doc";
-import { elementBounds, estimateWidth, renderDoc, sleeveFileName } from "./render-doc";
+import { elementBounds, estimateWidth, insideSafeArea, renderDoc, sleeveFileName, wrapLines } from "./render-doc";
 
 const doc = (over: Partial<SleeveDoc> = {}): SleeveDoc => ({ ...emptyDoc(12), ...over });
 const text = (over: Partial<TextElement> = {}) => newText(12, over);
@@ -120,8 +122,95 @@ describe("bounds", () => {
     expect(three.height).toBeCloseTo(one.height * 3, 6);
   });
 
-  it("takes the widest line", () => {
-    const b = elementBounds(text({ text: "i\nwiiiiiiiiide" }), estimateWidth);
-    expect(b.width).toBeCloseTo(estimateWidth("wiiiiiiiiide", text()), 6);
+  it("reports the box, so the wrap width is what you grab", () => {
+    expect(elementBounds(text({ text: "i", width: 90 }), estimateWidth).width).toBe(90);
+  });
+
+  it("grows past the box only when a single word overhangs it", () => {
+    const el = text({ text: "Supercalifragilistic", width: 5, fontSize: 10 });
+    expect(elementBounds(el, estimateWidth).width).toBeCloseTo(estimateWidth("Supercalifragilistic", el), 6);
+  });
+});
+
+describe("word wrap", () => {
+  const long = "Inner Harbour Coffee Roasters of Victoria British Columbia";
+
+  it("breaks a long line to the box and keeps every word", () => {
+    const el = text({ text: long, width: 60, fontSize: 8 });
+    const ls = wrapLines(el, estimateWidth);
+    expect(ls.length).toBeGreaterThan(1);
+    expect(ls.join(" ").split(/\s+/)).toEqual(long.split(/\s+/));
+  });
+
+  it("never exceeds the box unless a single word does", () => {
+    const el = text({ text: long, width: 60, fontSize: 8 });
+    for (const line of wrapLines(el, estimateWidth)) {
+      if (line.split(/\s+/).length > 1) expect(estimateWidth(line, el)).toBeLessThanOrEqual(60);
+    }
+  });
+
+  it("lets a word wider than the box overhang rather than breaking it mid-word", () => {
+    const el = text({ text: "Supercalifragilistic", width: 5, fontSize: 10 });
+    expect(wrapLines(el, estimateWidth)).toEqual(["Supercalifragilistic"]);
+  });
+
+  it("keeps typed breaks as hard breaks", () => {
+    const el = text({ text: "one\ntwo", width: 400 });
+    expect(wrapLines(el, estimateWidth)).toEqual(["one", "two"]);
+  });
+
+  it("preserves a blank line", () => {
+    expect(wrapLines(text({ text: "a\n\nb", width: 400 }), estimateWidth)).toEqual(["a", "", "b"]);
+  });
+
+  it("rewraps when the box narrows", () => {
+    const wide = wrapLines(text({ text: long, width: 400, fontSize: 8 }), estimateWidth);
+    const narrow = wrapLines(text({ text: long, width: 40, fontSize: 8 }), estimateWidth);
+    expect(narrow.length).toBeGreaterThan(wide.length);
+  });
+
+  it("renders one tspan per wrapped line", () => {
+    const svg = renderDoc(doc({ elements: [text({ text: long, width: 60, fontSize: 8 })] }));
+    const expected = wrapLines(text({ text: long, width: 60, fontSize: 8 }), estimateWidth).length;
+    expect(svg.match(/<tspan/g)).toHaveLength(expected);
+  });
+
+  it("curves every wrapped line, not just the typed ones", () => {
+    const el = text({ text: long, width: 60, fontSize: 8, curve: 40 });
+    const svg = renderDoc(doc({ elements: [el] }));
+    expect(svg.match(/<textPath/g)).toHaveLength(wrapLines(el, estimateWidth).length);
+  });
+
+  it("aligns against the edges of the box", () => {
+    const left = renderDoc(doc({ elements: [text({ text: "hi", width: 100, align: "left" })] }));
+    const right = renderDoc(doc({ elements: [text({ text: "hi", width: 100, align: "right" })] }));
+    expect(left).toContain('text-anchor="start"');
+    expect(right).toContain('text-anchor="end"');
+    /* 100mm box, so the two anchors sit 100mm apart. */
+    const x = (s: string) => Number(/<tspan x="([-\d.]+)"/.exec(s)![1]);
+    expect(x(right) - x(left)).toBeCloseTo(100, 1);
+  });
+});
+
+describe("safe area", () => {
+  it("accepts a modest block in the middle of the band", () => {
+    const d = emptyDoc(12);
+    expect(insideSafeArea(d, d.elements[0], estimateWidth)).toBe(true);
+  });
+
+  it("rejects a block that has wrapped taller than the band", () => {
+    const el = text({ text: "Inner Harbour Coffee Roasters of Victoria British Columbia", width: 60, fontSize: 11 });
+    expect(insideSafeArea(doc({ elements: [el] }), el, estimateWidth)).toBe(false);
+  });
+
+  it("rejects something dragged off the end of the sleeve", () => {
+    const el = text({ text: "hi", width: 20, fontSize: 6, x: 5 });
+    expect(insideSafeArea(doc({ elements: [el] }), el, estimateWidth)).toBe(false);
+  });
+
+  it("rejects something pushed past the glue lap", () => {
+    const l = layoutFor(12);
+    const el = text({ text: "hi", width: 20, fontSize: 6, x: l.width - 8 });
+    expect(insideSafeArea(doc({ elements: [el] }), el, estimateWidth)).toBe(false);
   });
 });

@@ -17,15 +17,44 @@ export type Measurer = (text: string, el: TextElement) => number;
 export const estimateWidth: Measurer = (text, el) =>
   text.length * el.fontSize * (el.bold ? 0.58 : 0.54) + Math.max(0, text.length - 1) * el.letterSpacing;
 
-export const lines = (el: TextElement) => el.text.split("\n");
+/**
+ * Greedy word wrap to the element's box, with typed line breaks kept as hard breaks. A single word
+ * wider than the box is left to overhang rather than broken mid-word — breaking a café's name in
+ * half is worse than a line that runs wide, and the safe-area guide shows when it has.
+ */
+export function wrapLines(el: TextElement, measure: Measurer): string[] {
+  const max = Math.max(el.width, el.fontSize * 0.5);
+  const out: string[] = [];
+
+  for (const paragraph of el.text.split("\n")) {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    if (!words.length) {
+      out.push("");
+      continue;
+    }
+    let line = "";
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (line && measure(candidate, el) > max) {
+        out.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    if (line) out.push(line);
+  }
+
+  return out.length ? out : [""];
+}
 
 /** The box the editor draws handles around. */
 export function elementBounds(el: SleeveElement, measure: Measurer) {
   if (el.kind === "text") {
-    const ls = lines(el);
-    const width = Math.max(1, ...ls.map((l) => measure(l, el)));
-    const height = ls.length * el.fontSize * el.lineHeight;
-    return { width, height };
+    /* The box, not the letters — so the wrap width is what you grab and drag. */
+    const ls = wrapLines(el, measure);
+    const widest = Math.max(1, ...ls.map((l) => measure(l, el)));
+    return { width: Math.max(el.width, widest), height: ls.length * el.fontSize * el.lineHeight };
   }
   return { width: el.width, height: Math.max(el.height, el.kind === "shape" && el.shape === "line" ? el.strokeWidth : 0) };
 }
@@ -36,7 +65,7 @@ const transform = (el: SleeveElement) =>
 const opacity = (el: SleeveElement) => (el.opacity < 1 ? ` opacity="${n(el.opacity)}"` : "");
 
 function renderText(el: TextElement, measure: Measurer, idPrefix: string): string {
-  const ls = lines(el);
+  const ls = wrapLines(el, measure);
   const stack = fontStack(el.font);
   const fill = colour(el.fill, "#ede9de");
   const anchor = el.align === "left" ? "start" : el.align === "right" ? "end" : "middle";
@@ -73,9 +102,9 @@ function renderText(el: TextElement, measure: Measurer, idPrefix: string): strin
 
   const total = ls.length * el.fontSize * el.lineHeight;
   const first = el.y - total / 2 + el.fontSize * el.lineHeight * 0.5;
-  const x = el.align === "left" ? el.x - elementBounds(el, measure).width / 2
-    : el.align === "right" ? el.x + elementBounds(el, measure).width / 2
-    : el.x;
+  /* Aligned against the edges of the box, which is what makes left and right mean anything. */
+  const half = elementBounds(el, measure).width / 2;
+  const x = el.align === "left" ? el.x - half : el.align === "right" ? el.x + half : el.x;
   const tspans = ls
     .map((line, i) => `<tspan x="${n(x)}" y="${n(first + i * el.fontSize * el.lineHeight)}">${esc(line)}</tspan>`)
     .join("");
@@ -185,3 +214,36 @@ export const sleeveFileName = (doc: SleeveDoc) => {
   const name = (first?.text ?? "artwork").split("\n")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   return `cupcasa-sleeve-${doc.size}oz-${name || "artwork"}.svg`;
 };
+
+/**
+ * Whether every corner of an element sits inside the safe area.
+ *
+ * Wrapping makes it easy to build a text block taller than the band without noticing, and the
+ * clip means it would simply print cut off. Cheaper to say so than to let someone order 500
+ * sleeves with half a name on them.
+ */
+export function insideSafeArea(doc: SleeveDoc, el: SleeveElement, measure: Measurer): boolean {
+  const d = sleeveDieline(doc.size);
+  const l = layout(d);
+  const b = elementBounds(el, measure);
+  const inset = degAt(d.safeArea, d.innerRadius);
+  const minR = d.innerRadius + d.safeArea;
+  const maxR = d.outerRadius - d.safeArea;
+  const minDeg = l.startDeg + inset;
+  const maxDeg = l.foldDeg - inset;
+  const a = (el.rotation * Math.PI) / 180;
+
+  for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+    const lx = (sx * b.width) / 2;
+    const ly = (sy * b.height) / 2;
+    const x = el.x + lx * Math.cos(a) - ly * Math.sin(a);
+    const y = el.y + lx * Math.sin(a) + ly * Math.cos(a);
+    const dx = x - l.cx;
+    const dy = y - l.cy;
+    const r = Math.hypot(dx, dy);
+    /* Angle either side of straight up, matching how the sector is laid out. */
+    const deg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+    if (r < minR || r > maxR || deg < minDeg || deg > maxDeg) return false;
+  }
+  return true;
+}

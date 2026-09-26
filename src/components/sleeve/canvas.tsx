@@ -150,7 +150,11 @@ export function SleeveCanvas({
     const ratio = Math.max(0.1, Math.hypot(x - el.x, y - el.y) / drag.startDist);
     const start = drag.start;
     if (start.kind === "text") {
-      patch(drag.id, { fontSize: Math.min(90, Math.max(2, Math.round(start.fontSize * ratio * 10) / 10)) });
+      /* Type and box scale together, so a corner drag makes the text bigger without re-wrapping it. */
+      patch(drag.id, {
+        fontSize: Math.min(90, Math.max(2, Math.round(start.fontSize * ratio * 10) / 10)),
+        width: Math.min(400, Math.max(6, Math.round(start.width * ratio * 10) / 10)),
+      });
     } else {
       patch(drag.id, {
         width: Math.max(1, Math.round(start.width * ratio * 10) / 10),

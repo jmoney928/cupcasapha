@@ -29,6 +29,8 @@ export type TextElement = Base & {
   letterSpacing: number;
   lineHeight: number;
   align: "left" | "center" | "right";
+  /** Box width in mm. Text wraps to it; a word longer than the box overhangs rather than breaking. */
+  width: number;
   fill: string;
   /** Degrees of curve. 0 is a straight line; positive bends the text upward. */
   curve: number;
@@ -72,10 +74,14 @@ export function centreOf(size: CupSize) {
 
 export function newText(size: CupSize, over: Partial<TextElement> = {}): TextElement {
   const c = centreOf(size);
+  const d = sleeveDieline(size);
   return {
     id: newId(), kind: "text", x: c.x, y: c.y, rotation: 0, opacity: 1, locked: false,
     text: "Your café", font: "sans", fontSize: 11, bold: true, italic: false,
-    letterSpacing: 0, lineHeight: 1.25, align: "center", fill: "#ede9de", curve: 0,
+    letterSpacing: 0, lineHeight: 1.25, align: "center",
+    /* Wide enough that a short name never wraps, narrow enough that a sentence does. */
+    width: Math.round(d.arcBottom * 0.7),
+    fill: "#ede9de", curve: 0,
     ...over,
   };
 }

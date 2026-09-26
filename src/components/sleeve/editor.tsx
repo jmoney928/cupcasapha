@@ -7,7 +7,7 @@ import {
   add, byId, duplicate, emptyDoc, newImage, newShape, newText, remove, reorder, resize, update,
   type SleeveDoc, type SleeveElement,
 } from "@/lib/sleeve/doc";
-import { renderDoc, sleeveFileName } from "@/lib/sleeve/render-doc";
+import { insideSafeArea, renderDoc, sleeveFileName } from "@/lib/sleeve/render-doc";
 import { SleeveCanvas } from "./canvas";
 import { Panel } from "./panel";
 import { Row, Swatches } from "./controls";
@@ -81,6 +81,9 @@ export function SleeveEditor() {
   }, []);
 
   const selected = selectedId ? byId(doc, selectedId) ?? null : null;
+
+  /* Anything outside the safe area still prints — it just prints cut off, so say so up front. */
+  const overflowing = doc.elements.filter((el) => !insideSafeArea(doc, el, measure));
 
   const patch = (p: Partial<SleeveElement>) => selectedId && commit((d) => update(d, selectedId, p));
 
@@ -248,6 +251,13 @@ export function SleeveEditor() {
       />
 
       {error && <p className="text-sm text-coral font-semibold">{error}</p>}
+
+      {overflowing.length > 0 && (
+        <p className="text-sm font-semibold text-espresso/80 bg-butter/40 border border-caramel/30 rounded-2xl px-4 py-3">
+          {overflowing.length === 1 ? "One piece runs" : `${overflowing.length} pieces run`} past the blue safe
+          line. Anything out there gets trimmed off — make it smaller, or widen its box so it wraps shorter.
+        </p>
+      )}
 
       <div className="grid lg:grid-cols-[1fr_20rem] gap-4 items-start">
         <div className="rounded-3xl bg-cream-deep/40 border border-espresso/8 p-4" onPointerDownCapture={beginGesture}>
