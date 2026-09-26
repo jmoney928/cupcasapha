@@ -165,7 +165,7 @@ export default function SustainabilityPage() {
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
               <Button href="/shop" variant="cream" size="lg">
-                Reserve cups <ArrowRight className="w-5 h-5" />
+                Shop packs <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/why-pha" variant="dark" size="lg">
                 The material

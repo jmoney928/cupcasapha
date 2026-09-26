@@ -1,24 +1,17 @@
 import type { Metadata } from "next";
-import { Package, Gift, TrendingDown, Truck, Leaf, Check, Printer } from "lucide-react";
+import { Package, Gift, Truck, Leaf, Check, Printer, Sparkles } from "lucide-react";
 import { Reveal, Eyebrow } from "@/components/ui";
 import { LeadForm } from "@/components/lead-form";
-import { products, formatPrice } from "@/lib/products";
+import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 
 export const metadata: Metadata = {
   title: "Wholesale & Bulk",
   description:
-    "Wholesale compostable PHA cups for cafés, chains and distributors. Tiered volume pricing, free samples, and custom printing on orders of 100,000+ cups. Request a quote.",
+    "Café pricing on compostable PHA cups: 15, 17 and 19¢ a cup by the case of 1,000, 5¢ lids, custom sleeves, 1,000 free with your first order, and Cup Casa OS at no charge. Custom-printed cups at 100,000+.",
 };
 
-const tiers = [
-  { name: "Starter", range: "1–9 cases", discount: "List price", note: "Buy online instantly" },
-  { name: "Café", range: "10–49 cases", discount: "Up to 8% off", note: "Best for single locations" },
-  { name: "Volume", range: "50–199 cases", discount: "Up to 15% off", note: "Multi-site & growing brands · custom printing from 100 cases" },
-  { name: "Distributor", range: "200+ cases", discount: "Custom pricing", note: "Pallet & container freight · custom printing available" },
-];
-
 const perks = [
-  { icon: TrendingDown, title: "Tiered pricing", text: "The more you order, the lower your per-cup cost." },
+  { icon: Sparkles, title: "Cup Casa OS free", text: "Reorder autopilot, costing, compliance and brand tools, bundled with your cups." },
   { icon: Gift, title: "Free samples", text: "Try every size before you commit a single dollar." },
   { icon: Truck, title: "Freight sorted", text: "Pallet and LTL freight to your door, US & Canada." },
   { icon: Package, title: "Reliable supply", text: "Consistent stock so you never run dry mid-service." },
@@ -37,47 +30,73 @@ export default function WholesalePage() {
             <span className="text-coral">priced for volume.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
-            Stock genuinely compostable cups across your whole operation — and put
-            your brand on them at 100,000 cups or more. Tell us what you need and
-            we&apos;ll send a tailored quote, plus free samples to prove the quality.
+            One price, published. Cups by the case of 1,000, lids that fit every size, and
+            sleeves printed with your brand — plus Cup Casa OS at no charge for as long as you
+            order cups. Free samples before you commit a dollar.
           </p>
         </div>
       </section>
 
-      {/* base pricing */}
+      {/* the offer */}
       <section className="section-pad py-6">
         <div className="mb-6">
-          <span className="label-caps text-coral">Per-cup pricing</span>
+          <span className="label-caps text-coral">Café pricing</span>
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-2">
-            Simple list pricing.
+            The whole offer, on one page.
           </h2>
           <p className="text-espresso/60 mt-2 max-w-xl">
-            Every size is double-wall and ships blank, sold by the case of 1,000.
-            Volume tiers below bring the per-cup price down from here.
+            Sold by the case of {CAFE_OFFER.caseCount.toLocaleString()}. No tiers to negotiate and
+            no minimum beyond a single case.
           </p>
         </div>
+
         <div className="grid sm:grid-cols-3 gap-4">
-          {products.map((p) => (
-            <div
-              key={p.slug}
-              className="rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6"
-            >
+          {cafeRows.map((row) => (
+            <div key={row.size} className="rounded-3xl bg-cream-deep/50 border border-espresso/8 p-6">
               <div className="flex items-baseline justify-between">
-                <p className="font-display text-2xl font-extrabold">{p.size}</p>
-                <span className="label-caps text-espresso/40">Double wall</span>
+                <p className="font-display text-2xl font-extrabold">{row.size}</p>
+                <span className="label-caps text-espresso/40">{row.shortName}</span>
               </div>
               <div className="mt-5 flex items-baseline justify-between">
-                <span className="text-espresso/70">{p.shortName}</span>
-                <span className="font-display font-bold text-coral">
-                  {formatPrice(p.pricePerCup)}
-                  <span className="text-coral/60 text-sm font-normal">/cup</span>
-                </span>
+                <span className="text-espresso/70">Per cup</span>
+                <span className="font-display font-bold text-coral text-2xl">{row.perCupCents}¢</span>
               </div>
               <p className="text-xs text-espresso/45 mt-4">
-                {formatPrice(p.casePrice)} per case of {p.caseCount.toLocaleString()}
+                {dollars(row.caseDollars)} per case of {CAFE_OFFER.caseCount.toLocaleString()}
+              </p>
+              <p className="text-xs text-espresso/45 mt-1">
+                {row.perServeCents}¢ a drink with a lid and a sleeve
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-4 mt-4">
+          <div className="rounded-3xl bg-white/70 border border-caramel/20 p-6">
+            <p className="label-caps text-coral">Lids</p>
+            <p className="font-display text-3xl font-extrabold mt-2">{CAFE_OFFER.lidCents}¢</p>
+            <p className="text-sm text-espresso/70 mt-2">
+              One lid fits all three sizes, so there is only ever one lid to stock. With any cup
+              order.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white/70 border border-caramel/20 p-6">
+            <p className="label-caps text-coral">Custom sleeves</p>
+            <p className="font-display text-3xl font-extrabold mt-2">{CAFE_OFFER.sleeveWithCupsCents}¢</p>
+            <p className="text-sm text-espresso/70 mt-2">
+              Your first {CAFE_OFFER.freeSleeves.toLocaleString()} are free with your first cup
+              order. After that it is {CAFE_OFFER.sleeveWithCupsCents}¢ a sleeve while you keep
+              ordering cups, or {CAFE_OFFER.sleeveStandaloneCents}¢ on their own.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-espresso text-cream p-6">
+            <p className="label-caps text-coral">Cup Casa OS</p>
+            <p className="font-display text-3xl font-extrabold mt-2">Free</p>
+            <p className="text-sm text-cream/70 mt-2">
+              Reorder autopilot, recipe costing, the compliance binder and the brand kit —
+              included, not upsold. <a href="/os" className="underline font-semibold">See what&apos;s in it</a>.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -94,9 +113,9 @@ export default function WholesalePage() {
                 Your brand on the cup, at volume.
               </h2>
               <p className="text-cream/65 mt-2 max-w-2xl">
-                Full-colour, edge-to-edge printing with your artwork is available on orders of
-                100,000 cups or more (100 cases, any mix of sizes). Ask for it in your quote
-                request and we&apos;ll include printed pricing and lead times.
+                Full-colour, edge-to-edge printing on the cup itself starts at
+                {" "}{CAFE_OFFER.customCupMinimum.toLocaleString()} cups (100 cases, any mix of sizes).
+                Below that, your branding goes on the sleeve — printed here, no minimum, no setup fee.
               </p>
             </div>
             <a
@@ -107,40 +126,6 @@ export default function WholesalePage() {
             </a>
           </div>
         </Reveal>
-      </section>
-
-      {/* tiers */}
-      <section className="section-pad py-12">
-        <Reveal>
-          <h2 className="font-display text-4xl font-bold mb-2">Volume tiers</h2>
-          <p className="text-espresso/70 mb-8">
-            Indicative tiers — your exact quote depends on sizes, volume and freight.
-          </p>
-        </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {tiers.map((t, i) => (
-            <Reveal key={t.name} delay={i * 80}>
-              <div
-                className={`h-full rounded-3xl p-6 border ${
-                  i === 2
-                    ? "bg-espresso text-cream border-espresso"
-                    : "bg-white/70 border-caramel/20"
-                }`}
-              >
-                <p className={`font-display text-xl font-bold ${i === 2 ? "text-leaf-bright" : "text-coral"}`}>
-                  {t.name}
-                </p>
-                <p className={`text-sm mt-1 ${i === 2 ? "text-cream/70" : "text-espresso/60"}`}>
-                  {t.range}
-                </p>
-                <p className="font-display text-2xl font-bold mt-4">{t.discount}</p>
-                <p className={`text-sm mt-2 ${i === 2 ? "text-cream/70" : "text-espresso/60"}`}>
-                  {t.note}
-                </p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
       </section>
 
       {/* perks */}
@@ -174,8 +159,9 @@ export default function WholesalePage() {
             </p>
             <ul className="mt-6 space-y-3">
               {[
-                "Custom volume pricing",
-                "Custom printing on 100,000+ cups",
+                "Published pricing, no negotiation",
+                "Custom-printed cups at 100,000+",
+                "Custom sleeves at any quantity",
                 "Free samples of every size",
                 "Freight to the US & Canada",
                 "Net terms available for established accounts",
@@ -204,7 +190,7 @@ export default function WholesalePage() {
                 name: "volume",
                 label: "Estimated monthly volume",
                 type: "select",
-                options: ["1–9 cases", "10–49 cases", "50–199 cases", "200+ cases"],
+                options: ["1–4 cases", "5–19 cases", "20–99 cases", "100+ cases"],
                 required: true,
               },
               {
@@ -217,7 +203,12 @@ export default function WholesalePage() {
                 name: "printing",
                 label: "Custom printing?",
                 type: "select",
-                options: ["No — blank cups", "Yes — 100,000+ cups with our artwork", "Not sure yet"],
+                options: [
+                  "Custom sleeves",
+                  "Custom-printed cups (100,000+)",
+                  "Blank cups, no printing",
+                  "Not sure yet",
+                ],
               },
               { name: "message", label: "Anything else?", type: "textarea" },
             ]}

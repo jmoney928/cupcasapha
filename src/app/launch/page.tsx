@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand";
 import { EmailLink } from "@/components/launch/email-link";
+import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 import s from "./for-cafes.module.css";
 
 const EMAIL = "hello@cupcasa.com";
@@ -33,7 +34,7 @@ export default function ForCafesPage() {
           <div className={s.stats}>
             <div className={s.stat}><b>98%</b><span>of the 167 Victoria coffee drinkers we surveyed said they’d pay 15¢ more per coffee for this cup.</span></div>
             <div className={s.stat}><b>1st</b><span>and only cup in Canada with these certifications. Launch cafés get it before anyone else.</span></div>
-            <div className={s.stat}><b>20–24¢</b><span>per cup, about what most cafés are already paying for PLA.</span></div>
+            <div className={s.stat}><b>{cafeRows[0].perCupCents}–{cafeRows[cafeRows.length - 1].perCupCents}¢</b><span>per cup — under what most cafés are already paying for PLA.</span></div>
           </div>
         </div>
       </section>
@@ -110,9 +111,23 @@ export default function ForCafesPage() {
           <p className={s.lede}>We’re placing the first container with a small group of launch cafés. Spots are limited to what’s on the boat.</p>
           <div className={s.pricing}>
             <div>
-              <div className={s.priceRow}><div className={s.size}><b>8oz</b> <span>· The Espresso</span></div><div className={s.case}>$200 / case of 1,000</div><div className={s.per}>20¢</div></div>
-              <div className={s.priceRow}><div className={s.size}><b>12oz</b> <span>· The Everyday</span></div><div className={s.case}>$220 / case of 1,000</div><div className={s.per}>22¢</div></div>
-              <div className={s.priceRow}><div className={s.size}><b>16oz</b> <span>· The Big One</span></div><div className={s.case}>$240 / case of 1,000</div><div className={s.per}>24¢</div></div>
+              {cafeRows.map((row) => (
+                <div key={row.size} className={s.priceRow}>
+                  <div className={s.size}><b>{row.size}</b> <span>· {row.shortName}</span></div>
+                  <div className={s.case}>{dollars(row.caseDollars)} / case of {CAFE_OFFER.caseCount.toLocaleString()}</div>
+                  <div className={s.per}>{row.perCupCents}¢</div>
+                </div>
+              ))}
+              <div className={s.priceRow}>
+                <div className={s.size}><b>Lids</b> <span>· one fits all three</span></div>
+                <div className={s.case}>With any cup order</div>
+                <div className={s.per}>{CAFE_OFFER.lidCents}¢</div>
+              </div>
+              <div className={s.priceRow}>
+                <div className={s.size}><b>Custom sleeves</b> <span>· your brand</span></div>
+                <div className={s.case}>First {CAFE_OFFER.freeSleeves.toLocaleString()} free, then {CAFE_OFFER.sleeveWithCupsCents}¢</div>
+                <div className={s.per}>{CAFE_OFFER.sleeveWithCupsCents}¢</div>
+              </div>
               <p className={s.note}>Prices in CAD before tax. We deliver to your café.</p>
               <p className={s.note}>
                 <a href="/calculator" style={{ fontWeight: 700 }}>Work out what the switch is worth to you →</a>
@@ -122,11 +137,12 @@ export default function ForCafesPage() {
               <div className={s.eyebrow}>What launch cafés get</div>
               <ul className={s.perks}>
                 <li>Launch pricing held for 12 months</li>
+                <li>Your first {CAFE_OFFER.freeSleeves.toLocaleString()} custom sleeves free</li>
+                <li>Cup Casa OS free, for as long as you order cups</li>
                 <li>First-container allocation</li>
                 <li>Store-locator listing on cupcasa.com from day one</li>
                 <li>Launch announcement on @cup_casa</li>
                 <li>Free A-frame and till signage with QR code</li>
-                <li>First access to the resupply system when it’s ready</li>
               </ul>
             </div>
           </div>

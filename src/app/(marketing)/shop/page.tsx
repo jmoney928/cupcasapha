@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Leaf, Truck, Recycle, Layers } from "lucide-react";
+import { Leaf, Package, Recycle, Palette } from "lucide-react";
 import { products } from "@/lib/products";
 import { CERT_SHORT, MATERIAL_SHORT } from "@/lib/certs";
 import { ProductCard } from "@/components/product-card";
@@ -8,14 +8,14 @@ import { Reveal } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Shop PHA Cups",
   description:
-    "PHA-lined paper cups in 8oz, 12oz and 16oz — certified home compostable by DIN CERTCO, no PE, no PLA. Double wall, sold by the case of 1,000. Reserve with a $200 deposit.",
+    "PHA-lined paper cups in 8oz, 12oz and 16oz, sold as packs of cups, custom-printed sleeves and lids. Certified home compostable by DIN CERTCO. No PE, no PLA. From 35¢ a set.",
 };
 
 const perks = [
-  { icon: Truck, text: "Ships by the case of 1,000" },
+  { icon: Package, text: "Cups, sleeves and lids in every pack" },
   { icon: Leaf, text: CERT_SHORT },
   { icon: Recycle, text: MATERIAL_SHORT },
-  { icon: Layers, text: "Double wall — no sleeve needed" },
+  { icon: Palette, text: "Sleeves printed with your design" },
 ];
 
 export default function ShopPage() {
@@ -23,12 +23,12 @@ export default function ShopPage() {
     <>
       <section className="section-pad pt-12 pb-8 text-center">
         <span className="label-caps text-coral">The shop</span>
-        <h1 className="font-display text-5xl sm:text-6xl mt-4">Pick your cups.</h1>
+        <h1 className="font-display text-5xl sm:text-6xl mt-4">Pick your pack.</h1>
         <p className="text-lg text-espresso/70 mt-4 max-w-xl mx-auto">
-          Blank, unbranded, PHA-lined paper — sold by the case of 1,000. Reserve now
-          with a <strong>$200 deposit</strong> — cups arriving{" "}
-          <strong>December 2026</strong>. Need volume?{" "}
-          <a href="/wholesale" className="text-coral font-semibold underline">Go wholesale</a>.
+          Every pack is a matched set: a PHA-lined cup, a sleeve printed with your design,
+          and a lid. From <strong>35¢ a set</strong>, arriving{" "}
+          <strong>December 2026</strong>. Running a café?{" "}
+          <a href="/wholesale" className="text-coral font-semibold underline">See case pricing</a>.
         </p>
       </section>
 
@@ -50,10 +50,11 @@ export default function ShopPage() {
         <div className="mb-6">
           <span className="label-caps text-coral">Three sizes</span>
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-2">
-            Ready to go, unbranded.
+            Pick a size, pick a pack.
           </h2>
           <p className="text-espresso/60 mt-2 max-w-xl">
-            Clean, undecorated PHA cups — perfect as-is, or add your own sleeve or stamp.
+            The cup is blank. The sleeve carries your design — we print it here on our own UV
+            printer, so there is no minimum and no setup fee.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -4,15 +4,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Plus, Check } from "lucide-react";
 import { useState } from "react";
-import { type Product, formatPrice } from "@/lib/products";
+import { type Product } from "@/lib/products";
+import { packsForSize } from "@/lib/packs";
+import { formatCents } from "@/lib/skus";
 import { useCart } from "@/components/cart-context";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add, setOpen } = useCart();
   const [added, setAdded] = useState(false);
 
+  /* The card quotes and adds the smallest pack; the product page is where the sizes are chosen. */
+  const options = packsForSize(product.oz as 8 | 12 | 16);
+  const entry = options[0];
+  const best = options[options.length - 1];
+
   const handleAdd = () => {
-    add(product.slug, 1);
+    add(entry.slug, 1);
     setAdded(true);
     setOpen(true);
     setTimeout(() => setAdded(false), 1500);
@@ -24,11 +31,9 @@ export function ProductCard({ product }: { product: Product }) {
         href={`/shop/${product.slug}`}
         className="relative block aspect-[4/3] overflow-hidden"
       >
-        {product.doubleWall && (
-          <span className="absolute top-4 left-4 z-10 bg-espresso text-cream text-xs font-bold px-3 py-1 rounded-full">
-            Double wall
-          </span>
-        )}
+        <span className="absolute top-4 left-4 z-10 bg-espresso text-cream text-xs font-bold px-3 py-1 rounded-full">
+          Home compostable
+        </span>
         <span className="absolute top-4 right-4 z-10 bg-cream text-espresso text-xs font-bold px-3 py-1 rounded-full">
           {product.size}
         </span>
@@ -45,14 +50,15 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="flex items-baseline justify-between gap-2">
           <h3 className="font-display text-xl font-bold">{product.name}</h3>
           <span className="font-display font-bold text-coral whitespace-nowrap">
-            {formatPrice(product.casePrice)}
+            {formatCents(entry.totalCents)}
           </span>
         </div>
         <p className="text-sm text-espresso/60 mb-1">{product.shortName}</p>
         <p className="text-sm text-espresso/70 flex-1">{product.blurb}</p>
 
         <div className="text-xs text-espresso/50 mt-3 mb-4">
-          {formatPrice(product.pricePerCup)}/cup · case of {product.caseCount.toLocaleString()}
+          {entry.packSize} sets · {entry.perTrioCents}¢ each, down to {best.perTrioCents}¢ at{" "}
+          {best.packSize}
         </div>
 
         <div className="flex gap-2">
@@ -68,7 +74,7 @@ export function ProductCard({ product }: { product: Product }) {
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4" /> Reserve
+                <Plus className="w-4 h-4" /> Add {entry.packSize}
               </>
             )}
           </button>

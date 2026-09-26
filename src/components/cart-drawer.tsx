@@ -4,12 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import { X, Minus, Plus, Trash2, Loader2 } from "lucide-react";
 import { useCart } from "@/components/cart-context";
-import { products, formatPrice } from "@/lib/products";
+import { findSku, formatCents } from "@/lib/skus";
+import { DEPOSIT_CENTS } from "@/lib/deposit";
 import { fbqTrack } from "@/lib/fbq";
 import { Cup } from "@/components/cup";
 
 export function CartDrawer() {
-  const { items, isOpen, setOpen, setCases, remove, subtotal, count } = useCart();
+  const { items, isOpen, setOpen, setQty, remove, packSubtotalCents, caseSubtotalCents, hasCases, count } =
+    useCart();
+  const dueTodayCents = packSubtotalCents + (hasCases ? DEPOSIT_CENTS : 0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,9 +21,9 @@ export function CartDrawer() {
     setError(null);
     fbqTrack("InitiateCheckout", {
       content_ids: items.map((i) => i.slug),
-      contents: items.map((i) => ({ id: i.slug, quantity: i.cases })),
+      contents: items.map((i) => ({ id: i.slug, quantity: i.qty })),
       num_items: count,
-      value: Math.round(subtotal * 100) / 100,
+      value: dueTodayCents / 100,
       currency: "CAD",
     });
     try {
@@ -81,28 +84,26 @@ export function CartDrawer() {
           )}
 
           {items.map((item) => {
-            const p = products.find((x) => x.slug === item.slug);
-            if (!p) return null;
+            const sku = findSku(item.slug);
+            if (!sku) return null;
             return (
               <div
                 key={item.slug}
                 className="flex gap-4 bg-white/60 rounded-3xl p-4 border border-caramel/20"
               >
                 <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden">
-                  <Image src={p.image} alt={p.name} fill sizes="56px" className="object-cover" />
+                  <Image src={sku.image} alt={sku.name} fill sizes="56px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between gap-2">
                     <div>
-                      <p className="font-display font-bold leading-tight">{p.name}</p>
-                      <p className="text-sm text-espresso/60">
-                        {formatPrice(p.casePrice)} / case · {p.caseCount.toLocaleString()} cups
-                      </p>
+                      <p className="font-display font-bold leading-tight">{sku.name}</p>
+                      <p className="text-sm text-espresso/60">{sku.meta}</p>
                     </div>
                     <button
                       onClick={() => remove(item.slug)}
                       className="text-espresso/40 hover:text-coral self-start"
-                      aria-label={`Remove ${p.name}`}
+                      aria-label={`Remove ${sku.name}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -110,17 +111,17 @@ export function CartDrawer() {
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2 bg-cream-deep rounded-full p-1">
                       <button
-                        onClick={() => setCases(item.slug, item.cases - 1)}
+                        onClick={() => setQty(item.slug, item.qty - 1)}
                         className="w-7 h-7 rounded-full bg-white flex items-center justify-center hover:bg-coral hover:text-cream"
                         aria-label="Decrease"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                       <span className="w-8 text-center font-bold text-sm">
-                        {item.cases}
+                        {item.qty}
                       </span>
                       <button
-                        onClick={() => setCases(item.slug, item.cases + 1)}
+                        onClick={() => setQty(item.slug, item.qty + 1)}
                         className="w-7 h-7 rounded-full bg-white flex items-center justify-center hover:bg-leaf hover:text-cream"
                         aria-label="Increase"
                       >
@@ -128,7 +129,7 @@ export function CartDrawer() {
                       </button>
                     </div>
                     <span className="font-display font-bold">
-                      {formatPrice(p.casePrice * item.cases)}
+                      {formatCents(sku.unitPriceCents * item.qty)}
                     </span>
                   </div>
                 </div>
@@ -139,23 +140,38 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="p-5 border-t border-caramel/25 space-y-3">
-            <div className="rounded-2xl bg-coral/10 text-espresso/80 text-sm p-3 leading-snug">
-              🎟️ Reserve your order with a <strong>$200 deposit</strong>. Cups are
-              arriving <strong>December 2026</strong> — we&apos;ll bill the balance when
-              they ship.
-            </div>
-            <div className="flex justify-between text-sm text-espresso/60">
-              <span>Order value (reserved)</span>
-              <span className="font-semibold">{formatPrice(subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-lg">
-              <span className="font-semibold">Deposit due today</span>
-              <span className="font-display font-bold">{formatPrice(200)}</span>
+            {hasCases && (
+              <div className="rounded-2xl bg-coral/10 text-espresso/80 text-sm p-3 leading-snug">
+                🎟️ Cases are reserved with a <strong>{formatCents(DEPOSIT_CENTS)} deposit</strong>. Cups
+                arrive <strong>December 2026</strong> — we&apos;ll bill the balance when they ship.
+              </div>
+            )}
+            {packSubtotalCents > 0 && (
+              <div className="flex justify-between text-sm text-espresso/70">
+                <span>Packs</span>
+                <span className="font-semibold">{formatCents(packSubtotalCents)}</span>
+              </div>
+            )}
+            {hasCases && (
+              <>
+                <div className="flex justify-between text-sm text-espresso/60">
+                  <span>Cases reserved</span>
+                  <span className="font-semibold">{formatCents(caseSubtotalCents)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-espresso/70">
+                  <span>Case deposit</span>
+                  <span className="font-semibold">{formatCents(DEPOSIT_CENTS)}</span>
+                </div>
+              </>
+            )}
+            <div className="flex justify-between text-lg border-t border-caramel/25 pt-3">
+              <span className="font-semibold">Due today</span>
+              <span className="font-display font-bold">{formatCents(dueTodayCents)}</span>
             </div>
             <p className="text-xs text-espresso/60">
-              Need 50+ cases?{" "}
+              Running a café?{" "}
               <a href="/wholesale" className="underline font-semibold">
-                Get wholesale pricing
+                See café pricing
               </a>
               .
             </p>
@@ -174,7 +190,7 @@ export function CartDrawer() {
                   <Loader2 className="w-5 h-5 animate-spin" /> Redirecting…
                 </>
               ) : (
-                "Pay $200 deposit"
+                `Pay ${formatCents(dueTodayCents)}`
               )}
             </button>
           </div>

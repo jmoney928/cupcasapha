@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { products } from "@/lib/products";
+import { findSku } from "@/lib/skus";
+import { DEPOSIT_CENTS } from "@/lib/deposit";
 
-type IncomingItem = { slug: string; cases: number };
+type IncomingItem = { slug: string; qty: number };
 
 export async function POST(req: Request) {
   // Accept either name (project uses STRIPE_API_KEY; STRIPE_SECRET_KEY also supported).
@@ -25,9 +26,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const items = (body.items ?? []).filter(
-    (i) => i && typeof i.slug === "string" && Number(i.cases) > 0
-  );
+  const items = (body.items ?? [])
+    .filter((i) => i && typeof i.slug === "string" && Number.isFinite(Number(i.qty)) && Number(i.qty) > 0)
+    .map((i) => ({ slug: i.slug, qty: Math.min(Math.floor(Number(i.qty)), 999) }));
   if (items.length === 0) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
@@ -38,33 +39,52 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
 
-  // Flat $200 reservation deposit — regardless of sizes/quantities in the cart.
-  // Cups are arriving December 2026; the balance is settled when they ship.
-  const DEPOSIT_CAD = 200;
+  /*
+   * Two kinds of line. A consumer pack is charged in full here and nothing is owed later.
+   * A café case is reserved against one flat deposit however many cases are in the cart, with the
+   * balance billed when the container lands — so cases never become a Stripe line item.
+   *
+   * Prices are looked up server-side from the catalogue; a tampered payload cannot set its own.
+   */
+  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  const reservedCases: string[] = [];
 
-  const reserved = items
-    .map((item) => {
-      const product = products.find((p) => p.slug === item.slug);
-      return product ? `${item.cases}× ${product.name}` : null;
-    })
-    .filter(Boolean)
-    .join(", ");
+  for (const item of items) {
+    const sku = findSku(item.slug);
+    if (!sku) continue;
+    if (sku.kind === "pack") {
+      line_items.push({
+        quantity: item.qty,
+        price_data: {
+          currency: "cad",
+          unit_amount: sku.unitPriceCents,
+          product_data: { name: `cupcasa — ${sku.name}`, description: sku.meta },
+        },
+      });
+    } else {
+      reservedCases.push(`${item.qty}× ${sku.name}`);
+    }
+  }
 
-  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
-    {
+  const reserved = reservedCases.join(", ");
+
+  if (reserved) {
+    line_items.push({
       quantity: 1,
       price_data: {
         currency: "cad",
-        unit_amount: DEPOSIT_CAD * 100,
+        unit_amount: DEPOSIT_CENTS,
         product_data: {
-          name: "cupcasa — Reservation Deposit",
-          description: `$${DEPOSIT_CAD} deposit to reserve your order. Cups arriving December 2026.${
-            reserved ? ` Reserving: ${reserved}.` : ""
-          }`,
+          name: "cupcasa — Case Reservation Deposit",
+          description: `Deposit to reserve your cases. Cups arriving December 2026. Reserving: ${reserved}.`,
         },
       },
-    },
-  ];
+    });
+  }
+
+  if (line_items.length === 0) {
+    return NextResponse.json({ error: "Nothing in your cart could be priced." }, { status: 400 });
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -75,7 +95,10 @@ export async function POST(req: Request) {
       shipping_address_collection: { allowed_countries: ["US", "CA"] },
       phone_number_collection: { enabled: true },
       automatic_tax: { enabled: false },
-      metadata: { type: "reservation_deposit", reserved: reserved.slice(0, 490) },
+      metadata: {
+        type: reserved ? "packs_and_reservation" : "packs",
+        reserved: reserved.slice(0, 490),
+      },
     });
     return NextResponse.json({ url: session.url });
   } catch (err) {

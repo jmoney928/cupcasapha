@@ -14,7 +14,7 @@ const nav = [
   { href: "/sustainability", label: "Sustainability" },
   { href: "/calculator", label: "Calculator" },
   { href: "/os", label: "Cup Casa OS" },
-  { href: "/wholesale", label: "Custom & Wholesale" },
+  { href: "/wholesale", label: "For cafés" },
   { href: "/about", label: "About" },
 ];
 
@@ -43,8 +43,8 @@ export function SiteHeader() {
     <>
       {/* announcement bar */}
       <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2.5 px-4 font-medium tracking-tight">
-        Now taking deposits — reserve your cups with{" "}
-        <span className="text-coral font-semibold">$200</span> · shipping{" "}
+        Cups, custom sleeves and lids from{" "}
+        <span className="text-coral font-semibold">35¢ a set</span> · shipping{" "}
         <span className="font-semibold">December 2026</span>
       </div>
 
@@ -111,7 +111,7 @@ export function SiteHeader() {
               href="/shop"
               className="btn-pill hidden sm:inline-flex bg-coral text-white px-5 py-2.5 text-sm hover:bg-coral-deep"
             >
-              Reserve cups
+              Shop packs
               <Particles className="w-5 h-3 text-white/90" />
             </Link>
             <button
@@ -143,7 +143,7 @@ export function SiteHeader() {
               onClick={() => setMobileOpen(false)}
               className="btn-pill bg-coral text-white px-5 py-3 mt-2 hover:bg-coral-deep"
             >
-              Reserve cups
+              Shop packs
             </Link>
           </div>
         )}

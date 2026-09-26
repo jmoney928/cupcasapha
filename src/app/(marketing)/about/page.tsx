@@ -43,7 +43,7 @@ export default function AboutPage() {
               <Cup tone="coral" />
             </div>
             <div className="w-36 animate-float-slow mt-10">
-              <Cup tone="leaf" doubleWall />
+              <Cup tone="leaf" />
             </div>
             <div className="w-28 animate-float mt-4" style={{ animationDelay: "0.8s" }}>
               <Cup tone="caramel" />

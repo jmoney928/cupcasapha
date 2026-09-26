@@ -12,7 +12,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { products, getProduct } from "@/lib/products";
-import { AddToCart } from "@/components/add-to-cart";
+import { PackPicker } from "@/components/pack-picker";
 import { Button, Eyebrow } from "@/components/ui";
 import { CertBadge } from "@/components/cert-badge";
 
@@ -70,11 +70,9 @@ export default async function ProductPage({
         <div className="grid lg:grid-cols-2 gap-10">
           {/* visual */}
           <div className="relative rounded-[2.5rem] overflow-hidden min-h-[380px] lg:min-h-[460px]">
-            {product.doubleWall && (
-              <span className="absolute top-6 left-6 z-10 bg-espresso text-cream text-sm font-bold px-4 py-1.5 rounded-full">
-                Double wall
-              </span>
-            )}
+            <span className="absolute top-6 left-6 z-10 bg-espresso text-cream text-sm font-bold px-4 py-1.5 rounded-full">
+              Home compostable
+            </span>
             <Image
               src={product.image}
               alt={product.name}
@@ -110,13 +108,13 @@ export default async function ProductPage({
 
             <div className="my-7 h-px bg-caramel/20" />
 
-            <AddToCart product={product} />
+            <PackPicker oz={product.oz as 8 | 12 | 16} />
 
             <div className="flex items-center gap-2 text-sm text-espresso/60 mt-4">
               <PackageCheck className="w-4 h-4 text-leaf" />
-              Sold by the case of {product.caseCount.toLocaleString()} ·{" "}
+              Every set is a cup, a custom-printed sleeve and a lid ·{" "}
               <Link href="/wholesale" className="underline font-semibold">
-                Need a pallet? Get wholesale pricing
+                Running a café? See case pricing
               </Link>
             </div>
 

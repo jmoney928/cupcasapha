@@ -30,8 +30,8 @@ const dispose = [
 
 const lifecycle = [
   { icon: Leaf, label: "Grown", text: "Microbes turn plant oils into PHA" },
-  { icon: CupSoda, label: "Made", text: "Formed into a double-wall cup" },
-  { icon: Coffee, label: "Used", text: "Hot or cold, no sleeve needed" },
+  { icon: CupSoda, label: "Made", text: "Formed into a PHA-lined cup" },
+  { icon: Coffee, label: "Used", text: "Hot or cold, with your sleeve on it" },
   { icon: "particles" as const, label: "Returns", text: "Microbes eat it back into soil" },
 ];
 

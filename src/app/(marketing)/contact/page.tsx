@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: "Are the cups really blank?",
-    a: "Yes — every cup ships completely unbranded. Add your own sleeve or stamp, or keep them clean.",
+    a: "The cup itself ships blank. Your branding goes on the sleeve, printed here with no minimum — or on the cup itself at 100,000 cups and up.",
   },
   {
     q: "Can I get samples?",

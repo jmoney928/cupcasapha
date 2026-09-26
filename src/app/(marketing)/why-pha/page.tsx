@@ -92,7 +92,7 @@ export default function WhyPhaPage() {
             </p>
             <div className="mt-8">
               <Button href="/shop" variant="primary" size="lg">
-                Reserve cups <ArrowRight className="w-5 h-5" />
+                Shop packs <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-2 mt-6">
@@ -104,7 +104,7 @@ export default function WhyPhaPage() {
           </div>
           <div className="flex justify-center gap-4">
             <div className="w-36 animate-float">
-              <Cup tone="leaf" doubleWall />
+              <Cup tone="leaf" />
             </div>
             <div className="w-32 animate-float-slow mt-12">
               <Cup tone="caramel" />

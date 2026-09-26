@@ -12,6 +12,7 @@ import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle, Mark } from "@/components/brand";
 import { ReserveStrip } from "@/components/reserve-strip";
 import { CertBadge } from "@/components/cert-badge";
+import { cafeRows, CAFE_OFFER } from "@/lib/cafe-offer";
 import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
 
 const heroSlides: HeroSlide[] = [
@@ -22,7 +23,7 @@ const heroSlides: HeroSlide[] = [
 
 const pillars = [
   { icon: Leaf, title: "Better material", text: "Paper lined with plant-based PHA instead of plastic. No PE, no PLA, no microplastics." },
-  { icon: Layers, title: "Hot or cold", text: "Double wall in every size — hot drinks stay comfortable to hold with no sleeve, cold drinks stay cold." },
+  { icon: Layers, title: "Your brand on it", text: "Every pack comes with sleeves printed with your design — no minimum, no setup fee, printed on our own UV press." },
   { icon: Recycle, title: "Returns to nature", text: "Certified home compostable by DIN CERTCO (certificate 9P0326). No industrial facility needed." },
 ];
 
@@ -50,15 +51,15 @@ export default function Home() {
               <span className="text-coral">Made to disappear.</span>
             </h1>
             <p className="text-lg text-cream/80 mt-6 max-w-md">
-              Home-compostable PHA-lined cups for hot coffee, cold brew, smoothies and
-              everything in between. No PE, no PLA, no microplastics.
+              Home-compostable PHA-lined cups, a lid, and a sleeve printed with your
+              design — from 35¢ a set. No PE, no PLA, no microplastics.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button href="/shop" variant="primary" size="lg">
-                Reserve cups <ArrowRight className="w-5 h-5" />
+                Shop packs <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/wholesale" variant="cream" size="lg">
-                Wholesale pricing
+                Café pricing
               </Button>
             </div>
             <div className="mt-6"><CertBadge variant="dark" /></div>
@@ -82,7 +83,7 @@ export default function Home() {
                 "No PE",
                 "No PLA",
                 "No microplastics",
-                "Double wall",
+                "Custom sleeves",
               ].map((t) => (
                 <span key={t} className="label-caps flex items-center mx-5 text-cream/80">
                   {t}
@@ -121,8 +122,8 @@ export default function Home() {
             </h2>
             <p className="text-cream/60 mt-4">
               8oz for espresso and small pours, 12oz for the everyday drink, 16oz for
-              smoothies, cold brew and the big iced ones. All double wall, all PHA-lined,
-              all shipped blank and ready to use.
+              smoothies, cold brew and the big iced ones. Every pack is a matched set —
+              cup, custom-printed sleeve and lid.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
@@ -152,10 +153,33 @@ export default function Home() {
           </div>
           <div className="text-center mt-8">
             <Button href="/shop" variant="primary" size="lg">
-              Shop the cups <ArrowRight className="w-5 h-5" />
+              Shop the packs <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
         </div>
+      </section>
+
+      {/* ---------------- FOR CAFÉS ---------------- */}
+      <section className="section-pad py-10">
+        <Reveal>
+          <div className="rounded-[2.5rem] border-2 border-espresso/10 bg-cream-deep/40 p-8 sm:p-12 grid md:grid-cols-[1fr_auto] gap-8 items-center">
+            <div>
+              <span className="label-caps text-coral">For cafés</span>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-3">
+                Pouring these all day?
+              </h2>
+              <p className="text-espresso/70 mt-4 max-w-xl">
+                Cafés buy by the case of {CAFE_OFFER.caseCount.toLocaleString()} — from{" "}
+                <strong>{cafeRows[0].perCupCents}¢ a cup</strong>, {CAFE_OFFER.lidCents}¢ lids,
+                and your first {CAFE_OFFER.freeSleeves.toLocaleString()} custom sleeves free with
+                your first order. Cup Casa OS comes with it, at no charge.
+              </p>
+            </div>
+            <Button href="/wholesale" variant="dark" size="lg">
+              See café pricing <ArrowRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </Reveal>
       </section>
 
       {/* ---------------- LIFECYCLE ---------------- */}
@@ -215,9 +239,9 @@ export default function Home() {
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
-              <span className="label-caps text-coral">Reserve now · shipping Dec 2026</span>
+              <span className="label-caps text-coral">Shipping December 2026</span>
               <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3">
-                Three sizes. One deposit.
+                Three sizes. One simple pack.
               </h2>
             </div>
             <Button href="/shop" variant="dark" size="md">
@@ -243,7 +267,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
               <Button href="/shop" variant="primary" size="lg">
-                Reserve cups <ArrowRight className="w-5 h-5" />
+                Shop packs <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/contact" variant="cream" size="lg">
                 Talk to us
