@@ -199,16 +199,16 @@ export default function WhyPhaPage() {
             ))}
           </div>
           <p className="text-cream/60 text-sm mt-6">
-            Composting infrastructure varies by region — check your local guidelines.
-            The point of PHA is that it breaks down responsibly across the widest range
-            of end-of-life scenarios.
+            Composting infrastructure varies by region — check your local guidelines. What
+            sets PHA apart is that it is certified for home composting as well as industrial,
+            which is the part most linings cannot claim.
           </p>
         </div>
       </section>
 
       {/* cta */}
       <section className="section-pad py-16 text-center">
-        <h2 className="font-display text-4xl font-bold">Convinced? We thought so.</h2>
+        <h2 className="font-display text-4xl font-bold">Work out what it costs you.</h2>
         <div className="flex flex-wrap gap-4 justify-center mt-8">
           <Button href="/shop" variant="primary" size="lg">
             Shop the cups <ArrowRight className="w-5 h-5" />

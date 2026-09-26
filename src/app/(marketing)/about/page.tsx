@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 const values = [
-  { icon: Leaf, title: "Planet first", text: "If it can't return to nature, we won't sell it. PHA, full stop." },
-  { icon: Coffee, title: "Built for service", text: "Cups that perform shift after shift — heat, ice, and everything between." },
-  { icon: Heart, title: "Honest, always", text: "No greenwashing, no asterisks. Just clear claims we can back up." },
+  { icon: Leaf, title: "One material", text: "Paper and a PHA lining. Nothing in the cup we can't tell you the end of life for." },
+  { icon: Coffee, title: "Built for service", text: "Hot espresso through to iced cold brew, shift after shift." },
+  { icon: Heart, title: "Claims you can check", text: "Certificate 9P0326, issued by DIN CERTCO. Ask and we'll send the document." },
 ];
 
 export default function AboutPage() {
@@ -71,11 +71,11 @@ export default function AboutPage() {
       <section className="section-pad py-16">
         <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-14 text-center">
           <h2 className="font-display text-3xl sm:text-4xl font-bold">
-            A subsite of cupcasa
+            One material, three sizes
           </h2>
           <p className="text-cream/75 mt-4 max-w-2xl mx-auto">
-            cupcasa cups is our dedicated home for fully PHA, unbranded foodservice cups —
-            the same care for coffee, now for the cup it comes in.
+            Paper with a PHA lining, in 8, 12 and 16oz, with one lid that fits all three. The
+            cup ships blank; your branding goes on the sleeve.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
             <Button href="/why-pha" variant="leaf" size="lg">

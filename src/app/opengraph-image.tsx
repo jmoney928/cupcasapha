@@ -42,7 +42,7 @@ export default async function OpenGraphImage() {
             <span style={{ color: "#e8735a" }}>Made to disappear.</span>
           </div>
           <div style={{ marginTop: 32, fontSize: 28, color: "#45443f", fontWeight: 600 }}>
-            Fully compostable PHA cups, hot or cold.
+            Home-compostable PHA-lined cups, hot or cold.
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={markSrc} alt="" width={236} height={62} style={{ marginTop: 56 }} />

@@ -100,7 +100,7 @@ export default function SustainabilityPage() {
             {[
               { v: "0%", l: "PE or PLA in the lining" },
               { v: CERT.number, l: "DIN CERTCO certificate, home compostable" },
-              { v: "100%", l: "plant-based PHA lining" },
+              { v: "Home", l: "compost — not just industrial" },
             ].map((s) => (
               <div key={s.l}>
                 <div className="font-display text-5xl font-extrabold text-coral tabular-nums">{s.v}</div>
@@ -158,10 +158,10 @@ export default function SustainabilityPage() {
           <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
           <div className="relative">
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold">
-              Better cup. Waste nothing.
+              See the certificate.
             </h2>
             <p className="text-white/85 mt-4 max-w-xl mx-auto">
-              A cup your customers love to hold — and the planet doesn&apos;t have to carry.
+              We&apos;ll send the DIN CERTCO document for certificate 9P0326 to anyone who asks.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
               <Button href="/shop" variant="cream" size="lg">

@@ -79,7 +79,7 @@ export function CartDrawer() {
                 <Cup tone="caramel" />
               </div>
               <p className="font-semibold">Your cart is empty</p>
-              <p className="text-sm">Cups are sold by the case of 1,000.</p>
+              <p className="text-sm">Packs of 100, 200 or 500 — a cup, a sleeve and a lid in each.</p>
             </div>
           )}
 

@@ -53,10 +53,10 @@ export function SiteFooter() {
         <div className="pb-12 mb-12 border-b border-cream/10 grid lg:grid-cols-2 gap-6 lg:items-center">
           <div>
             <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-cream tracking-tight">
-              A better circle for every cup.
+              Know when they land.
             </h3>
             <p className="text-cream/60 mt-2 max-w-md">
-              Drops, design tips and the occasional offer. No spam — just the good stuff.
+              The occasional email about shipping dates, pricing and new sizes. Nothing else.
             </p>
           </div>
           <NewsletterForm />
@@ -66,8 +66,8 @@ export function SiteFooter() {
           <div>
             <Logo variant="white" className="h-7 w-auto mb-5" />
             <p className="max-w-xs text-cream/60 leading-relaxed">
-              Fully compostable PHA cups for hot and cold drinks.
-              Made for every drink — made to disappear.
+              Home-compostable PHA-lined paper cups for hot and cold drinks.
+              No PE, no PLA, no microplastics.
             </p>
             <div className="flex gap-3 mt-6">
               <a href="https://instagram.com/cup_casa" target="_blank" rel="noopener noreferrer"

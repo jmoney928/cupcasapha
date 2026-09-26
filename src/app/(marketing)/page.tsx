@@ -65,7 +65,7 @@ export default function Home() {
             <div className="mt-6"><CertBadge variant="dark" /></div>
             <p className="flex items-center gap-2 text-sm text-cream/60 mt-4">
               <Particles className="w-6 h-4 text-coral" />
-              Better cup. Better future.
+              One lid fits all three sizes.
             </p>
           </Reveal>
         </div>
@@ -187,7 +187,7 @@ export default function Home() {
         <Reveal>
           <span className="label-caps text-coral">The cupcasa circle</span>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3 mb-12">
-            A better circle for every cup.
+            Where it ends up.
           </h2>
         </Reveal>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">

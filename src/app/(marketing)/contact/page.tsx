@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "How are the cups sold?",
-    a: "By the case of 1,000. Order online for small quantities, or request a wholesale quote for 10+ cases.",
+    a: "In packs of 100, 200 or 500 — each one a cup, a custom-printed sleeve and a lid. Cafés buy cups by the case of 1,000, with lids and sleeves priced separately; see the café page.",
   },
   {
     q: "Are the cups really blank?",
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: "Can I get samples?",
-    a: "Absolutely. Request samples on the wholesale page and we'll send every size, free.",
+    a: "Yes. Ask on the café page and we'll send every size, free.",
   },
   {
     q: "Where do you ship?",

@@ -17,8 +17,14 @@ const dispose = [
   {
     icon: Recycle,
     title: "Green bin / organics",
-    tag: "Good",
-    text: "Most municipal organics programs accept certified home-compostable cups. If your city's list says no, use the next option.",
+    tag: "Check first",
+    /*
+     * This said most programmes accept the cup. Our own verified research says otherwise: the CRD
+     * organics programme is built for food scraps and soiled paper and pulls compostable
+     * containers out at the sorting line. Sending people to the green bin on a claim we cannot
+     * stand behind is the exact greenwashing exposure the compliance module warns cafés about.
+     */
+    text: "Don't assume. Many organics programmes take food scraps and soiled paper only, and pull compostable containers out at the sorting line — the CRD's on southern Vancouver Island is one. Check your own city's list first.",
   },
   {
     icon: Trash2,
