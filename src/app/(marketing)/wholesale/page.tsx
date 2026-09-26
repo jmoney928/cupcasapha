@@ -5,7 +5,7 @@ import { LeadForm } from "@/components/lead-form";
 import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 
 export const metadata: Metadata = {
-  title: "Wholesale & Bulk",
+  title: "For Cafés — Pricing & Cup Casa OS",
   description:
     "Café pricing on compostable PHA cups: 15, 17 and 19¢ a cup by the case of 1,000, 5¢ lids, custom sleeves, 1,000 free with your first order, and Cup Casa OS at no charge. Custom-printed cups at 100,000+.",
 };
@@ -24,10 +24,10 @@ export default function WholesalePage() {
       <section className="section-pad pt-12 pb-12 relative overflow-hidden">
         <div className="absolute -top-10 right-0 w-96 h-96 rounded-full bg-coral-soft/30 blur-3xl" />
         <div className="relative max-w-3xl">
-          <Eyebrow color="coral">For cafés, chains & distributors</Eyebrow>
+          <Eyebrow color="coral">For cafés &amp; wholesale</Eyebrow>
           <h1 className="font-display text-5xl sm:text-6xl font-bold mt-5 leading-[0.95]">
-            Wholesale cups,<br />
-            <span className="text-coral">priced for volume.</span>
+            Everything your café<br />
+            <span className="text-coral">needs, one price.</span>
           </h1>
           <p className="text-lg text-espresso/70 mt-6">
             One price, published. Cups by the case of 1,000, lids that fit every size, and
