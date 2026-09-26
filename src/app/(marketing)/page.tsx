@@ -37,16 +37,18 @@ export default function Home() {
   return (
     <>
       {/* ---------------- HERO ---------------- */}
-      <section className="section-pad pt-12 sm:pt-16 pb-16 relative overflow-hidden">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div>
+      <section className="relative isolate overflow-hidden flex items-end sm:items-center min-h-[78svh] sm:min-h-0 sm:h-[min(80svh,740px)]">
+        <HeroSlideshow slides={heroSlides} />
+
+        <div className="section-pad w-full pt-12 pb-16 sm:py-0">
+          <Reveal className="max-w-xl">
             <span className="label-caps text-coral">Home compostable · plastic-free</span>
-            <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4">
+            <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4 text-cream">
               Made for every drink.
               <br />
               <span className="text-coral">Made to disappear.</span>
             </h1>
-            <p className="text-lg text-espresso/70 mt-6 max-w-md">
+            <p className="text-lg text-cream/80 mt-6 max-w-md">
               Home-compostable PHA-lined cups for hot coffee, cold brew, smoothies and
               everything in between. No PE, no PLA, no microplastics.
             </p>
@@ -54,19 +56,15 @@ export default function Home() {
               <Button href="/shop" variant="primary" size="lg">
                 Reserve cups <ArrowRight className="w-5 h-5" />
               </Button>
-              <Button href="/wholesale" variant="outline" size="lg">
+              <Button href="/wholesale" variant="cream" size="lg">
                 Wholesale pricing
               </Button>
             </div>
-            <div className="mt-6"><CertBadge /></div>
-            <p className="flex items-center gap-2 text-sm text-espresso/50 mt-4">
+            <div className="mt-6"><CertBadge variant="dark" /></div>
+            <p className="flex items-center gap-2 text-sm text-cream/60 mt-4">
               <Particles className="w-6 h-4 text-coral" />
               Better cup. Better future.
             </p>
-          </div>
-
-          <Reveal>
-            <HeroSlideshow slides={heroSlides} />
           </Reveal>
         </div>
       </section>
