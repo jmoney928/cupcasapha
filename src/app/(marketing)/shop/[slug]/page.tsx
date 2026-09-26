@@ -113,8 +113,8 @@ export default async function ProductPage({
             <div className="flex items-center gap-2 text-sm text-espresso/60 mt-4">
               <PackageCheck className="w-4 h-4 text-leaf" />
               Every set is a cup, a custom-printed sleeve and a lid ·{" "}
-              <Link href="/wholesale" className="underline font-semibold">
-                Running a café? See case pricing
+              <Link href="/sleeve" className="underline font-semibold">
+                Design your sleeve
               </Link>
             </div>
 

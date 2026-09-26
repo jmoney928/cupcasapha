@@ -57,6 +57,19 @@ export default function ShopPage() {
             printer, so there is no minimum and no setup fee.
           </p>
         </div>
+        <div className="rounded-3xl bg-espresso text-cream p-6 sm:p-8 mb-6 flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <span className="label-caps text-coral">Sleeve designer</span>
+            <p className="font-display text-2xl font-extrabold mt-2">Design your sleeve first.</p>
+            <p className="text-cream/65 text-sm mt-2 max-w-md">
+              Put your name or logo on the real dieline and download a print-ready file. Free, and
+              nothing leaves your browser.
+            </p>
+          </div>
+          <a href="/sleeve" className="btn-pill bg-coral text-white px-6 py-3 hover:bg-coral-deep whitespace-nowrap">
+            Open the designer
+          </a>
+        </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((p, i) => (
             <Reveal key={p.slug} delay={i * 90}>

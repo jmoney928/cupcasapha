@@ -18,7 +18,8 @@ const cols = [
   {
     title: "Shop",
     links: [
-      { href: "/shop", label: "Order cups" },
+      { href: "/shop", label: "Order packs" },
+      { href: "/sleeve", label: "Design your sleeve" },
       { href: "/shop/8oz-pha-cup", label: "8oz" },
       { href: "/shop/12oz-pha-cup", label: "12oz" },
       { href: "/shop/16oz-pha-cup", label: "16oz" },
@@ -37,7 +38,7 @@ const cols = [
   {
     title: "Business",
     links: [
-      { href: "/wholesale", label: "Custom & wholesale" },
+      { href: "/wholesale", label: "For cafés" },
       { href: "/wholesale#samples", label: "Request samples" },
       { href: "/contact", label: "Contact us" },
     ],
