@@ -19,7 +19,9 @@ const SPIN = 0.35; // radians a second
 
 const PAPER = "#efe9dd";
 const PAPER_DARK = "#c9c0b1";
-const LID = "#d9d2c4";
+const LID = "#ddd6c7";
+const LID_TOP = "#e7e1d4";
+const LID_WELL = "#ded7c8";
 
 /**
  * A turning preview of the cup with the sleeve on it.
@@ -193,29 +195,90 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
 
   if (tex) drawBand(ctx, doc, view, tex, rot);
 
-  /* Lid last, since it overlaps the rim. */
-  const lidR = rt * 1.03;
-  const lidH = 7 * scale;
+  drawLid(ctx, view, rt, topY);
+}
+
+/**
+ * A sip lid: a skirt that grips the cup and overhangs it slightly, a top face stepped in from the
+ * skirt, and a sip slot on the drinking side.
+ *
+ * Every part is a closed path rather than a rectangle with ellipses over it, and the shading is
+ * clipped to the skirt — painting a gradient over a bare rect is what left a grey block hanging
+ * off the sides.
+ */
+function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimTop: number, topY: number) {
+  const { cx, scale, tilt } = view;
+  const skirtR = rimTop * 1.04;
+  /* Shallow: a lid grips the rim, it does not sit on the cup like a tub. */
+  const skirtH = 3.2 * scale;
+  const faceY = topY - skirtH;
+  const wellR = skirtR * 0.84;
+
+  const skirt = () => {
+    ctx.beginPath();
+    ctx.moveTo(cx - skirtR, faceY);
+    ctx.lineTo(cx - skirtR, topY);
+    ctx.ellipse(cx, topY, skirtR, skirtR * tilt, 0, Math.PI, 0, true);
+    ctx.lineTo(cx + skirtR, faceY);
+    ctx.ellipse(cx, faceY, skirtR, skirtR * tilt, 0, 0, Math.PI, true);
+    ctx.closePath();
+  };
+
+  /* A little shadow where the lid overhangs, so it sits on the cup rather than floating. */
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(cx, topY + skirtR * tilt * 0.06, skirtR * 0.99, skirtR * tilt, 0, 0, Math.PI);
+  ctx.fillStyle = "rgba(26,26,26,0.10)";
+  ctx.fill();
+  ctx.restore();
+
+  skirt();
   ctx.fillStyle = LID;
-  ctx.beginPath();
-  ctx.ellipse(cx, topY, lidR, lidR * tilt, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillRect(cx - lidR, topY - lidH, lidR * 2, lidH);
+
+  ctx.save();
+  skirt();
+  ctx.clip();
+  const round = ctx.createLinearGradient(cx - skirtR, 0, cx + skirtR, 0);
+  round.addColorStop(0, "rgba(26,26,26,0.28)");
+  round.addColorStop(0.36, "rgba(26,26,26,0)");
+  round.addColorStop(0.68, "rgba(26,26,26,0)");
+  round.addColorStop(1, "rgba(26,26,26,0.28)");
+  ctx.fillStyle = round;
+  ctx.fillRect(cx - skirtR, faceY - skirtR * tilt, skirtR * 2, skirtH + skirtR * tilt * 2);
+  ctx.restore();
+
+  /* Top face, then a recess inside it — the ring left between the two reads as the raised rim. */
+  ctx.fillStyle = LID_TOP;
   ctx.beginPath();
-  ctx.ellipse(cx, topY - lidH, lidR, lidR * tilt, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, faceY, skirtR, skirtR * tilt, 0, 0, Math.PI * 2);
   ctx.fill();
-  const lidShade = ctx.createLinearGradient(cx - lidR, 0, cx + lidR, 0);
-  lidShade.addColorStop(0, "rgba(26,26,26,0.22)");
-  lidShade.addColorStop(0.35, "rgba(26,26,26,0)");
-  lidShade.addColorStop(0.72, "rgba(26,26,26,0)");
-  lidShade.addColorStop(1, "rgba(26,26,26,0.22)");
-  ctx.fillStyle = lidShade;
-  ctx.fillRect(cx - lidR, topY - lidH, lidR * 2, lidH + lidR * tilt);
-  /* The drinking hole, so it reads as a lid rather than a disc. */
-  ctx.fillStyle = "rgba(26,26,26,0.35)";
+
+  ctx.fillStyle = LID_WELL;
   ctx.beginPath();
-  ctx.ellipse(cx, topY - lidH - lidR * tilt * 0.35, lidR * 0.22, lidR * tilt * 0.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, faceY + skirtR * tilt * 0.04, wellR, wellR * tilt, 0, 0, Math.PI * 2);
   ctx.fill();
+
+  /* Catch light along the far edge of the recess. */
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.lineWidth = Math.max(0.5, 0.3 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, faceY + skirtR * tilt * 0.04, wellR, wellR * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  /* The sip hole: small, and on the near side, where you would actually drink from. */
+  const slotY = faceY + wellR * tilt * 0.74;
+  const slotW = wellR * 0.23;
+  const slotH = wellR * tilt * 0.34;
+  ctx.fillStyle = "rgba(38,30,24,0.55)";
+  ctx.beginPath();
+  ctx.ellipse(cx, slotY, slotW, slotH, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.40)";
+  ctx.lineWidth = Math.max(0.4, 0.25 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, slotY, slotW, slotH, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
 }
 
 function drawBand(
