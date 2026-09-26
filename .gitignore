@@ -46,3 +46,9 @@ next-env.d.ts
 # supabase cli
 supabase/.temp
 supabase/.branches
+
+# Source images dropped at the repo root. Site assets belong in public/.
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
