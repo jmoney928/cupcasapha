@@ -119,9 +119,12 @@ function TextControls({ el, onPatch }: { el: TextElement; onPatch: Patch }) {
         />
       </Row>
 
-      <Row label="Curve">
-        <Slide value={el.curve} onChange={(v) => onPatch({ curve: v })} min={-120} max={120} step={2} />
+      <Row label="Bend">
+        <Slide value={el.curve} onChange={(v) => onPatch({ curve: v })} min={-100} max={100} step={2} />
       </Row>
+      <p className="text-xs text-espresso/45 -mt-1">
+        Zero follows the band, which is what reads level once the sleeve is on a cup.
+      </p>
       <Row label="Tracking">
         <Slide value={el.letterSpacing} onChange={(v) => onPatch({ letterSpacing: v })} min={-0.5} max={3} step={0.05} />
       </Row>
@@ -152,6 +155,12 @@ function ImageControls({ el, onPatch }: { el: ImageElement; onPatch: Patch }) {
       <Row label="Height">
         <Num value={el.height} onChange={(v) => onPatch({ height: v, width: v * aspect })} min={2} max={120} suffix="mm" />
       </Row>
+      <Row label="Recolour">
+        <Swatches value={el.tint} onChange={(v) => onPatch({ tint: v })} allowNone noneLabel="As uploaded" />
+      </Row>
+      <p className="text-xs text-espresso/45 -mt-1">
+        Replaces every colour and keeps the transparency — best on a logo with a clear background.
+      </p>
     </>
   );
 }

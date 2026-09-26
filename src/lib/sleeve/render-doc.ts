@@ -9,6 +9,7 @@ import { sleeveDieline } from "./dielines";
 import { arcPath, degAt, layout, radialPath, sectorPath } from "./geometry";
 import type { ImageElement, ShapeElement, SleeveDoc, SleeveElement, TextElement } from "./doc";
 import { colour, dataImage, esc, fontStack, n } from "./safe";
+import type { SleeveDieline } from "./dielines";
 
 /** Width of a run of text, in mm. The browser measures properly; tests use the estimate. */
 export type Measurer = (text: string, el: TextElement) => number;
@@ -64,61 +65,85 @@ const transform = (el: SleeveElement) =>
 
 const opacity = (el: SleeveElement) => (el.opacity < 1 ? ` opacity="${n(el.opacity)}"` : "");
 
-function renderText(el: TextElement, measure: Measurer, idPrefix: string): string {
+/** The centre the dieline's arcs are struck from. Everything angular is measured from here. */
+export type Frame = { cx: number; cy: number };
+
+/**
+ * Text follows an arc struck from the dieline's own centre.
+ *
+ * This is the whole trick of a sleeve. The flat shape is an annular sector, so a constant radius
+ * on the sheet is a constant height once it is wrapped round the cup. Set text on a straight line
+ * and it crosses radii, which reads as a slope curving away on the cup; set it on a concentric arc
+ * and it sits level. `curve` bends away from that natural arc rather than replacing it.
+ */
+function renderText(el: TextElement, measure: Measurer, idPrefix: string, frame: Frame): string {
   const ls = wrapLines(el, measure);
   const stack = fontStack(el.font);
-  const fill = colour(el.fill, "#ede9de");
+  const fill = colour(el.fill, "#1a1a1a");
   const anchor = el.align === "left" ? "start" : el.align === "right" ? "end" : "middle";
+  const offset = el.align === "left" ? "0%" : el.align === "right" ? "100%" : "50%";
   const common =
     `font-family="${stack}" font-size="${n(el.fontSize)}" font-weight="${el.bold ? 700 : 400}"` +
     `${el.italic ? ' font-style="italic"' : ""}` +
     `${el.letterSpacing ? ` letter-spacing="${n(el.letterSpacing)}"` : ""} fill="${fill}"`;
 
-  if (el.curve) {
-    /* Each line rides its own arc, concentric, so a stack of curved lines stays parallel. */
-    const rad = Math.abs(el.curve) * (Math.PI / 180);
-    const up = el.curve > 0;
-    const paths: string[] = [];
-    const texts: string[] = [];
-    ls.forEach((line, i) => {
-      const width = Math.max(measure(line, el), 0.01);
-      const base = width / rad;
-      const step = i * el.fontSize * el.lineHeight;
-      const r = Math.max(1, up ? base - step : base + step);
-      const cy = up ? el.y + r : el.y - r;
-      const half = ((width / r) * 180) / Math.PI / 2;
-      const id = `${idPrefix}-${el.id}-l${i}`;
-      const from = up ? -half : half;
-      const to = up ? half : -half;
-      paths.push(`<path id="${id}" d="${arcPath({ cx: el.x, cy }, r, from, to)}" fill="none"/>`);
-      texts.push(
-        `<text ${common} dominant-baseline="middle"><textPath href="#${id}" startOffset="50%" text-anchor="middle">${esc(
-          line
-        )}</textPath></text>`
-      );
-    });
-    return `<g${transform(el)}${opacity(el)}><defs>${paths.join("")}</defs>${texts.join("")}</g>`;
-  }
+  const natural = Math.hypot(el.x - frame.cx, el.y - frame.cy);
+  /* Tighter radius bends more; looser flattens. Never past zero, which would invert the text. */
+  const bend = Math.max(0.2, 1 - el.curve / 150);
+  const base = Math.max(el.fontSize, natural * bend);
+  /* Angle either side of straight up, matching how the sector is laid out. */
+  const angle = (Math.atan2(el.x - frame.cx, -(el.y - frame.cy)) * 180) / Math.PI;
+  const step = el.fontSize * el.lineHeight;
 
-  const total = ls.length * el.fontSize * el.lineHeight;
-  const first = el.y - total / 2 + el.fontSize * el.lineHeight * 0.5;
-  /* Aligned against the edges of the box, which is what makes left and right mean anything. */
-  const half = elementBounds(el, measure).width / 2;
-  const x = el.align === "left" ? el.x - half : el.align === "right" ? el.x + half : el.x;
-  const tspans = ls
-    .map((line, i) => `<tspan x="${n(x)}" y="${n(first + i * el.fontSize * el.lineHeight)}">${esc(line)}</tspan>`)
-    .join("");
-  return `<text ${common} text-anchor="${anchor}" dominant-baseline="middle"${transform(el)}${opacity(
-    el
-  )}>${tspans}</text>`;
+  const paths: string[] = [];
+  const texts: string[] = [];
+  ls.forEach((line, i) => {
+    /* Later lines sit at a smaller radius, which is lower down the cup. */
+    const radius = Math.max(el.fontSize, base + ((ls.length - 1) / 2 - i) * step);
+    const halfDeg = degAt(el.width / 2, radius);
+    const id = `${idPrefix}-${el.id}-l${i}`;
+    paths.push(`<path id="${id}" d="${arcPath(frame, radius, angle - halfDeg, angle + halfDeg)}" fill="none"/>`);
+    texts.push(
+      `<text ${common} dominant-baseline="middle">` +
+        `<textPath href="#${id}" startOffset="${offset}" text-anchor="${anchor}">${esc(line)}</textPath></text>`
+    );
+  });
+
+  return `<g${transform(el)}${opacity(el)}><defs>${paths.join("")}</defs>${texts.join("")}</g>`;
 }
 
-function renderImage(el: ImageElement): string {
+/** Hex to the 0-1 channels a colour matrix wants. */
+function channels(hex: string): [number, number, number] | null {
+  const v = hex.trim().replace("#", "");
+  const full = v.length === 3 ? v.split("").map((c) => c + c).join("") : v;
+  if (!/^[0-9a-f]{6}$/i.test(full)) return null;
+  return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255) as [number, number, number];
+}
+
+function renderImage(el: ImageElement, idPrefix: string): string {
   const href = dataImage(el.href);
   if (!href) return "";
-  return `<image href="${href}" x="${n(el.x - el.width / 2)}" y="${n(el.y - el.height / 2)}" width="${n(
-    el.width
-  )}" height="${n(el.height)}" preserveAspectRatio="xMidYMid meet"${transform(el)}${opacity(el)}/>`;
+
+  /*
+   * Recolouring keeps the alpha and replaces every colour, which is what a logo needs: a black
+   * mark on transparency comes out in the chosen colour rather than as a tinted grey.
+   */
+  const rgb = el.tint && el.tint !== "none" ? channels(colour(el.tint, "")) : null;
+  const filterId = `${idPrefix}-tint-${el.id}`;
+  const defs = rgb
+    ? `<defs><filter id="${filterId}" color-interpolation-filters="sRGB">` +
+      `<feColorMatrix type="matrix" values="0 0 0 0 ${n(rgb[0])} 0 0 0 0 ${n(rgb[1])} 0 0 0 0 ${n(
+        rgb[2]
+      )} 0 0 0 1 0"/></filter></defs>`
+    : "";
+  const filter = rgb ? ` filter="url(#${filterId})"` : "";
+
+  return (
+    defs +
+    `<image href="${href}" x="${n(el.x - el.width / 2)}" y="${n(el.y - el.height / 2)}" width="${n(
+      el.width
+    )}" height="${n(el.height)}" preserveAspectRatio="xMidYMid meet"${filter}${transform(el)}${opacity(el)}/>`
+  );
 }
 
 function renderShape(el: ShapeElement): string {
@@ -139,8 +164,12 @@ function renderShape(el: ShapeElement): string {
   )}" rx="${n(el.radius)}" ${paint}${t}/>`;
 }
 
-export const renderElement = (el: SleeveElement, measure: Measurer, idPrefix = "s") =>
-  el.kind === "text" ? renderText(el, measure, idPrefix) : el.kind === "image" ? renderImage(el) : renderShape(el);
+export const renderElement = (el: SleeveElement, measure: Measurer, frame: Frame, idPrefix = "s") =>
+  el.kind === "text"
+    ? renderText(el, measure, idPrefix, frame)
+    : el.kind === "image"
+      ? renderImage(el, idPrefix)
+      : renderShape(el);
 
 export type RenderOptions = {
   /** Cut, fold, bleed and safe lines. On for the screen, off for the press. */
@@ -163,7 +192,7 @@ export function renderDoc(doc: SleeveDoc, opts: RenderOptions = {}): string {
   const safeShape = sectorPath(l, d.innerRadius + d.safeArea, d.outerRadius - d.safeArea, l.startDeg + safeInset, l.foldDeg - safeInset);
   const clipId = `${idPrefix}-clip`;
 
-  const art = doc.elements.map((el) => renderElement(el, measure, idPrefix)).join("");
+  const art = doc.elements.map((el) => renderElement(el, measure, l, idPrefix)).join("");
 
   const guideLayer = guides
     ? [
@@ -188,12 +217,77 @@ export function renderDoc(doc: SleeveDoc, opts: RenderOptions = {}): string {
     `<desc>1:1 at ${n(l.width)} × ${n(l.height)} mm. ${d.label} dieline, ${d.bleed}mm bleed, ${d.glueLap.width}mm glue lap.</desc>`,
     `<defs><clipPath id="${clipId}"><path d="${bleedShape}"/></clipPath></defs>`,
     `<path d="${bleedShape}" fill="${bg}"/>`,
+    /* The background design sits under everything, inside the same clip. */
+    `<g clip-path="url(#${clipId})">${patternLayer(doc, d, l, idPrefix)}</g>`,
     /* Artwork is clipped to the bleed so a dragged element can never print past the trim. */
     `<g clip-path="url(#${clipId})">${art}</g>`,
     guideLayer,
     cropMarks(l),
     `</svg>`,
   ].join("");
+}
+
+/**
+ * Background designs, drawn under the artwork.
+ *
+ * Rings follow the dieline's own arcs, so they wrap as level bands round the cup rather than
+ * sloping — the same reason text has to. The tiled ones are deliberately quiet: a sleeve is a
+ * background for a café's mark, not a competitor to it.
+ */
+function patternLayer(doc: SleeveDoc, d: SleeveDieline, l: ReturnType<typeof layout>, idPrefix: string): string {
+  if (doc.pattern === "none") return "";
+  const ink = colour(doc.patternInk, "#1a1a1a");
+  const spread = degAt(d.bleed, d.innerRadius);
+  const from = l.startDeg - spread;
+  const to = l.endDeg + spread;
+
+  if (doc.pattern === "rings") {
+    const rings: string[] = [];
+    for (let r = d.innerRadius + 4; r < d.outerRadius; r += 4) {
+      rings.push(`<path d="${arcPath(l, r, from, to)}"/>`);
+    }
+    return `<g fill="none" stroke="${ink}" stroke-opacity="0.16" stroke-width="0.5">${rings.join("")}</g>`;
+  }
+
+  if (doc.pattern === "rule") {
+    const inset = 2.5;
+    const framed = sectorPath(
+      l,
+      d.innerRadius + inset,
+      d.outerRadius - inset,
+      l.startDeg + degAt(inset, d.innerRadius),
+      l.foldDeg - degAt(inset, d.innerRadius)
+    );
+    return `<path d="${framed}" fill="none" stroke="${ink}" stroke-opacity="0.32" stroke-width="0.5"/>`;
+  }
+
+  const tiles: Record<string, { size: number; body: string }> = {
+    stripes: {
+      size: 7,
+      body: `<path d="M -1 8 L 8 -1 M 1 10 L 10 1" stroke="${ink}" stroke-opacity="0.13" stroke-width="0.55" fill="none"/>`,
+    },
+    dots: {
+      size: 7,
+      body: `<circle cx="3.5" cy="3.5" r="0.75" fill="${ink}" fill-opacity="0.17"/>`,
+    },
+    sprigs: {
+      size: 15,
+      body:
+        `<g stroke="${ink}" stroke-opacity="0.22" stroke-width="0.45" fill="none">` +
+        `<path d="M7.5 12.5 C7.5 9 7.5 6.5 7.5 4"/></g>` +
+        `<g fill="${ink}" fill-opacity="0.15">` +
+        `<path d="M7.5 7.4 C5.4 7.4 4.2 6.3 3.8 4.6 C5.9 4.6 7.1 5.7 7.5 7.4 Z"/>` +
+        `<path d="M7.5 9.6 C9.6 9.6 10.8 8.5 11.2 6.8 C9.1 6.8 7.9 7.9 7.5 9.6 Z"/></g>`,
+    },
+  };
+  const tile = tiles[doc.pattern];
+  if (!tile) return "";
+  const id = `${idPrefix}-pat`;
+  const area = sectorPath(l, d.innerRadius - d.bleed, d.outerRadius + d.bleed, from, to);
+  return (
+    `<defs><pattern id="${id}" width="${tile.size}" height="${tile.size}" patternUnits="userSpaceOnUse">` +
+    `${tile.body}</pattern></defs><path d="${area}" fill="url(#${id})"/>`
+  );
 }
 
 /** Corner marks outside the bleed, so the trimmer has something to line up on. */

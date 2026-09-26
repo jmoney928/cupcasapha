@@ -12,6 +12,7 @@ import { SleeveCanvas } from "./canvas";
 import { CupPreview } from "./cup-preview";
 import { Panel } from "./panel";
 import { Row, Swatches } from "./controls";
+import { PATTERNS, SLEEVE_STOCKS } from "@/lib/sleeve/safe";
 import { useMeasure } from "./use-measure";
 
 const MAX_LOGO_BYTES = 3 * 1024 * 1024;
@@ -261,6 +262,7 @@ export function SleeveEditor() {
       )}
 
       <div className="grid lg:grid-cols-[1fr_20rem] gap-4 items-start">
+        <div className="space-y-4">
         <div className="rounded-3xl bg-cream-deep/40 border border-espresso/8 p-4" onPointerDownCapture={beginGesture}>
           <SleeveCanvas
             doc={doc}
@@ -273,12 +275,66 @@ export function SleeveEditor() {
           />
         </div>
 
+          {/* The sleeve itself, under the sheet it is printed on. */}
+          <div className="rounded-3xl bg-white/60 border border-caramel/20 p-4 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div>
+              <p className="label-caps text-espresso/50 mb-2">Sleeve stock</p>
+              <div className="flex gap-2">
+                {SLEEVE_STOCKS.map((stock) => (
+                  <button
+                    key={stock.id}
+                    type="button"
+                    onClick={() =>
+                      commit((cur) => ({
+                        ...cur,
+                        background: stock.colour,
+                        patternInk: stock.ink,
+                        /* Ink that was the old stock's default follows the stock across. */
+                        elements: cur.elements.map((el) =>
+                          el.kind === "text" && SLEEVE_STOCKS.some((s2) => s2.ink === el.fill)
+                            ? { ...el, fill: stock.ink }
+                            : el
+                        ),
+                      }))
+                    }
+                    aria-pressed={doc.background === stock.colour}
+                    className={`btn-pill pl-2 pr-4 py-1.5 text-sm border-2 gap-2 ${
+                      doc.background === stock.colour ? "border-coral" : "border-espresso/12 hover:border-espresso/35"
+                    }`}
+                  >
+                    <span
+                      className="w-6 h-6 rounded-full border border-espresso/15"
+                      style={{ background: stock.colour }}
+                    />
+                    {stock.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="label-caps text-espresso/50 mb-2">Background design</p>
+              <div className="flex flex-wrap gap-1.5">
+                {PATTERNS.map((pat) => (
+                  <button
+                    key={pat.id}
+                    type="button"
+                    onClick={() => commit((cur) => ({ ...cur, pattern: pat.id }))}
+                    aria-pressed={doc.pattern === pat.id}
+                    className={`btn-pill px-4 py-1.5 text-sm border-2 ${
+                      doc.pattern === pat.id ? "border-coral bg-coral text-white" : "border-espresso/12 hover:border-espresso/35"
+                    }`}
+                  >
+                    {pat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-4 lg:sticky lg:top-24">
           <div className="rounded-3xl bg-white/60 border border-caramel/20 p-4 space-y-4">
-          <Row label="Sleeve colour">
-            <Swatches value={doc.background} onChange={(v) => commit((cur) => ({ ...cur, background: v }))} />
-          </Row>
-          <div className="h-px bg-caramel/25" />
           <Panel
             el={selected}
             onPatch={patch}

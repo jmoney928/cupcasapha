@@ -31,7 +31,11 @@ const LID = "#d9d2c4";
 export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const texture = useRef<HTMLImageElement | null>(null);
-  const rotation = useRef(0);
+  /*
+   * Half a turn puts the middle of the artwork toward the viewer. At zero it is the glued seam
+   * that faces front, which is the one part of the sleeve nobody is meant to look at.
+   */
+  const rotation = useRef(Math.PI);
   const dragging = useRef<{ x: number; from: number } | null>(null);
   const [spinning, setSpinning] = useState(true);
   const [ready, setReady] = useState(false);
@@ -110,7 +114,7 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
           <button
             type="button"
             onClick={() => {
-              rotation.current = 0;
+              rotation.current = Math.PI;
             }}
             title="Face front"
             className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral"

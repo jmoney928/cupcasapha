@@ -29,3 +29,23 @@ export const FONTS = [
 export type FontId = (typeof FONTS)[number]["id"];
 
 export const fontStack = (id: string) => FONTS.find((f) => f.id === id)?.stack ?? FONTS[0].stack;
+
+/** The two stocks we print sleeves on. */
+export const SLEEVE_STOCKS = [
+  { id: "white", label: "White", colour: "#f4f1ea", ink: "#1a1a1a" },
+  { id: "kraft", label: "Kraft brown", colour: "#a9855f", ink: "#2b1d12" },
+] as const;
+
+export const DEFAULT_STOCK = SLEEVE_STOCKS[0];
+
+/** Background designs. Each is drawn under the artwork and clipped to the sleeve. */
+export const PATTERNS = [
+  { id: "none", label: "Plain" },
+  { id: "rings", label: "Rings" },
+  { id: "stripes", label: "Stripes" },
+  { id: "dots", label: "Dots" },
+  { id: "sprigs", label: "Sprigs" },
+  { id: "rule", label: "Framed" },
+] as const;
+
+export type PatternId = (typeof PATTERNS)[number]["id"];

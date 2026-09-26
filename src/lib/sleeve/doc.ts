@@ -5,7 +5,7 @@
  */
 import { sleeveDieline, type CupSize } from "./dielines";
 import { bandCentre, layout } from "./geometry";
-import type { FontId } from "./safe";
+import { DEFAULT_STOCK, type FontId, type PatternId } from "./safe";
 
 export type ElementKind = "text" | "image" | "shape";
 
@@ -32,7 +32,10 @@ export type TextElement = Base & {
   /** Box width in mm. Text wraps to it; a word longer than the box overhangs rather than breaking. */
   width: number;
   fill: string;
-  /** Degrees of curve. 0 is a straight line; positive bends the text upward. */
+  /**
+   * How far the line bends away from the band's own arc. 0 follows it, which is what reads level
+   * once the sleeve is on a cup; positive tightens the bend, negative flattens it.
+   */
   curve: number;
 };
 
@@ -41,6 +44,8 @@ export type ImageElement = Base & {
   href: string;
   width: number;
   height: number;
+  /** Recolour the artwork to this, keeping its transparency. "none" leaves it as uploaded. */
+  tint: string;
 };
 
 export type ShapeElement = Base & {
@@ -59,6 +64,8 @@ export type SleeveElement = TextElement | ImageElement | ShapeElement;
 export type SleeveDoc = {
   size: CupSize;
   background: string;
+  pattern: PatternId;
+  patternInk: string;
   elements: SleeveElement[];
 };
 
@@ -81,7 +88,7 @@ export function newText(size: CupSize, over: Partial<TextElement> = {}): TextEle
     letterSpacing: 0, lineHeight: 1.25, align: "center",
     /* Wide enough that a short name never wraps, narrow enough that a sentence does. */
     width: Math.round(d.arcBottom * 0.7),
-    fill: "#ede9de", curve: 0,
+    fill: DEFAULT_STOCK.ink, curve: 0,
     ...over,
   };
 }
@@ -92,7 +99,7 @@ export function newImage(size: CupSize, href: string, aspect: number): ImageElem
   const height = Math.min(d.bandHeight - 2 * d.safeArea, 30);
   return {
     id: newId(), kind: "image", x: c.x, y: c.y, rotation: 0, opacity: 1, locked: false,
-    href, height, width: height * (aspect > 0 ? aspect : 1),
+    href, height, width: height * (aspect > 0 ? aspect : 1), tint: "none",
   };
 }
 
@@ -101,15 +108,22 @@ export function newShape(size: CupSize, shape: ShapeElement["shape"]): ShapeElem
   return {
     id: newId(), kind: "shape", x: c.x, y: c.y, rotation: 0, opacity: 1, locked: false,
     shape, width: shape === "line" ? 80 : 40, height: shape === "line" ? 0 : 20,
-    fill: shape === "line" ? "none" : "#e8735a", stroke: shape === "line" ? "#ede9de" : "none",
+    fill: shape === "line" ? "none" : "#e8735a", stroke: shape === "line" ? DEFAULT_STOCK.ink : "none",
     strokeWidth: shape === "line" ? 1.5 : 0, radius: 2,
   };
 }
 
+/**
+ * The starting document. Its one element carries a fixed id rather than a generated one: this is
+ * built during render on the server and again on the client, and a clock-based id would differ
+ * between the two, which shows up as a hydration mismatch on every glyph.
+ */
 export const emptyDoc = (size: CupSize = 12): SleeveDoc => ({
   size,
-  background: "#1a1a1a",
-  elements: [newText(size)],
+  background: DEFAULT_STOCK.colour,
+  pattern: "none",
+  patternInk: DEFAULT_STOCK.ink,
+  elements: [newText(size, { id: "seed" })],
 });
 
 /* ---------------------------------------------------------------- operations */

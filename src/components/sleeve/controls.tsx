@@ -63,11 +63,12 @@ export function Slide({
 }
 
 export function Swatches({
-  value, onChange, allowNone = false,
+  value, onChange, allowNone = false, noneLabel = "None",
 }: {
   value: string;
   onChange: (v: string) => void;
   allowNone?: boolean;
+  noneLabel?: string;
 }) {
   const colours = ["#1a1a1a", "#ede9de", "#ffffff", "#e8735a", "#2e4a38", "#e7c9a3", "#8fb3a3", "#9b9b94"];
   return (
@@ -76,8 +77,8 @@ export function Swatches({
         <button
           type="button"
           onClick={() => onChange("none")}
-          aria-label="No fill"
-          title="No fill"
+          aria-label={noneLabel}
+          title={noneLabel}
           aria-pressed={value === "none"}
           className={`w-6 h-6 rounded-full border-2 bg-white relative overflow-hidden ${
             value === "none" ? "border-coral" : "border-espresso/20"

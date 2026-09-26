@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TextElement } from "@/lib/sleeve/doc";
-import type { Measurer } from "@/lib/sleeve/render-doc";
+import { estimateWidth, type Measurer } from "@/lib/sleeve/render-doc";
 import { fontStack } from "@/lib/sleeve/safe";
 
 /**
@@ -13,6 +13,13 @@ import { fontStack } from "@/lib/sleeve/safe";
 export function useMeasure(): Measurer {
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
   const cache = useRef(new Map<string, number>());
+  /*
+   * There is no canvas on the server, so the first client render has to agree with the HTML the
+   * server sent or hydration mismatches on every glyph. Both start from the shared estimate;
+   * measuring properly begins once mounted, which re-renders with the real widths.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const get = useCallback(() => {
     if (!ctx.current && typeof document !== "undefined") {
@@ -23,22 +30,22 @@ export function useMeasure(): Measurer {
 
   return useMemo<Measurer>(
     () => (text: string, el: TextElement) => {
+      if (!mounted) return estimateWidth(text, el);
       const font = `${el.italic ? "italic " : ""}${el.bold ? 700 : 400} ${el.fontSize}px ${fontStack(el.font)}`;
       const key = `${font}|${el.letterSpacing}|${text}`;
       const hit = cache.current.get(key);
       if (hit !== undefined) return hit;
 
       const c = get();
-      /* Falls back to the shared estimate on the server or if a canvas is unavailable. */
-      const base = c
-        ? ((c.font = font), c.measureText(text).width)
-        : text.length * el.fontSize * (el.bold ? 0.58 : 0.54);
-      const width = base + Math.max(0, text.length - 1) * el.letterSpacing;
+      /* No canvas available at all — fall back rather than render nothing. */
+      if (!c) return estimateWidth(text, el);
+      c.font = font;
+      const width = c.measureText(text).width + Math.max(0, text.length - 1) * el.letterSpacing;
 
       if (cache.current.size > 2000) cache.current.clear();
       cache.current.set(key, width);
       return width;
     },
-    [get]
+    [get, mounted]
   );
 }

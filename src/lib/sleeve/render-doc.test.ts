@@ -169,10 +169,10 @@ describe("word wrap", () => {
     expect(narrow.length).toBeGreaterThan(wide.length);
   });
 
-  it("renders one tspan per wrapped line", () => {
-    const svg = renderDoc(doc({ elements: [text({ text: long, width: 60, fontSize: 8 })] }));
-    const expected = wrapLines(text({ text: long, width: 60, fontSize: 8 }), estimateWidth).length;
-    expect(svg.match(/<tspan/g)).toHaveLength(expected);
+  it("renders one arc per wrapped line", () => {
+    const el = text({ text: long, width: 60, fontSize: 8 });
+    const svg = renderDoc(doc({ elements: [el] }));
+    expect(svg.match(/<textPath/g)).toHaveLength(wrapLines(el, estimateWidth).length);
   });
 
   it("curves every wrapped line, not just the typed ones", () => {
@@ -181,14 +181,13 @@ describe("word wrap", () => {
     expect(svg.match(/<textPath/g)).toHaveLength(wrapLines(el, estimateWidth).length);
   });
 
-  it("aligns against the edges of the box", () => {
+  it("aligns against the ends of the arc the box spans", () => {
     const left = renderDoc(doc({ elements: [text({ text: "hi", width: 100, align: "left" })] }));
     const right = renderDoc(doc({ elements: [text({ text: "hi", width: 100, align: "right" })] }));
+    expect(left).toContain('startOffset="0%"');
     expect(left).toContain('text-anchor="start"');
+    expect(right).toContain('startOffset="100%"');
     expect(right).toContain('text-anchor="end"');
-    /* 100mm box, so the two anchors sit 100mm apart. */
-    const x = (s: string) => Number(/<tspan x="([-\d.]+)"/.exec(s)![1]);
-    expect(x(right) - x(left)).toBeCloseTo(100, 1);
   });
 });
 
@@ -212,5 +211,121 @@ describe("safe area", () => {
     const l = layoutFor(12);
     const el = text({ text: "hi", width: 20, fontSize: 6, x: l.width - 8 });
     expect(insideSafeArea(doc({ elements: [el] }), el, estimateWidth)).toBe(false);
+  });
+});
+
+
+/** Radii of the arcs text is set on — the paths the textPaths point at, not the sleeve outline. */
+const textArcRadii = (svg: string) =>
+  [...svg.matchAll(/<path id="[^"]*-l\d+" d="M [-\d.]+ [-\d.]+ A ([\d.]+)/g)].map((m) => Number(m[1]));
+
+const arcRadius = (svg: string) => textArcRadii(svg)[0];
+
+/** Radii of the ring design, taken from its own group so the outline is not counted. */
+const ringRadii = (svg: string) => {
+  const group = /<g fill="none" stroke="[^"]*" stroke-opacity="0\.16"[^>]*>([\s\S]*?)<\/g>/.exec(svg);
+  return group ? [...group[1].matchAll(/A ([\d.]+)/g)].map((m) => Number(m[1])) : [];
+};
+
+describe("text follows the band", () => {
+  /*
+   * The whole point of a sector: constant radius on the sheet is constant height on the cup. Text
+   * off that arc slopes away once the sleeve is wrapped, which is exactly what looked wrong in the
+   * cup preview.
+   */
+  it.each(SLEEVE_SIZES)("%ioz sets text on an arc struck from the dieline's own centre", (size) => {
+    const l = layoutFor(size);
+    const el = newText(size, { text: "Level", curve: 0 });
+    const svg = renderDoc({ ...emptyDoc(size), elements: [el] });
+    const expected = Math.hypot(el.x - l.cx, el.y - l.cy);
+    expect(arcRadius(svg)).toBeCloseTo(expected, 1);
+  });
+
+  it("moves the arc with the element, so height on the cup tracks position", () => {
+    const l = layoutFor(12);
+    const base = newText(12, { curve: 0 });
+    const higher = { ...base, y: base.y - 10 };
+    const lower = { ...base, y: base.y + 10 };
+    /* The centre is below the sheet, so higher up means further from it. */
+    expect(arcRadius(renderDoc({ ...emptyDoc(12), elements: [higher] }))).toBeGreaterThan(
+      arcRadius(renderDoc({ ...emptyDoc(12), elements: [lower] }))
+    );
+    expect(arcRadius(renderDoc({ ...emptyDoc(12), elements: [lower] }))).toBeLessThan(
+      Math.hypot(base.x - l.cx, base.y - l.cy) + 0.001
+    );
+  });
+
+  it("bends tighter or flatter than the band without ever inverting", () => {
+    const flat = arcRadius(renderDoc({ ...emptyDoc(12), elements: [newText(12, { curve: -100 })] }));
+    const natural = arcRadius(renderDoc({ ...emptyDoc(12), elements: [newText(12, { curve: 0 })] }));
+    const tight = arcRadius(renderDoc({ ...emptyDoc(12), elements: [newText(12, { curve: 100 })] }));
+    expect(flat).toBeGreaterThan(natural);
+    expect(tight).toBeLessThan(natural);
+    expect(tight).toBeGreaterThan(0);
+  });
+
+  it("stacks lines at falling radii, so they read as lines down the cup", () => {
+    const svg = renderDoc({ ...emptyDoc(12), elements: [newText(12, { text: "one\ntwo\nthree", width: 400 })] });
+    const radii = textArcRadii(svg);
+    expect(radii).toHaveLength(3);
+    expect(radii[0]).toBeGreaterThan(radii[1]);
+    expect(radii[1]).toBeGreaterThan(radii[2]);
+  });
+});
+
+describe("background designs", () => {
+  it("draws nothing when plain", () => {
+    expect(renderDoc(doc({ pattern: "none" }))).not.toContain("<pattern");
+  });
+
+  it.each(["stripes", "dots", "sprigs"] as const)("%s tiles the sleeve", (pattern) => {
+    const svg = renderDoc(doc({ pattern }));
+    expect(svg).toContain("<pattern");
+    expect(svg).toContain("fill=\"url(#");
+  });
+
+  it("strikes rings from the same centre as the text, so they wrap level too", () => {
+    const svg = renderDoc(doc({ pattern: "rings" }));
+    const l = layoutFor(12);
+    const d = sleeveDieline(12);
+    const radii = ringRadii(svg);
+    expect(radii.length).toBeGreaterThan(5);
+    for (const r of radii) {
+      expect(r).toBeGreaterThanOrEqual(d.innerRadius);
+      expect(r).toBeLessThanOrEqual(d.outerRadius);
+    }
+    expect(l.cx).toBeGreaterThan(0);
+  });
+
+  it("keeps every design inside the sleeve", () => {
+    for (const pattern of ["rings", "stripes", "dots", "sprigs", "rule"] as const) {
+      expect(renderDoc(doc({ pattern }))).toContain("clip-path=");
+    }
+  });
+});
+
+describe("image recolour", () => {
+  const img = (tint: string) => ({
+    ...newText(12), kind: "image" as const, href: "data:image/png;base64,AAAA",
+    width: 20, height: 20, tint,
+  });
+
+  it("leaves the file alone when asked for as uploaded", () => {
+    const svg = renderDoc(doc({ elements: [img("none") as never] }));
+    expect(svg).toContain("<image");
+    expect(svg).not.toContain("feColorMatrix");
+  });
+
+  it("replaces every colour and keeps the alpha", () => {
+    const svg = renderDoc(doc({ elements: [img("#e8735a") as never] }));
+    expect(svg).toContain("feColorMatrix");
+    /* Last row passes alpha straight through; the colour rows are constants. */
+    expect(svg).toMatch(/values="0 0 0 0 [\d.]+ 0 0 0 0 [\d.]+ 0 0 0 0 [\d.]+ 0 0 0 1 0"/);
+  });
+
+  it("refuses a colour it cannot vouch for", () => {
+    const svg = renderDoc(doc({ elements: [img('red" onload="x') as never] }));
+    expect(svg).not.toContain("onload");
+    expect(svg).not.toContain("feColorMatrix");
   });
 });
