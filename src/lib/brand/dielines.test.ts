@@ -9,8 +9,8 @@ import { DIELINES } from "./dielines";
 describe("sleeve sector geometry", () => {
   const sleeves = Object.values(DIELINES).filter((d) => d.sector);
 
-  it("covers the sizes whose drawings arrived", () => {
-    expect(sleeves.map((d) => d.id).sort()).toEqual(["sleeve12", "sleeve16"]);
+  it("covers all three sizes", () => {
+    expect(sleeves.map((d) => d.id).sort()).toEqual(["sleeve12", "sleeve16", "sleeve8"]);
   });
 
   it.each(sleeves)("$id arc lengths follow from its radii and sweep", (d) => {
@@ -40,7 +40,11 @@ describe("sleeve sector geometry", () => {
     expect(bandOnCup.to).toBeLessThan(cup.height);
   });
 
-  it("flags the 8oz as still missing", () => {
-    expect(DIELINES.sleeve8.confirmed).toBe(false);
+  it("leaves nothing unconfirmed", () => {
+    expect(Object.values(DIELINES).filter((d) => !d.confirmed)).toEqual([]);
+  });
+
+  it("every sleeve carries the drawing it was read from", () => {
+    for (const d of sleeves) expect(d.source).toMatch(/^content\/dielines\/.+\.svg$/);
   });
 });

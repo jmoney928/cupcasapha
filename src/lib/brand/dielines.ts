@@ -78,14 +78,19 @@ export const DIELINES: Record<string, Dieline> = {
       bandOnCup: { from: 35, to: 95 },
     },
   },
-  /**
-   * Page 1 of the supplier's three-page set. The 8oz is the base size on the consumer packs, so
-   * this is the one gap that still stops a full set of sleeve artwork being generated.
-   */
   sleeve8: {
-    id: "sleeve8", label: "8oz sleeve", trim: { width: 0, height: 0 },
-    bleed: 0, safeArea: 0, confirmed: false,
-    note: "Drawing not supplied — the 12oz and 16oz arrived as pages 2 and 3 of 3. Cannot generate until page 1 lands.",
+    id: "sleeve8", label: "8oz sleeve", trim: { width: 263, height: 85 },
+    bleed: 3, safeArea: 4, confirmed: true,
+    source: "content/dielines/sleeve-8oz.svg",
+    note: "Print area 211 × 45.9mm. The drawing asks for cup dimensions and glue lap to be confirmed with the printer before tooling.",
+    sector: {
+      innerRadius: 171.6, outerRadius: 217.5, sweepDeg: 70.6,
+      bandHeight: 45.9, arcBottom: 211.4, arcTop: 268.0,
+      glueLap: { width: 12, deg: 4.01 },
+      /* The 8oz is the odd one out: a 62mm base, where the 12oz and 16oz both sit on 60mm. */
+      cup: { topDia: 90, baseDia: 62, height: 70 },
+      bandOnCup: { from: 12, to: 57 },
+    },
   },
 };
 
