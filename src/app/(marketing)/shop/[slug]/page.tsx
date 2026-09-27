@@ -151,10 +151,11 @@ export default async function ProductPage({
                 fit: "object-cover",
               },
               {
-                src: "/products/sleeve.jpg",
-                alt: "A kraft corrugated cup sleeve, unprinted",
+                src: "/products/sleeve-printed.jpg",
+                alt: "A kraft corrugated cup sleeve printed with the cupcasa wordmark",
                 title: "A custom sleeve",
-                text: "Corrugated kraft, printed with your design here. No minimum, no setup fee.",
+                /* Our own mark is on the sample, so say so rather than let it read as theirs. */
+                text: "Corrugated kraft, printed here on our own press — ours shown, yours on the pack. No minimum, no setup fee.",
                 fit: "object-cover",
               },
               {
