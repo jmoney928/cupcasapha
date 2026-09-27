@@ -329,3 +329,49 @@ describe("image recolour", () => {
     expect(svg).not.toContain("feColorMatrix");
   });
 });
+
+describe("uploaded background", () => {
+  const PNG = "data:image/png;base64,AAAA";
+
+  it("draws nothing when none is set", () => {
+    expect(renderDoc(doc({ backgroundImage: null }))).not.toContain("<image");
+  });
+
+  it("covers the whole sheet rather than stretching to fit", () => {
+    const svg = renderDoc(doc({ backgroundImage: PNG }));
+    const l = layoutFor(12);
+    expect(svg).toContain('preserveAspectRatio="xMidYMid slice"');
+    expect(svg).toContain(`width="${Number(l.width.toFixed(3))}"`);
+    expect(svg).toContain(`height="${Number(l.height.toFixed(3))}"`);
+  });
+
+  it("is clipped, so a picture cannot print past the trim", () => {
+    const svg = renderDoc(doc({ backgroundImage: PNG }));
+    const clip = svg.indexOf("clip-path=");
+    expect(clip).toBeGreaterThan(-1);
+    expect(svg.indexOf("<image")).toBeGreaterThan(clip);
+  });
+
+  it("sits under the artwork, not over it", () => {
+    const svg = renderDoc(doc({ backgroundImage: PNG, elements: [text({ text: "Over" })] }));
+    expect(svg.indexOf("<image")).toBeLessThan(svg.indexOf("Over"));
+  });
+
+  it("keeps the stock colour underneath, so dimming shows it through", () => {
+    const svg = renderDoc(doc({ backgroundImage: PNG, background: "#a9855f", backgroundImageOpacity: 0.4 }));
+    expect(svg.indexOf('fill="#a9855f"')).toBeLessThan(svg.indexOf("<image"));
+    expect(svg).toContain('opacity="0.4"');
+  });
+
+  it("refuses anything that is not a self-contained image", () => {
+    for (const bad of ["https://example.com/bg.jpg", "data:text/html;base64,AAAA", "javascript:alert(1)"]) {
+      const svg = renderDoc(doc({ backgroundImage: bad }));
+      expect(svg).not.toContain("<image");
+      expect(svg).not.toContain(bad);
+    }
+  });
+
+  it("never fades the picture away entirely", () => {
+    expect(renderDoc(doc({ backgroundImage: PNG, backgroundImageOpacity: 0 }))).toContain('opacity="0.05"');
+  });
+});

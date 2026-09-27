@@ -217,14 +217,29 @@ export function renderDoc(doc: SleeveDoc, opts: RenderOptions = {}): string {
     `<desc>1:1 at ${n(l.width)} × ${n(l.height)} mm. ${d.label} dieline, ${d.bleed}mm bleed, ${d.glueLap.width}mm glue lap.</desc>`,
     `<defs><clipPath id="${clipId}"><path d="${bleedShape}"/></clipPath></defs>`,
     `<path d="${bleedShape}" fill="${bg}"/>`,
-    /* The background design sits under everything, inside the same clip. */
-    `<g clip-path="url(#${clipId})">${patternLayer(doc, d, l, idPrefix)}</g>`,
+    /*
+     * An uploaded background covers the whole sheet and is clipped to the bleed, so it reaches the
+     * trim on every edge whatever shape the picture is. Stock colour stays underneath, which is
+     * what shows through when it is dimmed.
+     */
+    `<g clip-path="url(#${clipId})">${backgroundImage(doc, l)}${patternLayer(doc, d, l, idPrefix)}</g>`,
     /* Artwork is clipped to the bleed so a dragged element can never print past the trim. */
     `<g clip-path="url(#${clipId})">${art}</g>`,
     guideLayer,
     cropMarks(l),
     `</svg>`,
   ].join("");
+}
+
+/** An uploaded picture, scaled to cover the sheet rather than stretched to fit it. */
+function backgroundImage(doc: SleeveDoc, l: ReturnType<typeof layout>): string {
+  const href = dataImage(doc.backgroundImage);
+  if (!href) return "";
+  const alpha = Math.min(1, Math.max(0.05, doc.backgroundImageOpacity));
+  return (
+    `<image href="${href}" x="0" y="0" width="${n(l.width)}" height="${n(l.height)}"` +
+    ` preserveAspectRatio="xMidYMid slice"${alpha < 1 ? ` opacity="${n(alpha)}"` : ""}/>`
+  );
 }
 
 /**

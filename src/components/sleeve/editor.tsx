@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Circle, Download, ImageUp, Minus, Redo2, Square, Type, Undo2 } from "lucide-react";
+import { Circle, Download, ImageUp, Minus, Redo2, Square, Trash2, Type, Undo2 } from "lucide-react";
 import { SLEEVE_SIZES, sleeveDieline, type CupSize } from "@/lib/sleeve/dielines";
 import {
   add, byId, duplicate, emptyDoc, newImage, newShape, newText, remove, reorder, resize, update,
@@ -30,6 +30,7 @@ export function SleeveEditor() {
   const [showGuides, setShowGuides] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const bgInput = useRef<HTMLInputElement>(null);
   const measure = useMeasure();
 
   /** Snapshot before a change, so undo has something to go back to. */
@@ -101,15 +102,16 @@ export function SleeveEditor() {
     setSelectedId(el.id);
   }
 
-  async function onFile(file: File) {
+  /** Reads a picked image and hands back a data URL, or null with the reason already shown. */
+  async function readImage(file: File): Promise<string | null> {
     setError(null);
     if (!/^image\/(png|jpeg|svg\+xml|webp|gif)$/.test(file.type)) {
       setError("PNG, JPG, SVG, WebP or GIF, please.");
-      return;
+      return null;
     }
     if (file.size > MAX_LOGO_BYTES) {
       setError("That file is over 3MB — a smaller one will print just as well.");
-      return;
+      return null;
     }
     const dataUrl = await new Promise<string | null>((resolve) => {
       const r = new FileReader();
@@ -117,10 +119,13 @@ export function SleeveEditor() {
       r.onerror = () => resolve(null);
       r.readAsDataURL(file);
     });
-    if (!dataUrl) {
-      setError("That file couldn't be read. Try another.");
-      return;
-    }
+    if (!dataUrl) setError("That file couldn't be read. Try another.");
+    return dataUrl;
+  }
+
+  async function onLogoFile(file: File) {
+    const dataUrl = await readImage(file);
+    if (!dataUrl) return;
     /* Measured before it lands, so an uploaded logo is never stretched to fit. */
     const aspect = await new Promise<number>((resolve) => {
       const img = new Image();
@@ -131,6 +136,13 @@ export function SleeveEditor() {
     const el = newImage(doc.size, dataUrl, aspect);
     commit((d) => add(d, el));
     setSelectedId(el.id);
+  }
+
+  async function onBackgroundFile(file: File) {
+    const dataUrl = await readImage(file);
+    if (!dataUrl) return;
+    /* A picture behind the type usually needs taking down a notch; start it there. */
+    commit((cur) => ({ ...cur, backgroundImage: dataUrl, backgroundImageOpacity: 0.8 }));
   }
 
   function download() {
@@ -247,7 +259,19 @@ export function SleeveEditor() {
         className="sr-only"
         onChange={(e) => {
           const f = e.target.files?.[0];
-          if (f) void onFile(f);
+          if (f) void onLogoFile(f);
+          e.target.value = "";
+        }}
+      />
+
+      <input
+        ref={bgInput}
+        type="file"
+        accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+        className="sr-only"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void onBackgroundFile(f);
           e.target.value = "";
         }}
       />
@@ -310,6 +334,50 @@ export function SleeveEditor() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <p className="label-caps text-espresso/50 mb-2">Background picture</p>
+              {doc.backgroundImage ? (
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={doc.backgroundImage}
+                    alt="Your background"
+                    className="h-10 w-16 object-cover rounded-lg border border-espresso/12"
+                  />
+                  <label className="flex items-center gap-2 text-xs font-semibold text-espresso/55">
+                    Show
+                    <input
+                      type="range"
+                      min={0.05}
+                      max={1}
+                      step={0.05}
+                      value={doc.backgroundImageOpacity}
+                      onChange={(e) =>
+                        commit((cur) => ({ ...cur, backgroundImageOpacity: Number(e.target.value) }))
+                      }
+                      className="w-24 accent-[#e8735a]"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => commit((cur) => ({ ...cur, backgroundImage: null }))}
+                    className="btn-pill px-3 py-2 border-2 border-espresso/12 hover:border-coral"
+                    title="Remove background"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => bgInput.current?.click()}
+                  className="btn-pill px-4 py-2 text-sm border-2 border-dashed border-espresso/25 hover:border-coral"
+                >
+                  <ImageUp className="w-4 h-4" /> Upload a picture
+                </button>
+              )}
             </div>
 
             <div>

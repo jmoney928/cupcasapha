@@ -66,6 +66,10 @@ export type SleeveDoc = {
   background: string;
   pattern: PatternId;
   patternInk: string;
+  /** An uploaded photo or texture filling the sleeve, as a self-contained data URL. */
+  backgroundImage: string | null;
+  /** How strongly it shows through, so type stays readable over a busy picture. */
+  backgroundImageOpacity: number;
   elements: SleeveElement[];
 };
 
@@ -123,6 +127,8 @@ export const emptyDoc = (size: CupSize = 12): SleeveDoc => ({
   background: DEFAULT_STOCK.colour,
   pattern: "none",
   patternInk: DEFAULT_STOCK.ink,
+  backgroundImage: null,
+  backgroundImageOpacity: 1,
   elements: [newText(size, { id: "seed" })],
 });
 
