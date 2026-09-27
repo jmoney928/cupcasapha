@@ -43,8 +43,7 @@ export function SiteHeader() {
     <>
       {/* announcement bar */}
       <div className="bg-espresso text-cream text-center text-xs sm:text-sm py-2.5 px-4 font-medium tracking-tight">
-        Cups, custom sleeves and lids from{" "}
-        <span className="text-coral font-semibold">35¢ a set</span> · shipping{" "}
+        Cups, custom sleeves and lids · shipping{" "}
         <span className="font-semibold">December 2026</span>
       </div>
 

@@ -134,6 +134,56 @@ export default async function ProductPage({
           </div>
         </div>
 
+        {/* what a set actually is — the three pieces, photographed */}
+        <section className="mt-14">
+          <h2 className="font-display text-2xl font-bold">What&apos;s in a set</h2>
+          <p className="text-espresso/65 mt-2 max-w-xl">
+            Every pack is these three, in equal numbers. Buy one pack and you have everything you
+            need to serve a drink.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-5 mt-6">
+            {[
+              {
+                src: product.image,
+                alt: `${product.name}, blank`,
+                title: `The ${product.size} cup`,
+                text: "Paper with a PHA lining. Single wall, blank, certified home compostable.",
+                fit: "object-cover",
+              },
+              {
+                src: "/products/sleeve.jpg",
+                alt: "A kraft corrugated cup sleeve, unprinted",
+                title: "A custom sleeve",
+                text: "Corrugated kraft, printed with your design here. No minimum, no setup fee.",
+                fit: "object-cover",
+              },
+              {
+                src: "/products/lid.png",
+                alt: "A white moulded bagasse sip lid",
+                title: "A bagasse lid",
+                text: "Moulded sugarcane fibre, not plastic. One lid fits all three cup sizes.",
+                fit: "object-contain",
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-3xl bg-white/60 border border-caramel/20 overflow-hidden">
+                <div className="relative aspect-[4/3] bg-white">
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className={item.fit}
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-display font-bold">{item.title}</h3>
+                  <p className="text-sm text-espresso/70 mt-1">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* specs */}
         <div className="mt-14 grid md:grid-cols-2 gap-x-12 gap-y-3 max-w-3xl">
           <h2 className="font-display text-2xl font-bold md:col-span-2 mb-2">

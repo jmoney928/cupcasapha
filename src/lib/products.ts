@@ -83,8 +83,8 @@ function build(b: Base): Product {
       { label: "Capacity", value: `${b.oz} oz` },
       { label: "Material", value: "Paper with PHA lining — no PE, no PLA, no microplastics" },
       { label: "Wall", value: "Single wall — add a sleeve for hot drinks" },
-      { label: "Finish", value: "Blank / unbranded" },
-      { label: "Case count", value: "1,000 cups" },
+      { label: "Finish", value: "Blank cup — your design prints on the sleeve" },
+      { label: "Sold in", value: "Packs of 100, 200 or 500 sets" },
       { label: "Certified", value: "Home compostable — DIN CERTCO 9P0326 (TÜV Rheinland group)" },
     ],
   };
