@@ -16,6 +16,17 @@ const H = 400;
 const PAD = { top: 20, bottom: 24, x: 26 };
 const SLICES = 120;
 const SPIN = 0.35; // radians a second
+/**
+ * Pixels across the sheet the band is sampled from.
+ *
+ * Bigger is not better here. The band is only a couple of hundred pixels wide on screen, and each
+ * of its wedges minifies the whole texture with no filtering of its own — so an oversized texture
+ * aliases into moiré, which is what fine artwork looked like at 3000. This is about twice what the
+ * band needs, rendered at double that and filtered down, which gives it a properly antialiased
+ * level to sample instead.
+ */
+const TEXTURE_WIDTH = 1200;
+const SUPERSAMPLE = 2;
 
 const PAPER = "#efe9dd";
 const PAPER_DARK = "#c9c0b1";
@@ -32,7 +43,7 @@ const LID_WELL = "#ded7c8";
  */
 export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const texture = useRef<HTMLImageElement | null>(null);
+  const texture = useRef<HTMLCanvasElement | null>(null);
   /*
    * Half a turn puts the middle of the artwork toward the viewer. At zero it is the glued seam
    * that faces front, which is the one part of the sleeve nobody is meant to look at.
@@ -49,7 +60,33 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
       const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
       const img = new Image();
       img.onload = () => {
-        texture.current = img;
+        /*
+         * Redrawn into a canvas at a generous fixed width. Taken at its intrinsic size the sheet
+         * is only ~1080px across, which is too few pixels for the band once it is cut into wedges
+         * again here — fine detail beats against the wedges and shows up as moiré.
+         */
+        const ratio = (img.naturalHeight || 1) / (img.naturalWidth || 1);
+        const height = Math.max(1, Math.round(TEXTURE_WIDTH * ratio));
+
+        /* Vector, so drawing it large re-renders it crisply rather than scaling up a bitmap. */
+        const hi = document.createElement("canvas");
+        hi.width = TEXTURE_WIDTH * SUPERSAMPLE;
+        hi.height = height * SUPERSAMPLE;
+        const hictx = hi.getContext("2d");
+        if (!hictx) return;
+        hictx.drawImage(img, 0, 0, hi.width, hi.height);
+
+        /* Then filtered down once, so every wedge samples an already-antialiased image. */
+        const off = document.createElement("canvas");
+        off.width = TEXTURE_WIDTH;
+        off.height = height;
+        const octx = off.getContext("2d");
+        if (octx) {
+          octx.imageSmoothingEnabled = true;
+          octx.imageSmoothingQuality = "high";
+          octx.drawImage(hi, 0, 0, off.width, off.height);
+          texture.current = off;
+        }
         setReady(true);
         URL.revokeObjectURL(url);
       };
@@ -157,7 +194,7 @@ function viewFor(doc: SleeveDoc): CupView {
   };
 }
 
-function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageElement | null, rot: number) {
+function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLCanvasElement | null, rot: number) {
   const d = sleeveDieline(doc.size);
   const view = viewFor(doc);
   const { cx, baseY, scale, tilt } = view;
@@ -285,7 +322,7 @@ function drawBand(
   ctx: CanvasRenderingContext2D,
   doc: SleeveDoc,
   view: CupView,
-  tex: HTMLImageElement,
+  tex: HTMLCanvasElement,
   rot: number
 ) {
   const d = sleeveDieline(doc.size);
@@ -299,9 +336,11 @@ function drawBand(
 
   /* The sheet's viewBox is in millimetres; the raster is some number of pixels across the same. */
   const sheet = layout(d);
-  const pxPerMmX = tex.naturalWidth / sheet.width;
-  const pxPerMmY = tex.naturalHeight / sheet.height;
+  const pxPerMmX = tex.width / sheet.width;
+  const pxPerMmY = tex.height / sheet.height;
 
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.save();
   /* Clip to the visible face of the band so no slice spills past its edges. */
   ctx.beginPath();

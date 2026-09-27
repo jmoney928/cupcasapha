@@ -46,6 +46,11 @@ export type ImageElement = Base & {
   height: number;
   /** Recolour the artwork to this, keeping its transparency. "none" leaves it as uploaded. */
   tint: string;
+  /**
+   * The picture bent round the band, baked in the browser. `href` stays the original so it can be
+   * re-baked whenever the size or position changes.
+   */
+  warped: { href: string; x: number; y: number; width: number; height: number } | null;
 };
 
 export type ShapeElement = Base & {
@@ -103,7 +108,7 @@ export function newImage(size: CupSize, href: string, aspect: number): ImageElem
   const height = Math.min(d.bandHeight - 2 * d.safeArea, 30);
   return {
     id: newId(), kind: "image", x: c.x, y: c.y, rotation: 0, opacity: 1, locked: false,
-    href, height, width: height * (aspect > 0 ? aspect : 1), tint: "none",
+    href, height, width: height * (aspect > 0 ? aspect : 1), tint: "none", warped: null,
   };
 }
 

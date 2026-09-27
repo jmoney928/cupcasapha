@@ -316,6 +316,11 @@ describe("image recolour", () => {
     expect(svg).not.toContain("feColorMatrix");
   });
 
+  it("carries one copy of the picture however many slices it is cut into", () => {
+    const svg = renderDoc(doc({ elements: [img("none") as never] }));
+    expect(svg.match(/href="data:image\/png/g)).toHaveLength(1);
+  });
+
   it("replaces every colour and keeps the alpha", () => {
     const svg = renderDoc(doc({ elements: [img("#e8735a") as never] }));
     expect(svg).toContain("feColorMatrix");
@@ -373,5 +378,39 @@ describe("uploaded background", () => {
 
   it("never fades the picture away entirely", () => {
     expect(renderDoc(doc({ backgroundImage: PNG, backgroundImageOpacity: 0 }))).toContain('opacity="0.05"');
+  });
+});
+
+describe("placed images", () => {
+  const placed = (over: Record<string, unknown> = {}) => ({
+    ...newText(12), kind: "image" as const, href: "data:image/png;base64,AAAA",
+    width: 40, height: 20, tint: "none", warped: null, ...over,
+  });
+
+  it("draws the bent picture where the bake says it goes", () => {
+    const warped = { href: "data:image/png;base64,BBBB", x: 10, y: 20, width: 50, height: 30 };
+    const svg = renderDoc(doc({ elements: [placed({ warped }) as never] }));
+    expect(svg).toContain('href="data:image/png;base64,BBBB"');
+    expect(svg).toContain('x="10" y="20" width="50" height="30"');
+    /* One ordinary image — nothing downstream has to honour a pile of clip paths. */
+    expect(svg).not.toContain("<clipPath id=\"s-img");
+    expect(svg.match(/<image/g)).toHaveLength(1);
+  });
+
+  it("places the original flat if nothing has baked it yet", () => {
+    const svg = renderDoc(doc({ elements: [placed() as never] }));
+    expect(svg).toContain('href="data:image/png;base64,AAAA"');
+    expect(svg).toContain("<image");
+  });
+
+  it("refuses a baked picture that is not a self-contained image", () => {
+    const warped = { href: "https://example.com/x.png", x: 0, y: 0, width: 10, height: 10 };
+    const svg = renderDoc(doc({ elements: [placed({ warped }) as never] }));
+    expect(svg).not.toContain("https://example.com");
+  });
+
+  it("still recolours, once, for the whole picture", () => {
+    const svg = renderDoc(doc({ elements: [placed({ tint: "#e8735a" }) as never] }));
+    expect(svg.match(/feColorMatrix/g)).toHaveLength(1);
   });
 });

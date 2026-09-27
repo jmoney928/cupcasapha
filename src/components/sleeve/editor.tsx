@@ -8,6 +8,7 @@ import {
   type SleeveDoc, type SleeveElement,
 } from "@/lib/sleeve/doc";
 import { insideSafeArea, renderDoc, sleeveFileName } from "@/lib/sleeve/render-doc";
+import { bakeWarp } from "@/lib/sleeve/warp-raster";
 import { SleeveCanvas } from "./canvas";
 import { CupPreview } from "./cup-preview";
 import { Panel } from "./panel";
@@ -157,6 +158,43 @@ export function SleeveEditor() {
     a.remove();
     URL.revokeObjectURL(url);
   }
+
+  /*
+   * Bend every placed picture round the band, whenever its size, position or the cup size changes.
+   * Baking is a canvas job, so it happens here rather than in the renderer, and it goes in with
+   * setDoc rather than commit — re-baking is a consequence of an edit, not an edit of its own, and
+   * should not take up a slot on the undo stack.
+   */
+  const baked = useRef(new Map<string, string>());
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const dieline = sleeveDieline(doc.size);
+      for (const el of doc.elements) {
+        if (el.kind !== "image") continue;
+        const sig = [doc.size, el.x, el.y, el.width, el.height, el.rotation]
+          .map((v) => (typeof v === "number" ? v.toFixed(2) : v))
+          .join("|");
+        if (baked.current.get(el.id) === sig) continue;
+
+        const result = await bakeWarp(el.href, dieline, el);
+        if (cancelled) return;
+        baked.current.set(el.id, sig);
+        setDoc((cur) => ({
+          ...cur,
+          elements: cur.elements.map((e) =>
+            e.id === el.id && e.kind === "image"
+              ? { ...e, warped: result ? { href: result.href, ...result.placement } : null }
+              : e
+          ),
+        }));
+      }
+    }, 160);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [doc]);
 
   /* Shortcuts, but never while someone is typing into a field. */
   useEffect(() => {

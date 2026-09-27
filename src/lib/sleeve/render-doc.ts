@@ -120,14 +120,18 @@ function channels(hex: string): [number, number, number] | null {
   return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255) as [number, number, number];
 }
 
+/**
+ * A placed picture, drawn as a single image.
+ *
+ * The bend is baked into the picture itself rather than expressed as clipped slices here — see
+ * warp-raster.ts for why. `warped` carries both the bent picture and where it sits; without it
+ * (nothing has baked it yet) the original is placed flat rather than not at all.
+ */
 function renderImage(el: ImageElement, idPrefix: string): string {
-  const href = dataImage(el.href);
+  const warped = el.warped ? dataImage(el.warped.href) : null;
+  const href = warped ?? dataImage(el.href);
   if (!href) return "";
 
-  /*
-   * Recolouring keeps the alpha and replaces every colour, which is what a logo needs: a black
-   * mark on transparency comes out in the chosen colour rather than as a tinted grey.
-   */
   const rgb = el.tint && el.tint !== "none" ? channels(colour(el.tint, "")) : null;
   const filterId = `${idPrefix}-tint-${el.id}`;
   const defs = rgb
@@ -138,11 +142,19 @@ function renderImage(el: ImageElement, idPrefix: string): string {
     : "";
   const filter = rgb ? ` filter="url(#${filterId})"` : "";
 
+  /* The baked picture already carries the element's rotation; a flat fallback still needs it. */
+  const box = warped && el.warped
+    ? { x: el.warped.x, y: el.warped.y, width: el.warped.width, height: el.warped.height, spin: "" }
+    : {
+        x: el.x - el.width / 2, y: el.y - el.height / 2,
+        width: el.width, height: el.height, spin: transform(el),
+      };
+
   return (
     defs +
-    `<image href="${href}" x="${n(el.x - el.width / 2)}" y="${n(el.y - el.height / 2)}" width="${n(
-      el.width
-    )}" height="${n(el.height)}" preserveAspectRatio="xMidYMid meet"${filter}${transform(el)}${opacity(el)}/>`
+    `<image href="${href}" x="${n(box.x)}" y="${n(box.y)}" width="${n(box.width)}" height="${n(
+      box.height
+    )}" preserveAspectRatio="none"${filter}${box.spin}${opacity(el)}/>`
   );
 }
 
