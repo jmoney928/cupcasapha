@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   Leaf,
   FlaskConical,
@@ -74,9 +75,25 @@ export default function WhyPhaPage() {
   return (
     <>
       {/* hero */}
-      <section className="section-pad pt-12 pb-16 relative overflow-hidden">
-        <div className="absolute -top-16 right-0 w-96 h-96 rounded-full bg-leaf-bright/20 blur-3xl" />
-        <div className="relative grid lg:grid-cols-2 gap-10 items-center">
+      <section className="section-pad pt-14 pb-20 lg:pt-20 lg:pb-28 relative overflow-hidden">
+        {/* The feedstock itself, sat behind the words. The photo carries its subject on the
+            right and open haze on the left, which is where the headline lives — the scrims
+            only deepen that and fade the frame back into the cream page below. */}
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/corn.jpg"
+            alt=""
+            aria-hidden
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[68%_center] lg:object-right"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/85 to-cream/30 lg:to-transparent" />
+          <div className="absolute inset-0 bg-cream/45 lg:hidden" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-cream to-transparent" />
+        </div>
+        <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <Eyebrow color="leaf">
               <FlaskConical className="w-4 h-4" /> The science, simply
