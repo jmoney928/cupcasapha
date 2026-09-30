@@ -17,8 +17,15 @@ const PAD = { top: 20, bottom: 24, x: 26 };
 const SLICES = 120;
 const SPIN = 0.35; // radians a second
 
-const PAPER = "#efe9dd";
-const PAPER_DARK = "#c9c0b1";
+/*
+ * Bone, not grey. Matched by eye against the photographs of our own cups rather than sampled
+ * off them — every pixel in those shots carries warm sun and bounce off a wood counter, so a
+ * sampled hex would be the lighting, not the paper. The shadow side is warm and close to the
+ * lit side because the stock is matte and uncoated; a wide dark falloff is what made this read
+ * as moulded plastic.
+ */
+const PAPER = "#ece5d9";
+const PAPER_DARK = "#d2c8b8";
 
 /*
  * The two things that make a paper cup read as one rather than as a cone.
@@ -29,8 +36,8 @@ const PAPER_DARK = "#c9c0b1";
  * Both are plainly there on our own cups; measure one and these are the numbers.
  */
 const RIM_ROLL_MM = 2.1;
-const BASE_ROLL_MM = 3.2;
-const BASE_FLARE_MM = 0.55;
+const BASE_ROLL_MM = 3.6;
+const BASE_FLARE_MM = 0.85;
 const LID = "#ddd6c7";
 const LID_TOP = "#e7e1d4";
 const LID_WELL = "#ded7c8";
@@ -198,10 +205,18 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
   ctx.closePath();
   const body = ctx.createLinearGradient(cx - rt, 0, cx + rt, 0);
   body.addColorStop(0, PAPER_DARK);
-  body.addColorStop(0.32, PAPER);
-  body.addColorStop(0.72, PAPER);
+  body.addColorStop(0.3, PAPER);
+  body.addColorStop(0.62, PAPER);
   body.addColorStop(1, PAPER_DARK);
   ctx.fillStyle = body;
+  ctx.fill();
+
+  /* A cup standing on a counter is a shade darker near its base, where less sky reaches it. */
+  const down = ctx.createLinearGradient(0, topY, 0, baseY);
+  down.addColorStop(0, "rgba(26,26,26,0)");
+  down.addColorStop(0.62, "rgba(26,26,26,0)");
+  down.addColorStop(1, "rgba(26,26,26,0.07)");
+  ctx.fillStyle = down;
   ctx.fill();
   ctx.restore();
 
