@@ -284,7 +284,7 @@ function draw(
     drawLid(ctx, view, rimOuter, topY);
   }
   /* Underneath, the printed base is the whole point of looking. */
-  if (isBelow(view)) drawPrintedBase(ctx, view, rb, baseY);
+  if (isBelow(view)) drawPrintedBase(ctx, view, rb, baseY, rt);
 }
 
 /**
@@ -298,7 +298,8 @@ function drawPrintedBase(
   ctx: CanvasRenderingContext2D,
   view: CupView,
   rb: number,
-  baseY: number
+  baseY: number,
+  bodyR: number
 ) {
   const { cx } = view;
   const r = rb * 0.95;
@@ -306,7 +307,19 @@ function drawPrintedBase(
   ctx.save();
   ctx.beginPath();
   ctx.ellipse(cx, baseY, r, ry(view, r), 0, 0, Math.PI * 2);
-  ctx.fillStyle = "#fdfcfa";
+  /*
+   * The same paper as the wall, lit across the same span so the tones meet where the two do.
+   * A near-white disc read as a label stuck on the bottom rather than the bottom itself.
+   */
+  const g = ctx.createLinearGradient(cx - bodyR, 0, cx + bodyR, 0);
+  g.addColorStop(0, PAPER_DARK);
+  g.addColorStop(0.32, PAPER);
+  g.addColorStop(0.72, PAPER);
+  g.addColorStop(1, PAPER_DARK);
+  ctx.fillStyle = g;
+  ctx.fill();
+  /* Turned away from the light, as the underside of anything standing up is. */
+  ctx.fillStyle = "rgba(26,26,26,0.05)";
   ctx.fill();
 
   /*
