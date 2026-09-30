@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pause, Play, RotateCw } from "lucide-react";
-import { sleeveDieline } from "@/lib/sleeve/dielines";
+import { sleeveDieline, type CupSize } from "@/lib/sleeve/dielines";
 import { layout } from "@/lib/sleeve/geometry";
 import type { SleeveDoc } from "@/lib/sleeve/doc";
 import { renderDoc, type Measurer } from "@/lib/sleeve/render-doc";
@@ -12,8 +12,25 @@ import {
 } from "@/lib/sleeve/wrap3d";
 
 const W = 320;
-const H = 400;
-const PAD = { top: 20, bottom: 24, x: 26 };
+const PAD = { top: 16, bottom: 18, x: 14 };
+const LID_MM = 7;
+
+/**
+ * The box a cup is drawn in, shaped to that cup.
+ *
+ * It used to be a fixed 320×400 for all three, which every size lost by. The 8oz is broader than
+ * it is tall, so it sat in seventy-odd pixels of dead height and looked small; the 16oz is much
+ * taller than the box, so it was squeezed down to fit and came out smaller than the panel could
+ * have shown. Each now gets a frame as wide as the panel and only as tall as it needs.
+ */
+function frameFor(size: CupSize) {
+  const d = sleeveDieline(size);
+  const rt = d.cup.topDia / 2;
+  const rb = d.cup.baseDia / 2;
+  const scale = (W - PAD.x * 2) / (rt * 2 * 1.06);
+  const tall = (d.cup.height + (rt + rb) * TILT + LID_MM) * scale + PAD.top + PAD.bottom;
+  return { w: W, h: Math.round(tall) };
+}
 const SLICES = 120;
 const SPIN = 0.35; // radians a second
 
@@ -66,6 +83,8 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
   const dragging = useRef<{ x: number; y: number; from: number; fromTilt: number } | null>(null);
   const [spinning, setSpinning] = useState(true);
   const [ready, setReady] = useState(false);
+  /* The drawing box is a property of the cup, so it changes only when the size does. */
+  const box = useMemo(() => frameFor(doc.size), [doc.size]);
 
   /* Rasterise the artwork when it settles, not on every keystroke. */
   useEffect(() => {
@@ -91,8 +110,8 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
     if (!ctx) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    el.width = W * dpr;
-    el.height = H * dpr;
+    el.width = box.w * dpr;
+    el.height = box.h * dpr;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let frame = 0;
@@ -103,7 +122,7 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
       last = now;
       if (spinning && !reduced && !dragging.current) rotation.current += SPIN * dt;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      draw(ctx, doc, texture.current, rotation.current, tilt.current);
+      draw(ctx, doc, texture.current, rotation.current, tilt.current, box.h);
       frame = requestAnimationFrame(loop);
     };
     frame = requestAnimationFrame(loop);
@@ -126,7 +145,7 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
     /* A drag across the width of the cup turns it about half way round. */
     rotation.current = dragging.current.from + ((e.clientX - dragging.current.x) / W) * Math.PI * 2;
     /* And up and down lifts the camera over the rim or drops it under the base. */
-    const next = dragging.current.fromTilt + ((e.clientY - dragging.current.y) / H) * 2.2;
+    const next = dragging.current.fromTilt + ((e.clientY - dragging.current.y) / box.h) * 2.2;
     tilt.current = clampTilt(next);
   }
   const onUp = () => {
@@ -160,7 +179,7 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
       </div>
       <canvas
         ref={canvas}
-        style={{ width: "100%", maxWidth: W, aspectRatio: `${W} / ${H}` }}
+        style={{ width: "100%", maxWidth: W, aspectRatio: `${box.w} / ${box.h}` }}
         className="mx-auto block cursor-grab active:cursor-grabbing touch-none"
         onPointerDown={onDown}
         onPointerMove={onMove}
@@ -182,21 +201,20 @@ export function clampTilt(t: number): number {
   return c < 0 ? -MIN_TILT : MIN_TILT;
 }
 
-function viewFor(doc: SleeveDoc, tilt: number): CupView {
+function viewFor(doc: SleeveDoc, tilt: number, H: number): CupView {
   const d = sleeveDieline(doc.size);
   const rt = d.cup.topDia / 2;
   const rb = d.cup.baseDia / 2;
   /* Room for the cup, the two foreshortened ellipses, and the lid sitting on top. */
-  const lidMm = 7;
   const ty = Math.abs(tilt);
-  const byHeight = (H - PAD.top - PAD.bottom) / (d.cup.height + (rt + rb) * ty + lidMm);
+  const byHeight = (H - PAD.top - PAD.bottom) / (d.cup.height + (rt + rb) * ty + LID_MM);
   const byWidth = (W - PAD.x * 2) / (rt * 2 * 1.06);
   const scale = Math.min(byHeight, byWidth);
   return {
     scale,
     tilt,
     cx: W / 2,
-    baseY: PAD.top + (lidMm + rt * ty + d.cup.height) * scale,
+    baseY: PAD.top + (LID_MM + rt * ty + d.cup.height) * scale,
   };
 }
 
@@ -205,10 +223,11 @@ function draw(
   doc: SleeveDoc,
   tex: HTMLImageElement | null,
   rot: number,
-  tiltNow: number
+  tiltNow: number,
+  H: number
 ) {
   const d = sleeveDieline(doc.size);
-  const view = viewFor(doc, tiltNow);
+  const view = viewFor(doc, tiltNow, H);
   const { cx, baseY, scale, tilt } = view;
   const rb = cupRadius(d, 0) * scale;
   const rt = cupRadius(d, d.cup.height) * scale;
