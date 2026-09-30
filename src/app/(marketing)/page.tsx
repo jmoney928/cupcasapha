@@ -17,9 +17,10 @@ import { MIN_TRIO_CENTS } from "@/lib/packs";
 import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
 
 const heroSlides: HeroSlide[] = [
+  { src: "/hero/seedling.jpg", alt: "A cupcasa cup lying on its side in dark soil, its printed base to the camera reading Made to disappear, a seedling pushing up beside it" },
+  { src: "/hero/forest.jpg", alt: "The three cupcasa sizes lying on a mossy rock in a rainforest, printed bases to the camera" },
+  { src: "/hero/hand.jpg", alt: "A hand holding up a cupcasa cup, base to the camera reading Made to disappear, old-growth forest behind" },
   { src: "/hero/counter.jpg", alt: "Three cupcasa cups upturned on a sunlit wooden counter, their printed bases reading Made to disappear, with coffee beans and an espresso behind" },
-  { src: "/hero/beach.jpg", alt: "Three cupcasa cups lying against driftwood on a pebble beach, printed bases to the camera, a forested headland in the mist behind" },
-  { src: "/hero/soil.jpg", alt: "Three cupcasa cups lying on dark soil among moss, fallen maple leaves and seedlings, printed bases to the camera" },
 ];
 
 const pillars = [
@@ -129,9 +130,9 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { img: "/products/8oz-pha-cup.png", size: "8oz", name: "The Espresso" },
-              { img: "/products/12oz-pha-cup.png", size: "12oz", name: "The Everyday" },
-              { img: "/products/16oz-pha-cup.png", size: "16oz", name: "The Big One" },
+              { img: "/products/8oz-pha-cup.jpg", size: "8oz", name: "The Espresso" },
+              { img: "/products/12oz-pha-cup.jpg", size: "12oz", name: "The Everyday" },
+              { img: "/products/16oz-pha-cup.jpg", size: "16oz", name: "The Big One" },
             ].map((c, i) => (
               <Reveal key={c.size} delay={i * 90}>
                 <a href={`/shop?size=${c.size.replace("oz", "")}`} className="group relative block rounded-3xl overflow-hidden aspect-[4/5] bg-cream">

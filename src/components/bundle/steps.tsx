@@ -242,7 +242,7 @@ export function StepParts({
       <div className="grid sm:grid-cols-3 gap-5">
         {PARTS_PHOTOS.map((item) => {
           const included = inBundle(item.key);
-          const src = item.src ?? `/products/${oz}oz-pha-cup.png`;
+          const src = item.src ?? `/products/${oz}oz-pha-cup.jpg`;
           return (
             <div
               key={item.key}

@@ -45,7 +45,7 @@ function build(packSize: PackSize, oz: CupSize): Pack {
     totalCents: per * packSize,
     name: `${packSize} × ${oz}oz — cups, sleeves & lids`,
     shortName: product?.shortName ?? `${oz}oz`,
-    image: `/products/${oz}oz-pha-cup.png`,
+    image: `/products/${oz}oz-pha-cup.jpg`,
   };
 }
 
