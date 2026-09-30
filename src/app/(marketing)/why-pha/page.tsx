@@ -10,7 +10,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button, Reveal, Eyebrow } from "@/components/ui";
-import { Cup } from "@/components/cup";
 import { CertBadge } from "@/components/cert-badge";
 import { MATERIAL_SHORT } from "@/lib/certs";
 
@@ -93,39 +92,29 @@ export default function WhyPhaPage() {
           <div className="absolute inset-0 bg-cream/45 lg:hidden" />
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-cream to-transparent" />
         </div>
-        <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <Eyebrow color="leaf">
-              <FlaskConical className="w-4 h-4" /> The science, simply
-            </Eyebrow>
-            <h1 className="font-display text-5xl sm:text-6xl font-bold mt-5 leading-[0.95]">
-              What on earth is <span className="text-leaf">PHA?</span>
-            </h1>
-            <p className="text-lg text-espresso/70 mt-6 max-w-lg">
-              PHA — polyhydroxyalkanoate — is a biopolymer that microbes make from
-              plants — and that other microbes eat when you&apos;re done with it. It&apos;s the
-              rare lining material that&apos;s certified compostable <em>at home</em>, not just in
-              an industrial facility. That&apos;s why we line every cupcasa cup with it.
-            </p>
-            <div className="mt-8">
-              <Button href="/shop" variant="primary" size="lg">
-                Shop packs <ArrowRight className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 mt-6">
-              <CertBadge size="sm" />
-              <span className="inline-flex items-center gap-2 rounded-full bg-leaf/12 text-leaf px-3 py-1.5 text-xs font-bold">
-                {MATERIAL_SHORT}
-              </span>
-            </div>
+        <div className="relative z-10 max-w-xl">
+          <Eyebrow color="leaf">
+            <FlaskConical className="w-4 h-4" /> The science, simply
+          </Eyebrow>
+          <h1 className="font-display text-5xl sm:text-6xl font-bold mt-5 leading-[0.95]">
+            What on earth is <span className="text-leaf">PHA?</span>
+          </h1>
+          <p className="text-lg text-espresso/70 mt-6 max-w-lg">
+            PHA — polyhydroxyalkanoate — is a biopolymer that microbes make from
+            plants — and that other microbes eat when you&apos;re done with it. It&apos;s the
+            rare lining material that&apos;s certified compostable <em>at home</em>, not just in
+            an industrial facility. That&apos;s why we line every cupcasa cup with it.
+          </p>
+          <div className="mt-8">
+            <Button href="/shop" variant="primary" size="lg">
+              Shop packs <ArrowRight className="w-5 h-5" />
+            </Button>
           </div>
-          <div className="flex justify-center gap-4">
-            <div className="w-36 animate-float">
-              <Cup tone="leaf" />
-            </div>
-            <div className="w-32 animate-float-slow mt-12">
-              <Cup tone="caramel" />
-            </div>
+          <div className="flex flex-wrap items-center gap-2 mt-6">
+            <CertBadge size="sm" />
+            <span className="inline-flex items-center gap-2 rounded-full bg-leaf/12 text-leaf px-3 py-1.5 text-xs font-bold">
+              {MATERIAL_SHORT}
+            </span>
           </div>
         </div>
       </section>
