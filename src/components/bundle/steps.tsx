@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { Check, Store, User } from "lucide-react";
-import { Cup } from "@/components/cup";
 import { formatCents } from "@/lib/skus";
 import {
   BUNDLE_SIZES,
@@ -17,8 +16,6 @@ import {
   type BundleQty,
 } from "@/lib/bundle";
 import type { CupSize } from "@/lib/calc/catalog";
-
-const TONES = { 8: "coral", 12: "caramel", 16: "leaf" } as const;
 
 /** One selectable card. Everything in the flow is a radio at heart, so it behaves like one. */
 function Choice({
@@ -63,8 +60,15 @@ export function StepSize({ value, onPick }: { value: CupSize | null; onPick: (oz
         const p = bundleProduct(oz);
         return (
           <Choice key={oz} selected={value === oz} onSelect={() => onPick(oz)}>
-            <div className="w-20 mx-auto mb-3">
-              <Cup tone={TONES[oz as 8 | 12 | 16]} />
+            {/* The cup itself, not a drawing of one — this is the step where you judge size. */}
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-cream-deep/40">
+              <Image
+                src={`/products/${oz}oz-cup.jpg`}
+                alt={`The ${oz}oz cupcasa cup with its lid`}
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover"
+              />
             </div>
             <p className="font-display text-2xl font-extrabold">{oz}oz</p>
             <p className="label-caps text-espresso/40 mt-0.5">{p?.shortName}</p>
@@ -242,7 +246,7 @@ export function StepParts({
       <div className="grid sm:grid-cols-3 gap-5">
         {PARTS_PHOTOS.map((item) => {
           const included = inBundle(item.key);
-          const src = item.src ?? `/products/${oz}oz-pha-cup.jpg`;
+          const src = item.src ?? `/products/${oz}oz-cup.jpg`;
           return (
             <div
               key={item.key}

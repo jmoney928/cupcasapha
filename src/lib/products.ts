@@ -71,7 +71,7 @@ function build(b: Base): Product {
     ozLabel: `${b.oz} oz`,
     oz: b.oz,
     pricePerCup,
-    image: `/products/${b.oz}oz-pha-cup.jpg`,
+    image: `/products/${b.oz}oz-cup.jpg`,
     caseCount: 1000,
     casePrice: Math.round(pricePerCup * 1000 * 100) / 100,
     singleWall: true,

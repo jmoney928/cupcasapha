@@ -130,9 +130,9 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { img: "/products/8oz-pha-cup.jpg", size: "8oz", name: "The Espresso" },
-              { img: "/products/12oz-pha-cup.jpg", size: "12oz", name: "The Everyday" },
-              { img: "/products/16oz-pha-cup.jpg", size: "16oz", name: "The Big One" },
+              { img: "/products/8oz-cup.jpg", size: "8oz", name: "The Espresso" },
+              { img: "/products/12oz-cup.jpg", size: "12oz", name: "The Everyday" },
+              { img: "/products/16oz-cup.jpg", size: "16oz", name: "The Big One" },
             ].map((c, i) => (
               <Reveal key={c.size} delay={i * 90}>
                 <a href={`/shop?size=${c.size.replace("oz", "")}`} className="group relative block rounded-3xl overflow-hidden aspect-[4/5] bg-cream">
