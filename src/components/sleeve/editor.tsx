@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Circle, Download, ImageUp, Minus, Redo2, Square, Trash2, Type, Undo2 } from "lucide-react";
+import { Circle, Download, ImageDown, ImageUp, Minus, Redo2, Square, Trash2, Type, Undo2 } from "lucide-react";
 import { SLEEVE_SIZES, sleeveDieline, type CupSize } from "@/lib/sleeve/dielines";
 import {
   add, byId, duplicate, emptyDoc, newImage, newShape, newText, remove, reorder, resize, update,
@@ -13,9 +13,9 @@ import { CupPreview } from "./cup-preview";
 import { Panel } from "./panel";
 import { Row, Swatches } from "./controls";
 import { PATTERNS, SLEEVE_STOCKS } from "@/lib/sleeve/safe";
+import { MAX_UPLOAD_BYTES, fitForPrint } from "@/lib/sleeve/downscale";
 import { useMeasure } from "./use-measure";
 
-const MAX_LOGO_BYTES = 3 * 1024 * 1024;
 const MAX_HISTORY = 60;
 
 /**
@@ -41,6 +41,8 @@ export function SleeveEditor({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showGuides, setShowGuides] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  /** A quiet line about what we did to a picture on the way in, not a problem to fix. */
+  const [note, setNote] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const bgInput = useRef<HTMLInputElement>(null);
   const measure = useMeasure();
@@ -114,47 +116,45 @@ export function SleeveEditor({
     setSelectedId(el.id);
   }
 
-  /** Reads a picked image and hands back a data URL, or null with the reason already shown. */
-  async function readImage(file: File): Promise<string | null> {
+  /**
+   * Reads a picked image, sized for the press on the way in. A phone photo is thousands of
+   * pixels wider than a sleeve can print, and every one of them would otherwise be carried
+   * through the editor and out the other side as base64.
+   */
+  async function readImage(file: File): Promise<{ dataUrl: string; aspect: number } | null> {
     setError(null);
+    setNote(null);
     if (!/^image\/(png|jpeg|svg\+xml|webp|gif)$/.test(file.type)) {
       setError("PNG, JPG, SVG, WebP or GIF, please.");
       return null;
     }
-    if (file.size > MAX_LOGO_BYTES) {
-      setError("That file is over 3MB — a smaller one will print just as well.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError("That file is over 12MB. Anything smaller will print just as well.");
       return null;
     }
-    const dataUrl = await new Promise<string | null>((resolve) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result));
-      r.onerror = () => resolve(null);
-      r.readAsDataURL(file);
-    });
-    if (!dataUrl) setError("That file couldn't be read. Try another.");
-    return dataUrl;
+    try {
+      const fitted = await fitForPrint(file);
+      if (fitted.note) setNote(fitted.note);
+      return { dataUrl: fitted.dataUrl, aspect: fitted.aspect };
+    } catch {
+      setError("That file couldn't be read. Try another.");
+      return null;
+    }
   }
 
   async function onLogoFile(file: File) {
-    const dataUrl = await readImage(file);
-    if (!dataUrl) return;
-    /* Measured before it lands, so an uploaded logo is never stretched to fit. */
-    const aspect = await new Promise<number>((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1);
-      img.onerror = () => resolve(1);
-      img.src = dataUrl;
-    });
-    const el = newImage(doc.size, dataUrl, aspect);
+    const read = await readImage(file);
+    if (!read) return;
+    const el = newImage(doc.size, read.dataUrl, read.aspect);
     commit((d) => add(d, el));
     setSelectedId(el.id);
   }
 
   async function onBackgroundFile(file: File) {
-    const dataUrl = await readImage(file);
-    if (!dataUrl) return;
+    const read = await readImage(file);
+    if (!read) return;
     /* A picture behind the type usually needs taking down a notch; start it there. */
-    commit((cur) => ({ ...cur, backgroundImage: dataUrl, backgroundImageOpacity: 0.8 }));
+    commit((cur) => ({ ...cur, backgroundImage: read.dataUrl, backgroundImageOpacity: 0.8 }));
   }
 
   function download() {
@@ -295,6 +295,13 @@ export function SleeveEditor({
       />
 
       {error && <p className="text-sm text-coral font-semibold">{error}</p>}
+
+      {note && (
+        <p className="text-sm text-espresso/70 bg-leaf/8 border border-leaf/25 rounded-2xl px-4 py-3 flex items-start gap-2">
+          <ImageDown className="w-4 h-4 text-leaf shrink-0 mt-0.5" />
+          <span>{note}</span>
+        </p>
+      )}
 
       {overflowing.length > 0 && (
         <p className="text-sm font-semibold text-espresso/80 bg-butter/40 border border-caramel/30 rounded-2xl px-4 py-3">
