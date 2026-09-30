@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Check, Store, User } from "lucide-react";
 import { formatCents } from "@/lib/skus";
@@ -283,6 +284,9 @@ export function StepParts({
 /**
  * Quantity, and the first place a price appears. Only the buyer's own path is rendered: a person
  * buying a pack never sees case pricing, and a café never has to scroll past packs it cannot use.
+ *
+ * Every choice here advances, the way size and contents do. A step where clicking the thing you
+ * want leaves the page exactly as it was reads as a broken button, not as a considered pause.
  */
 export function StepQuantity({
   who,
@@ -295,94 +299,27 @@ export function StepQuantity({
   oz: CupSize;
   parts: BundleParts;
   value: BundleQty | null;
-  onPick: (qty: BundleQty) => void;
+  /** `advance` moves to the next step; a half-typed number in the case field must not. */
+  onPick: (qty: BundleQty, advance?: boolean) => void;
 }) {
-  if (who === "cafe") {
-    const cases = value?.kind === "case" ? value.cases : 1;
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Store className="w-4 h-4 text-leaf" />
-          <p className="label-caps text-leaf">Café pricing · by the case</p>
-        </div>
-        <Choice
-          selected={value?.kind === "case"}
-          onSelect={() => onPick({ kind: "case", cases })}
-          className="block w-full"
-        >
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <div>
-              <p className="font-display text-2xl font-extrabold">By the case</p>
-              <p className="text-sm text-espresso/60 mt-0.5">
-                {CASE_UNITS.toLocaleString()} cups a case
-              </p>
-            </div>
-            <p className="font-bold text-leaf text-lg">
-              {unitCents(oz, parts, { kind: "case", cases: 1 })}¢ a set
-            </p>
-          </div>
+  return who === "cafe" ? (
+    <CafeQuantity oz={oz} parts={parts} value={value} onPick={onPick} />
+  ) : (
+    <PackQuantity oz={oz} parts={parts} value={value} onPick={onPick} />
+  );
+}
 
-          {value?.kind === "case" && (
-            <div
-              className="mt-5 pt-5 border-t border-espresso/10 flex flex-wrap items-center gap-4"
-              // The card is a button; the stepper inside it must not re-fire the card's onSelect.
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="text-sm font-bold">How many cases?</span>
-              <div className="flex items-center gap-1">
-                {[1, 2, 5, 10].map((n) => (
-                  <span
-                    key={n}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onPick({ kind: "case", cases: n })}
-                    onKeyDown={(e) => e.key === "Enter" && onPick({ kind: "case", cases: n })}
-                    className={`btn-pill px-3.5 py-1.5 text-sm border-2 cursor-pointer ${
-                      cases === n ? "border-leaf bg-leaf text-cream" : "border-espresso/12"
-                    }`}
-                  >
-                    {n}
-                  </span>
-                ))}
-                <input
-                  type="number"
-                  min={1}
-                  max={MAX_CASES}
-                  value={cases}
-                  aria-label="Number of cases"
-                  onChange={(e) => {
-                    const n = Math.max(1, Math.min(MAX_CASES, Math.floor(Number(e.target.value) || 1)));
-                    onPick({ kind: "case", cases: n });
-                  }}
-                  className="w-20 rounded-xl border border-espresso/20 bg-cream px-3 py-1.5 text-sm"
-                />
-              </div>
-              <p className="text-sm text-espresso/60">
-                {(cases * CASE_UNITS).toLocaleString()} cups ·{" "}
-                <strong>{formatCents(totalCents(oz, parts, { kind: "case", cases }))}</strong>
-              </p>
-            </div>
-          )}
-        </Choice>
-        <p className="text-xs text-espresso/50">
-          Cases are reserved against a flat deposit, with the balance settled when the container
-          lands. Nothing is charged in full up front.
-        </p>
-        <p className="text-sm text-espresso/70 rounded-2xl bg-leaf/8 border border-leaf/20 p-4">
-          Never ordered from us? Your first {CAFE_OFFER.trialCount} cups, lids and printed sleeves
-          are free —{" "}
-          <a
-            href="/wholesale#free-100"
-            className="font-bold underline decoration-coral decoration-2 underline-offset-2"
-          >
-            claim them here
-          </a>{" "}
-          and we will send your pricing with them.
-        </p>
-      </div>
-    );
-  }
-
+function PackQuantity({
+  oz,
+  parts,
+  value,
+  onPick,
+}: {
+  oz: CupSize;
+  parts: BundleParts;
+  value: BundleQty | null;
+  onPick: (qty: BundleQty, advance?: boolean) => void;
+}) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -396,7 +333,7 @@ export function StepQuantity({
             <Choice
               key={packSize}
               selected={value?.kind === "pack" && value.packSize === packSize}
-              onSelect={() => onPick(qty)}
+              onSelect={() => onPick(qty, true)}
             >
               <p className="font-display text-3xl font-extrabold">{packSize}</p>
               <p className="text-sm text-espresso/60">sets</p>
@@ -411,6 +348,127 @@ export function StepQuantity({
       <p className="text-xs text-espresso/50">
         The bigger the pack the lower the price per set. Charged at checkout; cups ship December
         2026.
+      </p>
+    </div>
+  );
+}
+
+/** The case counts worth a single click. Anything else is typed. */
+const CASE_PRESETS = [1, 2, 5, 10];
+
+/**
+ * A café only ever buys cases, so there is nothing to choose between — the choice is how many.
+ *
+ * This used to be one selectable card with the counter buttons and a number field *inside* it.
+ * A `<button>` may not contain a control, and Safari duly refused to deliver clicks to either,
+ * so on that browser the case count could not be changed at all. Everything here is now a
+ * sibling of everything else.
+ */
+function CafeQuantity({
+  oz,
+  parts,
+  value,
+  onPick,
+}: {
+  oz: CupSize;
+  parts: BundleParts;
+  value: BundleQty | null;
+  onPick: (qty: BundleQty, advance?: boolean) => void;
+}) {
+  const chosen = value?.kind === "case" ? value.cases : null;
+  const custom = chosen !== null && !CASE_PRESETS.includes(chosen);
+  const [typing, setTyping] = useState(custom);
+  const [draft, setDraft] = useState(String(chosen ?? ""));
+  const typed = Math.max(1, Math.min(MAX_CASES, Math.floor(Number(draft) || 0)));
+  const perSet = unitCents(oz, parts, { kind: "case", cases: 1 });
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="flex items-center gap-2">
+          <Store className="w-4 h-4 text-leaf" />
+          <span className="label-caps text-leaf">Café pricing · by the case</span>
+        </span>
+        <span className="text-sm text-espresso/60">
+          {CASE_UNITS.toLocaleString()} cups a case ·{" "}
+          <strong className="text-leaf">{perSet}¢ a set</strong>
+        </span>
+      </div>
+
+      <div role="radiogroup" aria-label="How many cases" className="grid sm:grid-cols-4 gap-4">
+        {CASE_PRESETS.map((n) => {
+          const qty: BundleQty = { kind: "case", cases: n };
+          return (
+            <Choice
+              key={n}
+              selected={chosen === n}
+              onSelect={() => {
+                setTyping(false);
+                onPick(qty, true);
+              }}
+            >
+              <p className="font-display text-3xl font-extrabold">{n}</p>
+              <p className="text-sm text-espresso/60">case{n === 1 ? "" : "s"}</p>
+              <p className="mt-3 text-sm font-bold text-leaf">
+                {(n * CASE_UNITS).toLocaleString()} cups
+              </p>
+              <p className="text-xs text-espresso/50 mt-1">{formatCents(totalCents(oz, parts, qty))}</p>
+            </Choice>
+          );
+        })}
+      </div>
+
+      {typing ? (
+        <div className="rounded-3xl border-2 border-coral bg-coral/6 p-5 flex flex-wrap items-end gap-4">
+          <label className="block">
+            <span className="block text-sm font-bold mb-1.5">How many cases?</span>
+            <input
+              type="number"
+              min={1}
+              max={MAX_CASES}
+              value={draft}
+              autoFocus
+              aria-label="Number of cases"
+              onChange={(e) => setDraft(e.target.value)}
+              className="w-32 rounded-2xl border border-espresso/20 bg-cream px-4 py-2.5"
+            />
+          </label>
+          <p className="text-sm text-espresso/65 pb-3">
+            {(typed * CASE_UNITS).toLocaleString()} cups ·{" "}
+            <strong>{formatCents(totalCents(oz, parts, { kind: "case", cases: typed }))}</strong>
+          </p>
+          <button
+            type="button"
+            onClick={() => onPick({ kind: "case", cases: typed }, true)}
+            className="btn-pill px-5 py-2.5 bg-coral text-white hover:bg-coral-deep ml-auto"
+          >
+            Use {typed} case{typed === 1 ? "" : "s"}
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setTyping(true)}
+          className="btn-pill px-5 py-2.5 border-2 border-espresso/15 hover:border-espresso/40 text-sm"
+        >
+          Another number of cases
+        </button>
+      )}
+
+      <p className="text-xs text-espresso/50">
+        Cases are reserved against a flat deposit, with the balance settled when the container
+        lands. Nothing is charged in full up front.
+      </p>
+      <p className="text-sm text-espresso/70 rounded-2xl bg-leaf/8 border border-leaf/20 p-4">
+        Never ordered from us? Your first {CAFE_OFFER.trialCount} cups, lids and printed sleeves
+        are free —{" "}
+        <a
+          href="/wholesale#free-100"
+          className="font-bold underline decoration-coral decoration-2 underline-offset-2"
+        >
+          claim them here
+        </a>{" "}
+        and we will send your pricing with them.
       </p>
     </div>
   );

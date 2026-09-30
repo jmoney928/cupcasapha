@@ -9,6 +9,7 @@ import { hasStashedSleeve, takeSleeve } from "@/lib/sleeve/handoff";
 import {
   emptyBundle,
   firstIncomplete,
+  needsDesign,
   qtyFitsWho,
   reachableStep,
   stepsFor,
@@ -119,8 +120,14 @@ export function BundleBuilder() {
       // already has a query is a no-op in the App Router, which stranded both the clamp below
       // and the rail's way back to step one.
       router.push(`/shop?step=${id}`, { scroll: false });
-      // The steps sit below the fold on a phone once the intro is scrolled past.
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      /*
+       * Jump, do not glide, and say so explicitly: globals.css sets `html { scroll-behavior:
+       * smooth }`, and an unspecified behaviour inherits that, so plain `scrollTo({top: 0})`
+       * animates too. On a page as tall as the design step the glide runs long enough that the
+       * next thing someone clicks slides out from under the cursor and the click lands on
+       * nothing — indistinguishable, from the other side of the screen, from a broken button.
+       */
+      window.scrollTo({ top: 0, behavior: "instant" });
     },
     [router]
   );
@@ -156,7 +163,10 @@ export function BundleBuilder() {
     set({ parts, ...(parts === bundle.parts ? {} : { designed: false }) });
     go("quantity");
   };
-  const pickQty = (qty: BundleQty) => set({ qty });
+  const pickQty = (qty: BundleQty, advance = false) => {
+    set({ qty });
+    if (advance) go(needsDesign({ ...bundle, qty }) ? "design" : "review");
+  };
 
   const next = steps[at + 1];
   const prev = steps[at - 1];
