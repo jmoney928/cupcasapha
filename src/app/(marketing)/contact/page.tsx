@@ -18,8 +18,8 @@ const faqs = [
     a: "The cup itself ships blank. Your branding goes on the sleeve, printed here with no minimum — or on the cup itself at 100,000 cups and up.",
   },
   {
-    q: "Can I get samples?",
-    a: "Yes. Ask on the café page and we'll send every size, free.",
+    q: "Can I try them before I order?",
+    a: "Yes. Cafés that have not ordered from us before get 100 cups, 100 lids and 100 custom-printed sleeves free — a hundred complete servings. Ask on the café page.",
   },
   {
     q: "Where do you ship?",

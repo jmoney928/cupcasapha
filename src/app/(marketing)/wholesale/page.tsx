@@ -7,12 +7,12 @@ import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 export const metadata: Metadata = {
   title: "For Cafés — Pricing & Cup Casa OS",
   description:
-    "Café pricing on compostable PHA cups: 15, 17 and 19¢ a cup by the case of 1,000, 5¢ lids, custom sleeves, 1,000 free with your first order, and Cup Casa OS at no charge. Custom-printed cups at 100,000+.",
+    "Café pricing on compostable PHA cups: 15, 17 and 19¢ a cup by the case of 1,000, 5¢ lids, custom sleeves, and Cup Casa OS at no charge. New cafés get their first 100 cups, lids and sleeves free. Custom-printed cups at 100,000+.",
 };
 
 const perks = [
   { icon: Sparkles, title: "Cup Casa OS free", text: "Reorder autopilot, costing, compliance and brand tools, bundled with your cups." },
-  { icon: Gift, title: "Free samples", text: "Try every size before you commit a single dollar." },
+  { icon: Gift, title: "First 100 free", text: "A hundred cups, lids and custom sleeves, free, before you spend anything." },
   { icon: Truck, title: "Freight sorted", text: "Pallet and LTL freight to your door, US & Canada." },
   { icon: Package, title: "Reliable supply", text: "Consistent stock so you never run dry mid-service." },
 ];
@@ -32,7 +32,7 @@ export default function WholesalePage() {
           <p className="text-lg text-espresso/70 mt-6">
             One price, published. Cups by the case of 1,000, lids that fit every size, and
             sleeves printed with your brand — plus Cup Casa OS at no charge for as long as you
-            order cups. Free samples before you commit a dollar.
+            order cups. Your first hundred — cups, lids and sleeves — are free.
           </p>
         </div>
       </section>
@@ -84,9 +84,9 @@ export default function WholesalePage() {
             <p className="label-caps text-coral">Custom sleeves</p>
             <p className="font-display text-3xl font-extrabold mt-2">{CAFE_OFFER.sleeveWithCupsCents}¢</p>
             <p className="text-sm text-espresso/70 mt-2">
-              Your first {CAFE_OFFER.freeSleeves.toLocaleString()} are free with your first cup
-              order. After that it is {CAFE_OFFER.sleeveWithCupsCents}¢ a sleeve while you keep
-              ordering cups, or {CAFE_OFFER.sleeveStandaloneCents}¢ on their own.
+              {CAFE_OFFER.sleeveWithCupsCents}¢ a sleeve while you keep ordering cups, or{" "}
+              {CAFE_OFFER.sleeveStandaloneCents}¢ on their own. Printed here on our own UV press,
+              so there is no minimum run.
             </p>
           </div>
           <div className="rounded-3xl bg-espresso text-cream p-6">
@@ -154,15 +154,15 @@ export default function WholesalePage() {
               Tell us what you need.
             </h2>
             <p className="text-espresso/70 mt-4">
-              Quote requests come with free samples by default. We typically reply within
-              one business day.
+              If you have not ordered from us before, ask for the free hundred and we will send
+              it with your pricing. We typically reply within one business day.
             </p>
             <ul className="mt-6 space-y-3">
               {[
                 "Published pricing, no negotiation",
                 "Custom-printed cups at 100,000+",
                 "Custom sleeves at any quantity",
-                "Free samples of every size",
+                "First 100 cups, lids and sleeves free",
                 "Freight to the US & Canada",
                 "Net terms available for established accounts",
               ].map((b) => (

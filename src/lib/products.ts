@@ -116,5 +116,9 @@ export const SLEEVE_CENTS = {
   withCups: 4,
 } as const;
 
-/** How many sleeves a café's first cup order includes at no charge. */
-export const FREE_SLEEVES_FIRST_ORDER = 1000;
+/**
+ * What a café that has never ordered from us gets, free, to try the cups in real service:
+ * a hundred each of cups, lids and custom-printed sleeves. One of each per drink, so a
+ * hundred complete servings — enough to run a week of mornings and decide.
+ */
+export const CAFE_TRIAL_COUNT = 100;

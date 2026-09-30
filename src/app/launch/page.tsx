@@ -125,7 +125,7 @@ export default function ForCafesPage() {
               </div>
               <div className={s.priceRow}>
                 <div className={s.size}><b>Custom sleeves</b> <span>· your brand</span></div>
-                <div className={s.case}>First {CAFE_OFFER.freeSleeves.toLocaleString()} free, then {CAFE_OFFER.sleeveWithCupsCents}¢</div>
+                <div className={s.case}>While you keep ordering cups</div>
                 <div className={s.per}>{CAFE_OFFER.sleeveWithCupsCents}¢</div>
               </div>
               <p className={s.note}>Prices in CAD before tax. We deliver to your café.</p>
@@ -137,7 +137,7 @@ export default function ForCafesPage() {
               <div className={s.eyebrow}>What launch cafés get</div>
               <ul className={s.perks}>
                 <li>Launch pricing held for 12 months</li>
-                <li>Your first {CAFE_OFFER.freeSleeves.toLocaleString()} custom sleeves free</li>
+                <li>Your first {CAFE_OFFER.trialCount} cups, lids and custom sleeves free</li>
                 <li>Cup Casa OS free, for as long as you order cups</li>
                 <li>First-container allocation</li>
                 <li>Store-locator listing on cupcasa.com from day one</li>

@@ -2,7 +2,7 @@
  * The café / wholesale offer, as data. Every figure here is derived from the same catalogue the
  * shop and the calculator read, so a reprice can never leave one page quoting an old number.
  */
-import { products, LID_CENTS, SLEEVE_CENTS, FREE_SLEEVES_FIRST_ORDER } from "@/lib/products";
+import { products, LID_CENTS, SLEEVE_CENTS, CAFE_TRIAL_COUNT } from "@/lib/products";
 import { toCents } from "@/lib/calc/money";
 
 export const CASE_COUNT = 1000;
@@ -37,7 +37,7 @@ export const CAFE_OFFER = {
   lidCents: LID_CENTS,
   sleeveStandaloneCents: SLEEVE_CENTS.standalone,
   sleeveWithCupsCents: SLEEVE_CENTS.withCups,
-  freeSleeves: FREE_SLEEVES_FIRST_ORDER,
+  trialCount: CAFE_TRIAL_COUNT,
   customCupMinimum: CUSTOM_CUP_MINIMUM,
 } as const;
 

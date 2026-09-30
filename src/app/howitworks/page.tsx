@@ -221,14 +221,14 @@ export default function HowItWorksPage() {
               </h2>
               <p className="text-white/85 text-lg mt-4 max-w-md">
                 Every café that switches keeps thousands of plastic-lined cups out of
-                landfill a year. If you run one, we’ll send free samples.
+                landfill a year. If you run one, your first hundred are on us.
               </p>
               <div className="flex flex-wrap gap-3 mt-7">
                 <Button href="/shop" variant="cream" size="lg">
                   Get these cups <ArrowRight className="w-5 h-5" />
                 </Button>
                 <Button href="/wholesale" variant="dark" size="lg">
-                  Free samples
+                  Get 100 free
                 </Button>
               </div>
             </div>
