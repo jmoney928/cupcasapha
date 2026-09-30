@@ -78,9 +78,17 @@ export async function POST(req: Request) {
   console.log("New lead:", { type, ...rows.reduce((o, r) => ({ ...o, [r.label]: r.value }), {}) });
 
   if (!apiKey) {
-    // Email not configured yet — don't fail the user; the submission is logged.
-    console.warn("RESEND_API_KEY not set — lead email not sent.");
-    return NextResponse.json({ ok: true });
+    /*
+     * This used to answer {ok:true} and log a warning. The person saw "Thanks, we'll be in
+     * touch", and the enquiry existed only in a Vercel log that ages out — the worst of both
+     * worlds, because nobody knew to chase it. Better to say plainly that it did not send and
+     * give an address that works.
+     */
+    console.error("RESEND_API_KEY not set — lead NOT delivered:", { type, name, email });
+    return NextResponse.json(
+      { error: `We couldn't send that just now. Please email us directly at ${to}.` },
+      { status: 503 }
+    );
   }
 
   try {
@@ -96,14 +104,14 @@ export async function POST(req: Request) {
     if (error) {
       console.error("Resend error:", error);
       return NextResponse.json(
-        { error: "We couldn't send your message right now. Please email us directly." },
+        { error: `We couldn't send your message right now. Please email us directly at ${to}.` },
         { status: 502 }
       );
     }
   } catch (err) {
     console.error("Lead email failed:", err);
     return NextResponse.json(
-      { error: "We couldn't send your message right now. Please email us directly." },
+      { error: `We couldn't send your message right now. Please email us directly at ${to}.` },
       { status: 502 }
     );
   }

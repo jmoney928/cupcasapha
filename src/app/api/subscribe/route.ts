@@ -22,10 +22,14 @@ export async function POST(req: Request) {
 
   console.log("Newsletter signup:", email);
 
-  // Not configured yet — don't break the UX; the signup is logged.
+  /* Same reasoning as the lead route: a signup that was not stored is not a signup, and
+     saying otherwise means nobody ever finds out. */
   if (!apiKey || !audienceId) {
-    console.warn("RESEND_API_KEY or RESEND_AUDIENCE_ID not set — subscriber not stored.");
-    return NextResponse.json({ ok: true });
+    console.error("RESEND_API_KEY or RESEND_AUDIENCE_ID not set — subscriber NOT stored:", email);
+    return NextResponse.json(
+      { error: "Sign-ups aren't working right now. Please try again later." },
+      { status: 503 }
+    );
   }
 
   try {

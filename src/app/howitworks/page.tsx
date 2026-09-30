@@ -12,7 +12,12 @@ const dispose = [
     icon: Sprout,
     title: "Home compost",
     tag: "Best",
-    text: "Toss it in — lid, cup and all. It's certified to break down in a backyard compost, no industrial facility needed.",
+    /*
+     * The cup's certification (DIN CERTCO 9P0326) covers the PHA lining, not the lid. The lid is
+     * moulded sugarcane fibre — a plant material, and described as one. Composting is stated of
+     * the cup, which we can stand behind, and the lid is described by what it is made of.
+     */
+    text: "Toss it in — lid, cup and all. The cup is certified to break down in a backyard compost, no industrial facility needed, and the lid is moulded from sugarcane fibre — fully organic material that composts.",
   },
   {
     icon: Recycle,

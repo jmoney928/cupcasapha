@@ -215,7 +215,7 @@ const PARTS_PHOTOS = [
     title: "A bagasse lid",
     src: "/products/lid.png",
     alt: "A white moulded bagasse sip lid",
-    text: "Moulded sugarcane fibre, not plastic. One lid fits all three cup sizes.",
+    text: "Moulded sugarcane fibre, not plastic — fully organic material that composts. One lid fits all three cup sizes.",
     fit: "object-contain",
     /* The lid is white on a white cut-out, so on a white tile it disappears entirely. */
     bg: "bg-cream-deep/60",
