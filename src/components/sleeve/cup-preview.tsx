@@ -395,17 +395,24 @@ function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number,
   /* It only has to clear the rolled lip, which is already in `rimOuter`. */
   const skirtR = rimOuter * 1.015;
   /* Shallow: a lid grips the rim, it does not sit on the cup like a tub. */
-  const skirtH = 3.2 * scale;
-  const faceY = topY - skirtH;
-  const wellR = skirtR * 0.84;
+  const skirtH = 3.0 * scale;
+  const brimY = topY - skirtH;
+  /*
+   * A moulded bagasse lid is not a flat disc with a hole. It has a broad flat brim, a rounded
+   * shoulder stepping UP from it, and a raised plateau in the middle — the earlier model had
+   * that plateau recessed, which is the shape of a plastic tub lid rather than ours.
+   */
+  const rise = 4.4 * scale;
+  const plateauR = skirtR * 0.63;
+  const plateauY = brimY - rise;
 
   const skirt = () => {
     ctx.beginPath();
-    ctx.moveTo(cx - skirtR, faceY);
+    ctx.moveTo(cx - skirtR, brimY);
     ctx.lineTo(cx - skirtR, topY);
     ctx.ellipse(cx, topY, skirtR, skirtR * tilt, 0, Math.PI, 0, true);
-    ctx.lineTo(cx + skirtR, faceY);
-    ctx.ellipse(cx, faceY, skirtR, skirtR * tilt, 0, 0, Math.PI, true);
+    ctx.lineTo(cx + skirtR, brimY);
+    ctx.ellipse(cx, brimY, skirtR, skirtR * tilt, 0, 0, Math.PI, true);
     ctx.closePath();
   };
 
@@ -425,45 +432,103 @@ function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number,
   skirt();
   ctx.clip();
   const round = ctx.createLinearGradient(cx - skirtR, 0, cx + skirtR, 0);
-  round.addColorStop(0, "rgba(26,26,26,0.28)");
+  round.addColorStop(0, "rgba(26,26,26,0.26)");
   round.addColorStop(0.36, "rgba(26,26,26,0)");
   round.addColorStop(0.68, "rgba(26,26,26,0)");
-  round.addColorStop(1, "rgba(26,26,26,0.28)");
+  round.addColorStop(1, "rgba(26,26,26,0.26)");
   ctx.fillStyle = round;
-  ctx.fillRect(cx - skirtR, faceY - skirtR * tilt, skirtR * 2, skirtH + skirtR * tilt * 2);
+  ctx.fillRect(cx - skirtR, brimY - skirtR * tilt, skirtR * 2, skirtH + skirtR * tilt * 2);
   ctx.restore();
 
-  /* Top face, then a recess inside it — the ring left between the two reads as the raised rim. */
+  /* The flat brim. */
   ctx.fillStyle = LID_TOP;
   ctx.beginPath();
-  ctx.ellipse(cx, faceY, skirtR, skirtR * tilt, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, brimY, skirtR, skirtR * tilt, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = LID_WELL;
+  /* The flange is stepped, not flat — a concentric groove runs round it. */
+  ctx.strokeStyle = "rgba(26,26,26,0.10)";
+  ctx.lineWidth = Math.max(0.6, 0.35 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, faceY + skirtR * tilt * 0.04, wellR, wellR * tilt, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  /* Catch light along the far edge of the recess. */
-  ctx.strokeStyle = "rgba(255,255,255,0.5)";
-  ctx.lineWidth = Math.max(0.5, 0.3 * scale);
+  ctx.ellipse(cx, brimY, skirtR * 0.85, skirtR * 0.85 * tilt, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,0.4)";
   ctx.beginPath();
-  ctx.ellipse(cx, faceY + skirtR * tilt * 0.04, wellR, wellR * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(cx, brimY - 0.5 * scale, skirtR * 0.85, skirtR * 0.85 * tilt, 0, Math.PI, Math.PI * 2);
   ctx.stroke();
 
-  /* The sip hole: small, and on the near side, where you would actually drink from. */
-  const slotY = faceY + wellR * tilt * 0.74;
-  const slotW = wellR * 0.23;
-  const slotH = wellR * tilt * 0.34;
-  ctx.fillStyle = "rgba(38,30,24,0.55)";
+  /* The shoulder: the near-side wall of the raised middle, as a strip between two front arcs. */
   ctx.beginPath();
-  ctx.ellipse(cx, slotY, slotW, slotH, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, brimY, plateauR, plateauR * tilt, 0, 0, Math.PI);
+  ctx.lineTo(cx - plateauR, plateauY);
+  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, Math.PI, 0, true);
+  ctx.closePath();
+  const wall = ctx.createLinearGradient(cx - plateauR, 0, cx + plateauR, 0);
+  wall.addColorStop(0, "#cdc6b7");
+  wall.addColorStop(0.4, LID);
+  wall.addColorStop(1, "#cdc6b7");
+  ctx.fillStyle = wall;
   ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,0.40)";
+
+  /* The raised middle. */
+  ctx.fillStyle = LID_TOP;
+  ctx.beginPath();
+  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* Where the shoulder turns over, catching the light along the far side. */
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
+  ctx.lineWidth = Math.max(0.5, 0.28 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  /* And a soft shadow where it meets the brim on the near side. */
+  ctx.strokeStyle = "rgba(26,26,26,0.12)";
+  ctx.lineWidth = Math.max(0.6, 0.35 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, brimY, plateauR, plateauR * tilt, 0, 0, Math.PI);
+  ctx.stroke();
+
+  /*
+   * The sip opening: a teardrop set toward the near edge of the plateau, wider across than
+   * deep, not a round port in the middle. Narrow end inward, as it is on the moulding.
+   */
+  const slotCy = plateauY + plateauR * tilt * 0.68;
+  const slotW = plateauR * 0.38;
+  const slotH = plateauR * tilt * 0.5;
+  ctx.fillStyle = "rgba(38,30,24,0.44)";
+  ctx.beginPath();
+  ctx.moveTo(cx - slotW, slotCy);
+  ctx.quadraticCurveTo(cx - slotW * 0.75, slotCy + slotH, cx, slotCy + slotH);
+  ctx.quadraticCurveTo(cx + slotW * 0.75, slotCy + slotH, cx + slotW, slotCy);
+  ctx.quadraticCurveTo(cx + slotW * 0.5, slotCy - slotH * 0.8, cx, slotCy - slotH * 0.8);
+  ctx.quadraticCurveTo(cx - slotW * 0.5, slotCy - slotH * 0.8, cx - slotW, slotCy);
+  ctx.closePath();
+  ctx.fill();
+
+  /* The moulded lip standing behind the opening. */
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
   ctx.lineWidth = Math.max(0.4, 0.25 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, slotY, slotW, slotH, 0, Math.PI, Math.PI * 2);
+  ctx.moveTo(cx - slotW, slotCy);
+  ctx.quadraticCurveTo(cx - slotW * 0.5, slotCy - slotH * 0.8, cx, slotCy - slotH * 0.8);
+  ctx.quadraticCurveTo(cx + slotW * 0.5, slotCy - slotH * 0.8, cx + slotW, slotCy);
   ctx.stroke();
+
+  /* The vent, on the far side. */
+  ctx.fillStyle = "rgba(38,30,24,0.45)";
+  ctx.beginPath();
+  ctx.ellipse(
+    cx - plateauR * 0.52,
+    plateauY - plateauR * tilt * 0.42,
+    Math.max(0.8, 0.5 * scale),
+    Math.max(0.5, 0.32 * scale),
+    0,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
 }
 
 function drawBand(
