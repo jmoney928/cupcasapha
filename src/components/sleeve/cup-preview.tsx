@@ -57,7 +57,13 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
    * that faces front, which is the one part of the sleeve nobody is meant to look at.
    */
   const rotation = useRef(Math.PI);
-  const dragging = useRef<{ x: number; from: number } | null>(null);
+  /*
+   * How far above (or below) the cup we are looking, as the squash of a horizontal circle.
+   * Positive looks down on it, negative looks up from underneath at the printed base, and zero
+   * is dead level. Kept off 0 by a hair because a circle exactly edge-on has no face to shade.
+   */
+  const tilt = useRef(TILT);
+  const dragging = useRef<{ x: number; y: number; from: number; fromTilt: number } | null>(null);
   const [spinning, setSpinning] = useState(true);
   const [ready, setReady] = useState(false);
 
@@ -97,7 +103,7 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
       last = now;
       if (spinning && !reduced && !dragging.current) rotation.current += SPIN * dt;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      draw(ctx, doc, texture.current, rotation.current);
+      draw(ctx, doc, texture.current, rotation.current, tilt.current);
       frame = requestAnimationFrame(loop);
     };
     frame = requestAnimationFrame(loop);
@@ -105,7 +111,12 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
   }, [doc, spinning, ready]);
 
   function onDown(e: React.PointerEvent) {
-    dragging.current = { x: e.clientX, from: rotation.current };
+    dragging.current = {
+      x: e.clientX,
+      y: e.clientY,
+      from: rotation.current,
+      fromTilt: tilt.current,
+    };
     try {
       (e.target as Element).setPointerCapture?.(e.pointerId);
     } catch {}
@@ -114,6 +125,9 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
     if (!dragging.current) return;
     /* A drag across the width of the cup turns it about half way round. */
     rotation.current = dragging.current.from + ((e.clientX - dragging.current.x) / W) * Math.PI * 2;
+    /* And up and down lifts the camera over the rim or drops it under the base. */
+    const next = dragging.current.fromTilt + ((e.clientY - dragging.current.y) / H) * 2.2;
+    tilt.current = clampTilt(next);
   }
   const onUp = () => {
     dragging.current = null;
@@ -154,31 +168,47 @@ export function CupPreview({ doc, measure }: { doc: SleeveDoc; measure: Measurer
         onPointerCancel={onUp}
         aria-label="Your sleeve on the cup — drag to turn it"
       />
-      <p className="text-xs text-espresso/50 text-center mt-1">Drag to turn it.</p>
+      <p className="text-xs text-espresso/50 text-center mt-1">Drag to turn it. Drag up to see the base.</p>
     </div>
   );
 }
 
-function viewFor(doc: SleeveDoc): CupView {
+/** Right over the top to right underneath, never exactly level — edge-on has no face to light. */
+const MAX_TILT = 0.82;
+const MIN_TILT = 0.05;
+export function clampTilt(t: number): number {
+  const c = Math.max(-MAX_TILT, Math.min(MAX_TILT, t));
+  if (Math.abs(c) >= MIN_TILT) return c;
+  return c < 0 ? -MIN_TILT : MIN_TILT;
+}
+
+function viewFor(doc: SleeveDoc, tilt: number): CupView {
   const d = sleeveDieline(doc.size);
   const rt = d.cup.topDia / 2;
   const rb = d.cup.baseDia / 2;
   /* Room for the cup, the two foreshortened ellipses, and the lid sitting on top. */
   const lidMm = 7;
-  const byHeight = (H - PAD.top - PAD.bottom) / (d.cup.height + (rt + rb) * TILT + lidMm);
+  const ty = Math.abs(tilt);
+  const byHeight = (H - PAD.top - PAD.bottom) / (d.cup.height + (rt + rb) * ty + lidMm);
   const byWidth = (W - PAD.x * 2) / (rt * 2 * 1.06);
   const scale = Math.min(byHeight, byWidth);
   return {
     scale,
-    tilt: TILT,
+    tilt,
     cx: W / 2,
-    baseY: PAD.top + (lidMm + rt * TILT + d.cup.height) * scale,
+    baseY: PAD.top + (lidMm + rt * ty + d.cup.height) * scale,
   };
 }
 
-function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageElement | null, rot: number) {
+function draw(
+  ctx: CanvasRenderingContext2D,
+  doc: SleeveDoc,
+  tex: HTMLImageElement | null,
+  rot: number,
+  tiltNow: number
+) {
   const d = sleeveDieline(doc.size);
-  const view = viewFor(doc);
+  const view = viewFor(doc, tiltNow);
   const { cx, baseY, scale, tilt } = view;
   const rb = cupRadius(d, 0) * scale;
   const rt = cupRadius(d, d.cup.height) * scale;
@@ -186,14 +216,17 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
 
   ctx.clearRect(0, 0, W, H);
 
-  /* A soft contact shadow, so the cup sits on something. */
-  const shadow = ctx.createRadialGradient(cx, baseY + rb * tilt, 1, cx, baseY + rb * tilt, rb * 1.7);
-  shadow.addColorStop(0, "rgba(26,26,26,0.20)");
-  shadow.addColorStop(1, "rgba(26,26,26,0)");
-  ctx.fillStyle = shadow;
-  ctx.beginPath();
-  ctx.ellipse(cx, baseY + rb * tilt * 0.9, rb * 1.7, rb * tilt * 1.5, 0, 0, Math.PI * 2);
-  ctx.fill();
+  /* A soft contact shadow, so the cup sits on something. Not when we are under the counter. */
+  if (!isBelow(view)) {
+    const sy = baseY + rb * tilt;
+    const shadow = ctx.createRadialGradient(cx, sy, 1, cx, sy, rb * 1.7);
+    shadow.addColorStop(0, "rgba(26,26,26,0.20)");
+    shadow.addColorStop(1, "rgba(26,26,26,0)");
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(cx, baseY + rb * tilt * 0.9, rb * 1.7, ry(view, rb) * 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   /* Cup body: the cone, lit from the left so it reads as round. */
   ctx.save();
@@ -227,9 +260,105 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
 
   /* The lid grips the rolled lip, not the wall, so it is set out by the roll as well. */
   const rimOuter = rt + RIM_ROLL_MM * scale;
-  drawRim(ctx, view, rt, rimOuter, topY);
-  drawLid(ctx, view, rimOuter, topY);
+  if (!isBelow(view)) {
+    drawRim(ctx, view, rt, rimOuter, topY);
+    drawLid(ctx, view, rimOuter, topY);
+  }
+  /* Underneath, the printed base is the whole point of looking. */
+  if (isBelow(view)) drawPrintedBase(ctx, view, rb, baseY);
 }
+
+/**
+ * The bottom of the cup, which is where our own mark goes. Only drawn when the camera is under
+ * the cup; from anywhere above it is a face pointing away and the body covers it.
+ *
+ * The lid is skipped from below rather than drawn behind, because at these angles the cup's own
+ * wall hides all of it and painting it first only risks its skirt bleeding past the silhouette.
+ */
+function drawPrintedBase(
+  ctx: CanvasRenderingContext2D,
+  view: CupView,
+  rb: number,
+  baseY: number
+) {
+  const { cx, scale } = view;
+  const r = rb * 0.93;
+  const eh = ry(view, r);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(cx, baseY, r, eh, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#f2ece1";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(26,26,26,0.14)";
+  ctx.lineWidth = Math.max(0.6, 0.3 * scale);
+  ctx.stroke();
+
+  /* Foreshortened with the face, so the type lies on the base rather than floating over it. */
+  ctx.translate(cx, baseY);
+  ctx.scale(1, Math.max(0.0001, Math.abs(view.tilt)));
+  ctx.fillStyle = "#1a1a1a";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  const size = Math.max(4, r * 0.15);
+  ctx.font = `600 ${size}px ui-serif, Georgia, "Times New Roman", serif`;
+  ctx.fillText("Made to disappear.", 0, -r * 0.06);
+
+  /* The mark: a small filled cup, as it is on the printed base. */
+  const m = r * 0.12;
+  ctx.beginPath();
+  ctx.moveTo(-m * 0.5, m * 0.35);
+  ctx.lineTo(m * 0.5, m * 0.35);
+  ctx.lineTo(m * 0.3, m * 0.95);
+  ctx.lineTo(-m * 0.3, m * 0.95);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = `${Math.max(3, r * 0.075)}px ui-sans-serif, system-ui, sans-serif`;
+  ctx.fillStyle = "rgba(26,26,26,0.55)";
+  ctx.fillText("HOME COMPOSTABLE · NO PE · NO PLA", 0, -r * 0.42);
+  ctx.fillText("cupcasa.com", 0, r * 0.62);
+  ctx.restore();
+}
+
+/**
+ * Drawing a cup you can orbit.
+ *
+ * Canvas will not take a negative radius, so every ellipse is drawn with the magnitude of the
+ * tilt and the *sign* decides which half of a circle faces us. The silhouette is exempt: its top
+ * boundary is the upper arc and its bottom the lower one whichever side you view from, because
+ * those are screen directions rather than parts of the cup. Faces are not exempt — the near half
+ * of a ring dips below its centre when you look down on it and rises above it when you look up.
+ */
+const ry = (view: CupView, r: number) => r * Math.abs(view.tilt);
+const UPPER: [number, number] = [Math.PI, Math.PI * 2];
+const LOWER: [number, number] = [0, Math.PI];
+const near = (view: CupView): [number, number] => (view.tilt < 0 ? UPPER : LOWER);
+
+/**
+ * The near half traced right-to-left, and its return leg left-to-right.
+ *
+ * A half arc has two ends, and which end it starts at flips with the tilt. Naming the halves by
+ * angle alone was enough to draw them but not to join them: the `lineTo` after an arc assumed it
+ * had finished on the left, so once the near half flipped the strip closed across itself and the
+ * sleeve came out as a bowtie. Asking for a direction instead of a range makes the joins hold.
+ */
+function nearStrip(view: CupView) {
+  return view.tilt < 0
+    ? { a: Math.PI * 2, b: Math.PI, ccw: true }
+    : { a: 0, b: Math.PI, ccw: false };
+}
+const stripTop = (ctx: CanvasRenderingContext2D, view: CupView, cx: number, cy: number, r: number) => {
+  const k = nearStrip(view);
+  ctx.ellipse(cx, cy, r, ry(view, r), 0, k.a, k.b, k.ccw);
+};
+const stripBottom = (ctx: CanvasRenderingContext2D, view: CupView, cx: number, cy: number, r: number) => {
+  const k = nearStrip(view);
+  ctx.ellipse(cx, cy, r, ry(view, r), 0, k.b, k.a, !k.ccw);
+};
+const far = (view: CupView): [number, number] => (view.tilt < 0 ? LOWER : UPPER);
+const isBelow = (view: CupView) => view.tilt < 0;
 
 /** The cone's silhouette — the back of the mouth and the front of the base. */
 function conePath(
@@ -240,12 +369,12 @@ function conePath(
   topY: number,
   baseY: number
 ) {
-  const { cx, tilt } = view;
+  const { cx } = view;
   ctx.beginPath();
   ctx.moveTo(cx - rt, topY);
-  ctx.ellipse(cx, topY, rt, rt * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(cx, topY, rt, ry(view, rt), 0, ...UPPER);
   ctx.lineTo(cx + rb, baseY);
-  ctx.ellipse(cx, baseY, rb, rb * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, baseY, rb, ry(view, rb), 0, ...LOWER);
   ctx.closePath();
 }
 
@@ -283,7 +412,7 @@ function drawSleeveShadow(
     ctx.strokeStyle = `rgba(26,26,26,${(0.032 * (1 - t) * (1 - t)).toFixed(3)})`;
     ctx.lineWidth = Math.max(1, fall / 1.6);
     ctx.beginPath();
-    ctx.ellipse(cx, yBot + t * fall, rBot, rBot * tilt, 0, 0, Math.PI);
+    ctx.ellipse(cx, yBot + t * fall * Math.sign(view.tilt || 1), rBot, ry(view, rBot), 0, ...near(view));
     ctx.stroke();
   }
   ctx.restore();
@@ -315,9 +444,9 @@ function drawBaseRoll(
    * way round.
    */
   ctx.beginPath();
-  ctx.ellipse(cx, baseY, ro, ro * tilt, 0, 0, Math.PI);
+  stripTop(ctx, view, cx, baseY, ro);
   ctx.lineTo(cx - ro, yTop);
-  ctx.ellipse(cx, yTop, ro, ro * tilt, 0, Math.PI, 0, true);
+  stripBottom(ctx, view, cx, yTop, ro);
   ctx.closePath();
   /*
    * Lit across the same span as the body, not its own, so the tones line up where the two meet.
@@ -341,7 +470,7 @@ function drawBaseRoll(
   ctx.strokeStyle = "rgba(26,26,26,0.18)";
   ctx.lineWidth = Math.max(0.6, 0.28 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, yTop, ro, ro * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, yTop, ro, ry(view, ro), 0, ...near(view));
   ctx.stroke();
   ctx.restore();
 }
@@ -362,9 +491,9 @@ function drawRim(
 
   ctx.beginPath();
   ctx.moveTo(cx - rimOuter, topY);
-  ctx.ellipse(cx, topY, rimOuter, rimOuter * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(cx, topY, rimOuter, ry(view, rimOuter), 0, ...UPPER);
   ctx.lineTo(cx + rimOuter, topY + h);
-  ctx.ellipse(cx, topY + h, rimOuter, rimOuter * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, topY + h, rimOuter, ry(view, rimOuter), 0, ...LOWER);
   ctx.closePath();
   const g = ctx.createLinearGradient(cx - rimOuter, 0, cx + rimOuter, 0);
   g.addColorStop(0, PAPER_DARK);
@@ -378,7 +507,7 @@ function drawRim(
   ctx.strokeStyle = "rgba(26,26,26,0.12)";
   ctx.lineWidth = Math.max(0.5, 0.3 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, topY + h, rt, rt * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, topY + h, rt, ry(view, rt), 0, ...near(view));
   ctx.stroke();
 }
 
@@ -410,16 +539,16 @@ function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number,
     ctx.beginPath();
     ctx.moveTo(cx - skirtR, brimY);
     ctx.lineTo(cx - skirtR, topY);
-    ctx.ellipse(cx, topY, skirtR, skirtR * tilt, 0, Math.PI, 0, true);
+    ctx.ellipse(cx, topY, skirtR, ry(view, skirtR), 0, Math.PI, 0, true);
     ctx.lineTo(cx + skirtR, brimY);
-    ctx.ellipse(cx, brimY, skirtR, skirtR * tilt, 0, 0, Math.PI, true);
+    ctx.ellipse(cx, brimY, skirtR, ry(view, skirtR), 0, 0, Math.PI, true);
     ctx.closePath();
   };
 
   /* A little shadow where the lid overhangs, so it sits on the cup rather than floating. */
   ctx.save();
   ctx.beginPath();
-  ctx.ellipse(cx, topY + skirtR * tilt * 0.06, skirtR * 0.99, skirtR * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, topY + skirtR * tilt * 0.06, skirtR * 0.99, ry(view, skirtR), 0, ...near(view));
   ctx.fillStyle = "rgba(26,26,26,0.10)";
   ctx.fill();
   ctx.restore();
@@ -437,31 +566,31 @@ function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number,
   round.addColorStop(0.68, "rgba(26,26,26,0)");
   round.addColorStop(1, "rgba(26,26,26,0.26)");
   ctx.fillStyle = round;
-  ctx.fillRect(cx - skirtR, brimY - skirtR * tilt, skirtR * 2, skirtH + skirtR * tilt * 2);
+  ctx.fillRect(cx - skirtR, brimY - ry(view, skirtR), skirtR * 2, skirtH + ry(view, skirtR) * 2);
   ctx.restore();
 
   /* The flat brim. */
   ctx.fillStyle = LID_TOP;
   ctx.beginPath();
-  ctx.ellipse(cx, brimY, skirtR, skirtR * tilt, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, brimY, skirtR, ry(view, skirtR), 0, 0, Math.PI * 2);
   ctx.fill();
 
   /* The flange is stepped, not flat — a concentric groove runs round it. */
   ctx.strokeStyle = "rgba(26,26,26,0.10)";
   ctx.lineWidth = Math.max(0.6, 0.35 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, brimY, skirtR * 0.85, skirtR * 0.85 * tilt, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, brimY, skirtR * 0.85, ry(view, skirtR * 0.85), 0, 0, Math.PI * 2);
   ctx.stroke();
   ctx.strokeStyle = "rgba(255,255,255,0.4)";
   ctx.beginPath();
-  ctx.ellipse(cx, brimY - 0.5 * scale, skirtR * 0.85, skirtR * 0.85 * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(cx, brimY - 0.5 * scale, skirtR * 0.85, ry(view, skirtR * 0.85), 0, ...far(view));
   ctx.stroke();
 
   /* The shoulder: the near-side wall of the raised middle, as a strip between two front arcs. */
   ctx.beginPath();
-  ctx.ellipse(cx, brimY, plateauR, plateauR * tilt, 0, 0, Math.PI);
+  stripTop(ctx, view, cx, brimY, plateauR);
   ctx.lineTo(cx - plateauR, plateauY);
-  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, Math.PI, 0, true);
+  stripBottom(ctx, view, cx, plateauY, plateauR);
   ctx.closePath();
   const wall = ctx.createLinearGradient(cx - plateauR, 0, cx + plateauR, 0);
   wall.addColorStop(0, "#cdc6b7");
@@ -473,21 +602,21 @@ function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number,
   /* The raised middle. */
   ctx.fillStyle = LID_TOP;
   ctx.beginPath();
-  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, plateauY, plateauR, ry(view, plateauR), 0, 0, Math.PI * 2);
   ctx.fill();
 
   /* Where the shoulder turns over, catching the light along the far side. */
   ctx.strokeStyle = "rgba(255,255,255,0.45)";
   ctx.lineWidth = Math.max(0.5, 0.28 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, plateauY, plateauR, plateauR * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.ellipse(cx, plateauY, plateauR, ry(view, plateauR), 0, ...far(view));
   ctx.stroke();
 
   /* And a soft shadow where it meets the brim on the near side. */
   ctx.strokeStyle = "rgba(26,26,26,0.12)";
   ctx.lineWidth = Math.max(0.6, 0.35 * scale);
   ctx.beginPath();
-  ctx.ellipse(cx, brimY, plateauR, plateauR * tilt, 0, 0, Math.PI);
+  ctx.ellipse(cx, brimY, plateauR, ry(view, plateauR), 0, ...near(view));
   ctx.stroke();
 
   /*
@@ -555,9 +684,9 @@ function drawBand(
   ctx.save();
   /* Clip to the visible face of the band so no slice spills past its edges. */
   ctx.beginPath();
-  ctx.ellipse(cx, yTop, rTop, rTop * tilt, 0, 0, Math.PI);
+  stripTop(ctx, view, cx, yTop, rTop);
   ctx.lineTo(cx - rBot, yBot);
-  ctx.ellipse(cx, yBot, rBot, rBot * tilt, 0, Math.PI, 0, true);
+  stripBottom(ctx, view, cx, yBot, rBot);
   ctx.closePath();
   ctx.clip();
 
@@ -652,6 +781,6 @@ function grain(
   conePath(ctx, view, rt, rb, topY, baseY);
   ctx.clip();
   ctx.fillStyle = grainPattern;
-  ctx.fillRect(view.cx - rt * 1.2, topY - rt * view.tilt, rt * 2.4, baseY - topY + rt * 2);
+  ctx.fillRect(view.cx - rt * 1.2, topY - ry(view, rt) - 2, rt * 2.4, baseY - topY + ry(view, rt) * 2 + 4);
   ctx.restore();
 }
