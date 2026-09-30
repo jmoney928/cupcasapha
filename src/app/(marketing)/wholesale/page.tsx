@@ -7,7 +7,7 @@ import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 export const metadata: Metadata = {
   title: "For Cafés — Pricing & Cup Casa OS",
   description:
-    "Café pricing on compostable PHA cups: 15, 17 and 19¢ a cup by the case of 1,000, 5¢ lids, custom sleeves, and Cup Casa OS at no charge. New cafés get their first 100 cups, lids and sleeves free. Custom-printed cups at 100,000+.",
+    "Café pricing on compostable PHA cups: 18, 20 and 22¢ a cup by the case of 1,000, or 27–31¢ for the set with a lid and a printed sleeve. Cup Casa OS at no charge. New cafés get their first 100 cups, lids and sleeves free. Custom-printed cups at 100,000+.",
 };
 
 const perks = [
@@ -64,8 +64,13 @@ export default function WholesalePage() {
               <p className="text-xs text-espresso/45 mt-4">
                 {dollars(row.caseDollars)} per case of {CAFE_OFFER.caseCount.toLocaleString()}
               </p>
-              <p className="text-xs text-espresso/45 mt-1">
-                {row.perServeCents}¢ a drink with a lid and a sleeve
+              <div className="mt-4 pt-4 border-t border-espresso/10 flex items-baseline justify-between">
+                <span className="text-espresso/70 text-sm">The set</span>
+                <span className="font-display font-bold text-2xl">{row.perServeCents}¢</span>
+              </div>
+              <p className="text-xs text-espresso/45 mt-2">
+                Cup, lid and your printed sleeve. Cup and sleeve {row.cupSleeveCents}¢, cup and
+                lid {row.cupLidCents}¢.
               </p>
             </div>
           ))}
@@ -82,11 +87,10 @@ export default function WholesalePage() {
           </div>
           <div className="rounded-3xl bg-white/70 border border-caramel/20 p-6">
             <p className="label-caps text-coral">Custom sleeves</p>
-            <p className="font-display text-3xl font-extrabold mt-2">{CAFE_OFFER.sleeveWithCupsCents}¢</p>
+            <p className="font-display text-3xl font-extrabold mt-2">{CAFE_OFFER.sleeveBrandedCents}¢</p>
             <p className="text-sm text-espresso/70 mt-2">
-              {CAFE_OFFER.sleeveWithCupsCents}¢ a sleeve while you keep ordering cups, or{" "}
-              {CAFE_OFFER.sleeveStandaloneCents}¢ on their own. Printed here on our own UV press,
-              so there is no minimum run.
+              Printed with your artwork on our own UV press, so there is no minimum run. Blank
+              stock, white or kraft, is {CAFE_OFFER.sleevePlainCents}¢.
             </p>
           </div>
           <div className="rounded-3xl bg-espresso text-cream p-6">

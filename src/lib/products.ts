@@ -31,7 +31,7 @@ type Base = {
 const base: Base[] = [
   {
     oz: 8,
-    pricePerCup: 0.15,
+    pricePerCup: 0.18,
     shortName: "The Espresso",
     blurb: "Perfect for espresso, cortados & small cold pours.",
     description:
@@ -41,7 +41,7 @@ const base: Base[] = [
   },
   {
     oz: 12,
-    pricePerCup: 0.17,
+    pricePerCup: 0.20,
     shortName: "The Everyday",
     blurb: "The go-to size for lattes, drip & iced coffee.",
     description:
@@ -51,7 +51,7 @@ const base: Base[] = [
   },
   {
     oz: 16,
-    pricePerCup: 0.19,
+    pricePerCup: 0.22,
     shortName: "The Big One",
     blurb: "The biggest pour — for hot lattes & large iced drinks.",
     description:
@@ -106,14 +106,14 @@ export const formatPrice = (n: number) =>
  * Lids and sleeves, priced in whole cents so nothing is ever derived from a float.
  * One lid fits all three cup sizes.
  */
-export const LID_CENTS = 5;
+export const LID_CENTS = 9;
 
 /** Sleeves are printed in-house on a UV printer, so there is no minimum run. */
 export const SLEEVE_CENTS = {
-  /** On its own, no cups. */
-  standalone: 8,
-  /** For a café that keeps ordering cups, after their free first thousand. */
-  withCups: 4,
+  /** Blank stock, white or kraft. */
+  plain: 8,
+  /** Printed with the café's own artwork. */
+  branded: 15,
 } as const;
 
 /**

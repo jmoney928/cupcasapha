@@ -126,7 +126,7 @@ export default function ForCafesPage() {
               <div className={s.priceRow}>
                 <div className={s.size}><b>Custom sleeves</b> <span>· your brand</span></div>
                 <div className={s.case}>While you keep ordering cups</div>
-                <div className={s.per}>{CAFE_OFFER.sleeveWithCupsCents}¢</div>
+                <div className={s.per}>{CAFE_OFFER.sleeveBrandedCents}¢</div>
               </div>
               <p className={s.note}>Prices in CAD before tax. We deliver to your café.</p>
               <p className={s.note}>
