@@ -197,12 +197,7 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
 
   /* Cup body: the cone, lit from the left so it reads as round. */
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(cx - rt, topY);
-  ctx.ellipse(cx, topY, rt, rt * tilt, 0, Math.PI, Math.PI * 2);
-  ctx.lineTo(cx + rb, baseY);
-  ctx.ellipse(cx, baseY, rb, rb * tilt, 0, 0, Math.PI);
-  ctx.closePath();
+  conePath(ctx, view, rt, rb, topY, baseY);
   const body = ctx.createLinearGradient(cx - rt, 0, cx + rt, 0);
   body.addColorStop(0, PAPER_DARK);
   body.addColorStop(0.3, PAPER);
@@ -222,12 +217,76 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
 
   drawBaseRoll(ctx, view, rb, baseY, rt);
 
-  if (tex) drawBand(ctx, doc, view, tex, rot);
+  if (tex) {
+    drawBand(ctx, doc, view, tex, rot);
+    /* The sleeve stands off the cup, so it throws a shadow down the wall beneath it. */
+    drawSleeveShadow(ctx, d, view, rt, rb, topY, baseY);
+  }
+
+  grain(ctx, view, rt, rb, topY, baseY);
 
   /* The lid grips the rolled lip, not the wall, so it is set out by the roll as well. */
   const rimOuter = rt + RIM_ROLL_MM * scale;
   drawRim(ctx, view, rt, rimOuter, topY);
   drawLid(ctx, view, rimOuter, topY);
+}
+
+/** The cone's silhouette — the back of the mouth and the front of the base. */
+function conePath(
+  ctx: CanvasRenderingContext2D,
+  view: CupView,
+  rt: number,
+  rb: number,
+  topY: number,
+  baseY: number
+) {
+  const { cx, tilt } = view;
+  ctx.beginPath();
+  ctx.moveTo(cx - rt, topY);
+  ctx.ellipse(cx, topY, rt, rt * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.lineTo(cx + rb, baseY);
+  ctx.ellipse(cx, baseY, rb, rb * tilt, 0, 0, Math.PI);
+  ctx.closePath();
+}
+
+/**
+ * Shadow cast by the sleeve onto the wall below it. A sleeve is corrugated and sits off the cup
+ * by a millimetre or two, which is exactly why it insulates — and why its lower edge reads as a
+ * dark line rather than a join.
+ */
+function drawSleeveShadow(
+  ctx: CanvasRenderingContext2D,
+  d: ReturnType<typeof sleeveDieline>,
+  view: CupView,
+  rt: number,
+  rb: number,
+  topY: number,
+  baseY: number
+) {
+  const { cx, scale, tilt } = view;
+  const yBot = baseY - d.bandOnCup.from * scale;
+  const rBot = cupRadius(d, d.bandOnCup.from) * scale;
+  const fall = 5 * scale;
+
+  ctx.save();
+  conePath(ctx, view, rt, rb, topY, baseY);
+  ctx.clip();
+  /*
+   * Laid along the arc, not across a box. A vertical gradient in a rectangle put a straight
+   * edge under a curved sleeve, which read as a seam drawn on the cup. Stacking the same arc
+   * a few times, fainter and lower each pass, keeps the shadow parallel to the edge casting it.
+   */
+  const passes = 16;
+  ctx.lineCap = "butt";
+  for (let i = 0; i < passes; i++) {
+    const t = i / (passes - 1);
+    ctx.strokeStyle = `rgba(26,26,26,${(0.032 * (1 - t) * (1 - t)).toFixed(3)})`;
+    ctx.lineWidth = Math.max(1, fall / 1.6);
+    ctx.beginPath();
+    ctx.ellipse(cx, yBot + t * fall, rBot, rBot * tilt, 0, 0, Math.PI);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 /**
@@ -489,5 +548,45 @@ function drawBand(
       }
     }
   }
+  ctx.restore();
+}
+
+/**
+ * Uncoated stock is not a flat fill. A little grain over the whole cup stops the gradients
+ * reading as vinyl — built once and reused, because generating noise every frame of a spin
+ * would cost more than the effect is worth.
+ */
+let grainPattern: CanvasPattern | null = null;
+
+function grain(
+  ctx: CanvasRenderingContext2D,
+  view: CupView,
+  rt: number,
+  rb: number,
+  topY: number,
+  baseY: number
+) {
+  if (!grainPattern) {
+    const tile = document.createElement("canvas");
+    tile.width = 64;
+    tile.height = 64;
+    const tctx = tile.getContext("2d");
+    if (!tctx) return;
+    const img = tctx.createImageData(64, 64);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = 128 + (Math.random() - 0.5) * 42;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+      img.data[i + 3] = 16;
+    }
+    tctx.putImageData(img, 0, 0);
+    grainPattern = ctx.createPattern(tile, "repeat");
+  }
+  if (!grainPattern) return;
+
+  ctx.save();
+  conePath(ctx, view, rt, rb, topY, baseY);
+  ctx.clip();
+  ctx.fillStyle = grainPattern;
+  ctx.fillRect(view.cx - rt * 1.2, topY - rt * view.tilt, rt * 2.4, baseY - topY + rt * 2);
   ctx.restore();
 }
