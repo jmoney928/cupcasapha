@@ -281,44 +281,125 @@ function drawPrintedBase(
   rb: number,
   baseY: number
 ) {
-  const { cx, scale } = view;
-  const r = rb * 0.93;
-  const eh = ry(view, r);
+  const { cx } = view;
+  const r = rb * 0.95;
 
   ctx.save();
   ctx.beginPath();
-  ctx.ellipse(cx, baseY, r, eh, 0, 0, Math.PI * 2);
-  ctx.fillStyle = "#f2ece1";
+  ctx.ellipse(cx, baseY, r, ry(view, r), 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#fdfcfa";
   ctx.fill();
-  ctx.strokeStyle = "rgba(26,26,26,0.14)";
-  ctx.lineWidth = Math.max(0.6, 0.3 * scale);
-  ctx.stroke();
 
-  /* Foreshortened with the face, so the type lies on the base rather than floating over it. */
+  /*
+   * Everything below is drawn in the circle's own space and squashed by the tilt, so the lockup
+   * lies on the base rather than floating in front of it.
+   */
   ctx.translate(cx, baseY);
   ctx.scale(1, Math.max(0.0001, Math.abs(view.tilt)));
-  ctx.fillStyle = "#1a1a1a";
+  ctx.fillStyle = BASE_INK;
+  ctx.strokeStyle = BASE_INK;
+
+  /* The hairline that rings the whole lockup. */
+  ctx.lineWidth = Math.max(0.35, r * 0.006);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
+  ctx.stroke();
+
+  /*
+   * Sized so the top run sits inside the top of the circle rather than wrapping down its sides,
+   * which is where it sits on the artwork. Forty-two letters at the first size I tried spanned
+   * most of a turn.
+   */
+  ctx.font = `${Math.max(3, r * 0.047)}px ui-sans-serif, system-ui, sans-serif`;
+  const track = r * 0.022;
+  arcText(ctx, "TÜV RHEINLAND CERTIFIED · HOME COMPOSTABLE", r * 0.82, track, "top");
+  arcText(ctx, "PAPER CUP · PHA LINED · CUPCASA.COM", r * 0.82, track, "bottom");
+
+  /* Sized to the circle rather than guessed at, so it fits at any cup size. */
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  let size = r * 0.2;
+  const serif = (n: number) => `${n}px ui-serif, Georgia, "Times New Roman", serif`;
+  ctx.font = serif(size);
+  const got = ctx.measureText("Made to disappear.").width;
+  if (got > 0) size = Math.max(4, (size * r * 1.04) / got);
+  ctx.font = serif(size);
+  ctx.fillText("Made to disappear.", 0, -r * 0.04);
 
-  const size = Math.max(4, r * 0.15);
-  ctx.font = `600 ${size}px ui-serif, Georgia, "Times New Roman", serif`;
-  ctx.fillText("Made to disappear.", 0, -r * 0.06);
+  drawMark(ctx, 0, r * 0.52, r * 0.22);
+  ctx.restore();
+}
 
-  /* The mark: a small filled cup, as it is on the printed base. */
-  const m = r * 0.12;
+/** The ink on the base: dark navy, not black — taken off the artwork. */
+const BASE_INK = "#2a3140";
+
+/**
+ * Text set around a circle, a glyph at a time. The bottom run goes the other way about and
+ * upside down, which is what makes a badge read when you turn it over — exactly how it sits on
+ * the printed base.
+ */
+function arcText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  radius: number,
+  tracking: number,
+  where: "top" | "bottom"
+) {
+  const chars = [...text];
+  const widths = chars.map((c) => ctx.measureText(c).width + tracking);
+  const span = widths.reduce((a, b) => a + b, 0) / radius;
+
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  let angle = -span / 2;
+  for (let i = 0; i < chars.length; i++) {
+    const step = widths[i] / radius;
+    ctx.save();
+    ctx.rotate((where === "bottom" ? Math.PI : 0) + angle + step / 2);
+    ctx.translate(0, -radius);
+    ctx.fillText(chars[i], 0, 0);
+    ctx.restore();
+    angle += step;
+  }
+  ctx.restore();
+}
+
+/**
+ * The mark: a cup coming apart into dots. The scatter is a fixed list, not random, so the same
+ * cup does not shed a different pattern on every frame of a turn.
+ */
+const MARK_DOTS: Array<[number, number, number]> = [
+  [0.52, 0.12, 0.085], [0.58, 0.46, 0.065], [0.64, 0.74, 0.05],
+  [0.72, 0.28, 0.055], [0.78, 0.6, 0.042], [0.86, 0.16, 0.04],
+  [0.9, 0.44, 0.032], [0.96, 0.72, 0.028], [1.02, 0.3, 0.025],
+  [1.08, 0.58, 0.02], [1.14, 0.12, 0.018], [1.2, 0.42, 0.015],
+];
+
+function drawMark(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
+  const h = w * 1.05;
+  ctx.save();
+  ctx.translate(x - w * 0.35, y - h / 2);
+
+  /* Lid: a bar with a thin rim under it. */
+  ctx.fillRect(-w * 0.34, 0, w * 0.68, h * 0.12);
+  ctx.fillRect(-w * 0.3, h * 0.17, w * 0.6, h * 0.08);
+
+  /* Body: a tapered cup. */
   ctx.beginPath();
-  ctx.moveTo(-m * 0.5, m * 0.35);
-  ctx.lineTo(m * 0.5, m * 0.35);
-  ctx.lineTo(m * 0.3, m * 0.95);
-  ctx.lineTo(-m * 0.3, m * 0.95);
+  ctx.moveTo(-w * 0.28, h * 0.31);
+  ctx.lineTo(w * 0.28, h * 0.31);
+  ctx.lineTo(w * 0.19, h);
+  ctx.lineTo(-w * 0.19, h);
   ctx.closePath();
   ctx.fill();
 
-  ctx.font = `${Math.max(3, r * 0.075)}px ui-sans-serif, system-ui, sans-serif`;
-  ctx.fillStyle = "rgba(26,26,26,0.55)";
-  ctx.fillText("HOME COMPOSTABLE · NO PE · NO PLA", 0, -r * 0.42);
-  ctx.fillText("cupcasa.com", 0, r * 0.62);
+  /* And the half that has already gone. */
+  for (const [dx, dy, dr] of MARK_DOTS) {
+    ctx.beginPath();
+    ctx.arc(-w * 0.28 + dx * w, h * 0.31 + dy * h * 0.72, dr * w, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 }
 
