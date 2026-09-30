@@ -1,15 +1,22 @@
 /**
  * Single source of truth for certification claims. Everything on the site that mentions a
  * certificate reads from here, so a number, link or wording change happens in one place.
- * Issued by DIN CERTCO, part of the TÜV Rheinland group.
+ *
+ * The certifier is named as TÜV Rheinland, which is what is printed on the cup itself. The
+ * certificates are issued and registered through DIN CERTCO, TÜV Rheinland's certification
+ * body — which is why the public register links below sit on dincertco.tuv.com. Same
+ * organisation, and the numbers are what make either name checkable.
  */
+
+/** How the certifier is named everywhere on the site. Never hard-code this. */
+export const CERT_ISSUER = "TÜV Rheinland";
 
 /** The cup's own certificate — the headline claim. */
 export const CERT = {
   number: "9P0326",
   title: "Certified home compostable",
   scheme: "DIN-Geprüft Home Compostable",
-  issuer: "DIN CERTCO (TÜV Rheinland group)",
+  issuer: CERT_ISSUER,
   /**
    * Public register entry. Deliberately unset for now: the site shows the number without a link.
    * When it's time, paste the entry URL (https://www.dincertco.tuv.com/registrations/<id>?locale=en)
@@ -17,14 +24,14 @@ export const CERT = {
    */
   entryUrl: null as string | null,
   /**
-   * DIN-Geprüft Home Compostable mark. Artwork and usage rules come from DIN CERTCO; it may not be
+   * DIN-Geprüft Home Compostable mark. Artwork and usage rules come from the certifier; it may not be
    * copied from the web. Drop the file at public/certs/din-geprueft-home-compostable.svg (or .png)
    * and set this to its path.
    */
   logoSrc: null as string | null,
 } as const;
 
-/** The PHA lining resin's own DIN CERTCO registrations (public), shown as supporting evidence. */
+/** The PHA lining resin's own TÜV Rheinland registrations (public), shown as supporting evidence. */
 export const RESIN_CERT_HOLDER = "Beijing PhaBuilder Biotechnology Co., Ltd";
 export const RESIN_CERT_VALID_UNTIL = "2029-04-30";
 export const RESIN_CERTS = [
@@ -51,4 +58,4 @@ export const RESIN_REGISTER_URL = "https://www.dincertco.tuv.com/companies/89794
 
 export const MATERIAL_CLAIM = "No PE, no PLA, no microplastics — PHA lining";
 export const MATERIAL_SHORT = "No PE · no PLA · no microplastics";
-export const CERT_SHORT = `${CERT.title} — DIN CERTCO ${CERT.number}`;
+export const CERT_SHORT = `${CERT.title} — ${CERT_ISSUER} ${CERT.number}`;

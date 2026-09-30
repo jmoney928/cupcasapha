@@ -26,7 +26,7 @@ const heroSlides: HeroSlide[] = [
 const pillars = [
   { icon: Leaf, title: "Better material", text: "Paper lined with plant-based PHA instead of plastic. No PE, no PLA, no microplastics." },
   { icon: Layers, title: "Your brand on it", text: "Every pack comes with sleeves printed with your design — no minimum, no setup fee, printed on our own UV press." },
-  { icon: Recycle, title: "Returns to nature", text: "Certified home compostable by DIN CERTCO (certificate 9P0326). No industrial facility needed." },
+  { icon: Recycle, title: "Returns to nature", text: "Certified home compostable by TÜV Rheinland (certificate 9P0326). No industrial facility needed." },
 ];
 
 const lifecycle = [
@@ -80,7 +80,7 @@ export default function Home() {
             <div key={i} className="flex items-center shrink-0">
               {[
                 "Certified home compostable",
-                "DIN CERTCO 9P0326",
+                "TÜV Rheinland 9P0326",
                 "PHA lining",
                 "No PE",
                 "No PLA",

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const values = [
   { icon: Leaf, title: "One material", text: "Paper and a PHA lining. Nothing in the cup we can't tell you the end of life for." },
   { icon: Coffee, title: "Built for service", text: "Hot espresso through to iced cold brew, shift after shift." },
-  { icon: Heart, title: "Claims you can check", text: "Certificate 9P0326, issued by DIN CERTCO. Ask and we'll send the document." },
+  { icon: Heart, title: "Claims you can check", text: "Certificate 9P0326, issued by TÜV Rheinland. Ask and we'll send the document." },
 ];
 
 export default function AboutPage() {

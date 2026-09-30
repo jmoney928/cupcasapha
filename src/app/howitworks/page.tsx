@@ -13,7 +13,7 @@ const dispose = [
     title: "Home compost",
     tag: "Best",
     /*
-     * The cup's certification (DIN CERTCO 9P0326) covers the PHA lining, not the lid. The lid is
+     * The cup's certification (TÜV Rheinland 9P0326) covers the PHA lining, not the lid. The lid is
      * moulded sugarcane fibre — a plant material, and described as one. Composting is stated of
      * the cup, which we can stand behind, and the lid is described by what it is made of.
      */
@@ -49,7 +49,7 @@ const lifecycle = [
 const compare = [
   { name: "Regular paper cup", lining: "Polyethylene (PE) plastic lining", home: false, industrial: false, clean: false, note: "Ends up in landfill — the plastic film makes it hard to recycle or compost." },
   { name: "“Compostable” PLA cup", lining: "Corn-plastic (PLA) lining", home: false, industrial: true, clean: false, note: "Only breaks down in hot industrial composters, which most places don’t have." },
-  { name: "This cup (PHA)", lining: "Paper with a PHA lining — no PE, no PLA", home: true, industrial: true, clean: true, note: "Certified home compostable by DIN CERTCO. Microbes eat the lining; nothing plastic is left.", highlight: true },
+  { name: "This cup (PHA)", lining: "Paper with a PHA lining — no PE, no PLA", home: true, industrial: true, clean: true, note: "Certified home compostable by TÜV Rheinland. Microbes eat the lining; nothing plastic is left.", highlight: true },
 ];
 
 const faqs = [
@@ -57,7 +57,7 @@ const faqs = [
   { q: "Is it safe to drink from?", a: "Yes. It’s food-safe. The lining is PHA, not polyethylene or PLA, so there’s no conventional plastic in contact with your drink." },
   { q: "Can I put it in the recycling instead?", a: "Please don't. Cups of any kind contaminate paper recycling. Compost or green bin is the right home for this one." },
   { q: "How long does it take to break down?", a: "Certified home-compost conditions: months, not centuries. Exact time depends on heat, moisture and how active your compost is." },
-  { q: "Why do you say “certified”?", a: "DIN CERTCO, an independent certifier in the TÜV Rheinland group, tested the cup and issued certificate 9P0326 for home compostability. The PHA lining material holds its own DIN CERTCO registrations too. We only claim what’s been tested." },
+  { q: "Why do you say “certified”?", a: "TÜV Rheinland, an independent certifier, tested the cup and issued certificate 9P0326 for home compostability. The PHA lining material holds its own TÜV Rheinland registrations too. We only claim what’s been tested." },
   { q: "Can I get these for my café?", a: "Yes. Cups are sold by the case of 1,000, and wholesale pricing is available for volume." },
 ];
 
@@ -193,7 +193,7 @@ export default function HowItWorksPage() {
           ))}
         </div>
         <p className="text-xs text-espresso/50 mt-4 max-w-2xl">
-          Certified home compostable by DIN CERTCO (TÜV Rheinland group), certificate {CERT.number}.
+          Certified home compostable by TÜV Rheinland, certificate {CERT.number}.
         </p>
       </section>
 

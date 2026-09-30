@@ -9,7 +9,7 @@ import { Eyebrow } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Build Your Bundle",
-  description: `Build a bundle of PHA-lined paper cups, lids and custom-printed sleeves — 8oz, 12oz or 16oz, by the pack or by the case. Design the sleeve as you go. Certified home compostable by DIN CERTCO. From ${MIN_TRIO_CENTS}¢ a set.`,
+  description: `Build a bundle of PHA-lined paper cups, lids and custom-printed sleeves — 8oz, 12oz or 16oz, by the pack or by the case. Design the sleeve as you go. Certified home compostable by TÜV Rheinland. From ${MIN_TRIO_CENTS}¢ a set.`,
 };
 
 const perks = [
