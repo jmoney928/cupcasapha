@@ -52,8 +52,8 @@ export default function CalculatorPage() {
                 rounder, friendlier one.
               </p>
               <div className="flex flex-wrap gap-3 mt-7">
-                <Button href="/launch" variant="primary" size="md">
-                  Become a launch café <ArrowRight className="w-4 h-4" />
+                <Button href="/wholesale#free-100" variant="primary" size="md">
+                  Claim your free hundred <ArrowRight className="w-4 h-4" />
                 </Button>
                 <Button href="/why-pha" variant="outline" size="md">
                   Why PHA
@@ -71,7 +71,7 @@ export default function CalculatorPage() {
               </ul>
               <p className="mt-4 text-xs text-espresso/50">
                 Want it checked against your actual invoices?{" "}
-                <Link href="/launch#contact" className="underline font-semibold">Send them over</Link> and we&apos;ll do it with you.
+                <Link href="/contact" className="underline font-semibold">Send them over</Link> and we&apos;ll do it with you.
               </p>
             </div>
           </div>

@@ -303,7 +303,7 @@ function LeadForm({
           <p className="font-display text-lg font-extrabold">On its way.</p>
           <p className="text-sm text-espresso/70">
             Your breakdown is in your inbox as a PDF. If you&apos;d rather talk it through, Jack and Sulli come to you —{" "}
-            <a href="/launch#contact" className="font-semibold underline">book 15 minutes</a>.
+            <a href="/contact" className="font-semibold underline">book 15 minutes</a>.
           </p>
         </div>
       </div>

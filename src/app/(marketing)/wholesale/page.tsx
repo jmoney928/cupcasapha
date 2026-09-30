@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Package, Gift, Truck, Leaf, Check, Printer, Sparkles } from "lucide-react";
+import { Package, Gift, Truck, Leaf, Check, Printer, Sparkles, Calculator, ArrowRight } from "lucide-react";
 import { Reveal, Eyebrow } from "@/components/ui";
 import { LeadForm } from "@/components/lead-form";
 import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
 import { MIN_TRIO_CENTS } from "@/lib/packs";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "For Cafés — Pricing & Cup Casa OS",
@@ -35,12 +36,18 @@ export default function WholesalePage() {
             sleeves printed with your brand — plus Cup Casa OS at no charge for as long as you
             order cups. Your first hundred — cups, lids and sleeves — are free.
           </p>
-          <div className="mt-8">
+          <div className="flex flex-wrap gap-3 mt-8">
             <a
               href="#free-100"
               className="btn-pill bg-coral text-white px-6 py-3.5 text-lg hover:bg-coral-deep"
             >
               <Gift className="w-5 h-5" /> Claim your free hundred
+            </a>
+            <a
+              href="#pricing"
+              className="btn-pill bg-espresso text-cream px-6 py-3.5 text-lg hover:bg-espresso-soft"
+            >
+              See the prices
             </a>
           </div>
         </div>
@@ -143,7 +150,7 @@ export default function WholesalePage() {
       </section>
 
       {/* the offer */}
-      <section className="section-pad py-6">
+      <section id="pricing" className="section-pad py-6 scroll-mt-24">
         <div className="mb-6">
           <span className="label-caps text-coral">Café pricing</span>
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold mt-2">
@@ -206,6 +213,66 @@ export default function WholesalePage() {
               included, not upsold. <a href="/os" className="underline font-semibold">See what&apos;s in it</a>.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ordering — the sheet above is only useful if there is a door next to it */}
+      <section className="section-pad py-6">
+        <div className="rounded-3xl border-2 border-espresso/10 bg-cream-deep/40 p-6 sm:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold">
+              Ready to order at these prices?
+            </h2>
+            <p className="text-espresso/70 mt-2 max-w-2xl">
+              Reserve cases in the bundle builder — pick a size, choose what goes in the set and
+              how many cases, and hold them against one flat deposit. The balance is settled when
+              the container lands.
+            </p>
+          </div>
+          <Link
+            href="/shop?who=cafe"
+            className="btn-pill bg-coral text-white px-6 py-3.5 hover:bg-coral-deep whitespace-nowrap"
+          >
+            Reserve cases <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* café tools, gathered here rather than scattered across the nav */}
+      <section className="section-pad py-6">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Link
+            href="/calculator"
+            className="group rounded-3xl bg-white/70 border border-caramel/20 p-6 hover:border-coral transition-colors"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-coral/12 flex items-center justify-center mb-4">
+              <Calculator className="w-6 h-6 text-coral" />
+            </div>
+            <h3 className="font-display font-bold text-lg">Run your own numbers</h3>
+            <p className="text-sm text-espresso/70 mt-1.5">
+              Put in what you pour and what you pay today. The calculator shows what the switch
+              costs, what it earns back at the till, and what you keep.
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-coral mt-4">
+              Open the calculator <ArrowRight className="w-4 h-4" />
+            </span>
+          </Link>
+          <Link
+            href="/os"
+            className="group rounded-3xl bg-white/70 border border-caramel/20 p-6 hover:border-coral transition-colors"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-leaf/15 flex items-center justify-center mb-4">
+              <Sparkles className="w-6 h-6 text-leaf" />
+            </div>
+            <h3 className="font-display font-bold text-lg">What Cup Casa OS does</h3>
+            <p className="text-sm text-espresso/70 mt-1.5">
+              Recipe costing, reorder by text, the compliance binder and a brand kit — included
+              with your cups, not sold separately.
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-coral mt-4">
+              See what is in it <ArrowRight className="w-4 h-4" />
+            </span>
+          </Link>
         </div>
       </section>
 

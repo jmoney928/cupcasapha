@@ -41,8 +41,8 @@ export default function OsPage() {
             separately and we never will.
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
-            <Button href="/launch" variant="primary" size="lg">
-              Become a launch café <ArrowRight className="w-5 h-5" />
+            <Button href="/wholesale#free-100" variant="primary" size="lg">
+              Claim your free hundred <ArrowRight className="w-5 h-5" />
             </Button>
             <Button href="/calculator" variant="outline" size="lg">Run your numbers</Button>
           </div>
@@ -197,7 +197,7 @@ export default function OsPage() {
               <Button href="/calculator" variant="cream" size="md">
                 Open the calculator <ArrowRight className="w-4 h-4" />
               </Button>
-              <Button href="/launch" variant="dark" size="md">Talk to us</Button>
+              <Button href="/wholesale#samples" variant="dark" size="md">Talk to us</Button>
             </div>
           </div>
         </div>
@@ -209,7 +209,7 @@ export default function OsPage() {
           <b>{STATUS_LABELS.building}</b> and <b>{STATUS_LABELS.planned}</b> are in development; nothing on this page
           is a commitment to a delivery date. Comparable retail figures reference third-party products a café can
           price independently and are shown only where such a comparison exists.{" "}
-          <Link href="/launch" className="underline font-semibold">Ask us</Link> if you want to see any of it working
+          <Link href="/contact" className="underline font-semibold">Ask us</Link> if you want to see any of it working
           before you order.
         </p>
       </section>

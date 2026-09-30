@@ -58,10 +58,10 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button href="/shop" variant="primary" size="lg">
-                Shop packs <ArrowRight className="w-5 h-5" />
+                Build your bundle <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/wholesale" variant="cream" size="lg">
-                Café pricing
+                For cafés
               </Button>
             </div>
             <div className="mt-6"><CertBadge variant="dark" /></div>
@@ -155,7 +155,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-8">
             <Button href="/shop" variant="primary" size="lg">
-              Shop the packs <ArrowRight className="w-5 h-5" />
+              Build your bundle <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
         </div>
@@ -242,15 +242,24 @@ export default function Home() {
       {/* ---------------- RESERVE / PRODUCTS ---------------- */}
       <section className="section-pad py-20">
         <Reveal>
+          {/*
+            * The two ways to buy, said out loud. This strip is the quick one — one click, the
+            * entry pack, done. The builder is the considered one. Unlabelled, they read as the
+            * same thing twice and the cheaper-looking one wins by accident.
+            */}
           <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
-            <div>
-              <span className="label-caps text-coral">Shipping December 2026</span>
+            <div className="max-w-xl">
+              <span className="label-caps text-coral">The quick way · shipping December 2026</span>
               <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-3">
-                Three sizes. One simple pack.
+                Already know what you want?
               </h2>
+              <p className="text-espresso/65 mt-3">
+                A hundred complete sets of any size, straight into the cart. If you would rather
+                choose the contents, the quantity and your own sleeve, build the bundle instead.
+              </p>
             </div>
             <Button href="/shop" variant="dark" size="md">
-              Shop all <ArrowRight className="w-4 h-4" />
+              Build a bundle instead <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
         </Reveal>
@@ -272,7 +281,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
               <Button href="/shop" variant="primary" size="lg">
-                Shop packs <ArrowRight className="w-5 h-5" />
+                Build your bundle <ArrowRight className="w-5 h-5" />
               </Button>
               <Button href="/contact" variant="cream" size="lg">
                 Talk to us

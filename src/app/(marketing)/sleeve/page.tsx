@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SleeveEditor } from "@/components/sleeve/editor";
+import { StandaloneSleeveEditor } from "@/components/sleeve/standalone";
 import { SLEEVE_DIELINES } from "@/lib/sleeve/dielines";
 import { Eyebrow } from "@/components/ui";
 import { Palette } from "lucide-react";
@@ -31,13 +31,14 @@ export default function SleevePage() {
           </p>
           <p className="text-sm text-espresso/55 mt-4">
             Nothing is uploaded. Your logo stays on your own machine and the file is built in your
-            browser.
+            browser. When you like it, <strong>Order this sleeve</strong> carries the design
+            straight into the bundle builder — you will not have to draw it twice.
           </p>
         </div>
       </section>
 
       <section className="section-pad pb-12">
-        <SleeveEditor />
+        <StandaloneSleeveEditor />
       </section>
 
       <section className="section-pad pb-16">
@@ -62,7 +63,7 @@ export default function SleevePage() {
           </dl>
           <div className="flex flex-wrap gap-3 mt-8">
             <Link href="/shop" className="btn-pill bg-coral text-white px-6 py-3 hover:bg-coral-deep">
-              Shop packs
+              Build your bundle
             </Link>
             <Link href="/wholesale" className="btn-pill bg-cream text-espresso px-6 py-3 hover:bg-cream-deep">
               Café pricing

@@ -8,13 +8,16 @@ import { useCart } from "@/components/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
 import { Logo, Particles } from "@/components/brand";
 
+/*
+ * Four, and the button makes five. Seven links meant the two that matter — build a bundle, and
+ * café pricing — competed with five that answer questions nobody has yet. The calculator and
+ * Cup Casa OS now live where a café is already standing, on /wholesale; sustainability is linked
+ * from the material page it belongs to. Everything is still one click from the footer.
+ */
 const nav = [
-  { href: "/shop", label: "Shop" },
-  { href: "/why-pha", label: "The Material" },
-  { href: "/sustainability", label: "Sustainability" },
-  { href: "/calculator", label: "Calculator" },
-  { href: "/os", label: "Cup Casa OS" },
   { href: "/wholesale", label: "For cafés" },
+  { href: "/why-pha", label: "The Material" },
+  { href: "/sleeve", label: "Sleeve designer" },
   { href: "/about", label: "About" },
 ];
 
@@ -110,7 +113,7 @@ export function SiteHeader() {
               href="/shop"
               className="btn-pill hidden sm:inline-flex bg-coral text-white px-5 py-2.5 text-sm hover:bg-coral-deep"
             >
-              Shop packs
+              Build your bundle
               <Particles className="w-5 h-3 text-white/90" />
             </Link>
             <button
@@ -142,7 +145,7 @@ export function SiteHeader() {
               onClick={() => setMobileOpen(false)}
               className="btn-pill bg-coral text-white px-5 py-3 mt-2 hover:bg-coral-deep"
             >
-              Shop packs
+              Build your bundle
             </Link>
           </div>
         )}

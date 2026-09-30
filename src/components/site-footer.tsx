@@ -18,7 +18,7 @@ const cols = [
   {
     title: "Shop",
     links: [
-      { href: "/shop", label: "Order packs" },
+      { href: "/shop", label: "Build your bundle" },
       { href: "/sleeve", label: "Design your sleeve" },
       { href: "/shop?size=8", label: "8oz" },
       { href: "/shop?size=12", label: "12oz" },
@@ -36,10 +36,12 @@ const cols = [
     ],
   },
   {
-    title: "Business",
+    title: "For cafés",
     links: [
-      { href: "/wholesale", label: "For cafés" },
-      { href: "/wholesale#samples", label: "Request samples" },
+      { href: "/wholesale", label: "Café pricing" },
+      { href: "/wholesale#free-100", label: "First 100 free" },
+      { href: "/shop?who=cafe", label: "Reserve cases" },
+      { href: "/wholesale#samples", label: "Request a quote" },
       { href: "/contact", label: "Contact us" },
     ],
   },

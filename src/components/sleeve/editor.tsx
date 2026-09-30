@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Circle, Download, ImageDown, ImageUp, Minus, Redo2, Square, Trash2, Type, Undo2 } from "lucide-react";
+import { ArrowRight, Circle, Download, ImageDown, ImageUp, Minus, Redo2, Square, Trash2, Type, Undo2 } from "lucide-react";
 import { SLEEVE_SIZES, sleeveDieline, type CupSize } from "@/lib/sleeve/dielines";
 import {
   add, byId, duplicate, emptyDoc, newImage, newShape, newText, remove, reorder, resize, update,
@@ -25,17 +25,27 @@ const MAX_HISTORY = 60;
  * Standalone on /sleeve it takes no props. Inside the bundle builder the size has already been
  * chosen, so it is seeded and the size switcher is hidden rather than left there to contradict
  * the step before it, and every change is reported up so the flow knows there is artwork.
+ *
+ * `onCarry` is what lets the standalone designer hand its work to the builder: given it, the
+ * toolbar grows a button that passes the live document out rather than downloading it.
  */
 export function SleeveEditor({
   initialSize = 12,
+  initialDoc,
   lockSize = false,
   onChange,
+  onCarry,
+  carryLabel = "Order this",
 }: {
   initialSize?: CupSize;
+  /** A design carried in from elsewhere, already sized for this sleeve. */
+  initialDoc?: SleeveDoc | null;
   lockSize?: boolean;
   onChange?: (doc: SleeveDoc) => void;
+  onCarry?: (doc: SleeveDoc) => void;
+  carryLabel?: string;
 } = {}) {
-  const [doc, setDoc] = useState<SleeveDoc>(() => emptyDoc(initialSize));
+  const [doc, setDoc] = useState<SleeveDoc>(() => initialDoc ?? emptyDoc(initialSize));
   const [past, setPast] = useState<SleeveDoc[]>([]);
   const [future, setFuture] = useState<SleeveDoc[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -265,9 +275,26 @@ export function SleeveEditor({
           <input type="checkbox" checked={showGuides} onChange={(e) => setShowGuides(e.target.checked)} className="w-4 h-4 accent-[#e8735a]" />
           Guides
         </label>
-        <button type="button" onClick={download} className="btn-pill px-5 py-2.5 text-sm bg-coral text-white hover:bg-coral-deep">
+        <button
+          type="button"
+          onClick={download}
+          className={`btn-pill px-5 py-2.5 text-sm ${
+            onCarry
+              ? "border-2 border-espresso/15 hover:border-espresso/40"
+              : "bg-coral text-white hover:bg-coral-deep"
+          }`}
+        >
           <Download className="w-4 h-4" /> Download
         </button>
+        {onCarry && (
+          <button
+            type="button"
+            onClick={() => onCarry(doc)}
+            className="btn-pill px-5 py-2.5 text-sm bg-coral text-white hover:bg-coral-deep"
+          >
+            {carryLabel} <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <input

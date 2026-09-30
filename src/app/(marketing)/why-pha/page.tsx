@@ -107,7 +107,7 @@ export default function WhyPhaPage() {
           </p>
           <div className="mt-8">
             <Button href="/shop" variant="primary" size="lg">
-              Shop packs <ArrowRight className="w-5 h-5" />
+              Build your bundle <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-6">

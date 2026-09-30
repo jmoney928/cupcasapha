@@ -10,6 +10,7 @@ import { formatCents } from "@/lib/skus";
 import { DEPOSIT_CENTS } from "@/lib/deposit";
 import { CAFE_OFFER } from "@/lib/cafe-offer";
 import {
+  buyerOption,
   handoff,
   partsOption,
   totalCents,
@@ -91,6 +92,13 @@ export function StepReview({
         <h3 className="font-display text-2xl font-extrabold">Your bundle</h3>
 
         <div className="mt-4">
+          {bundle.who && (
+            <Line
+              label="Buying as"
+              value={buyerOption(bundle.who).name}
+              onEdit={() => onGo("who")}
+            />
+          )}
           <Line
             label="Size"
             value={`${oz}oz — ${product?.shortName ?? ""}`}

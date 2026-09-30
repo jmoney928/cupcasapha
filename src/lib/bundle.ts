@@ -2,19 +2,66 @@
  * The bundle builder's model: what a bundle is, what it costs, and what is still missing before
  * it can be ordered.
  *
- * Two kinds of buyer walk the same five steps and diverge only on quantity. Someone buying a pack
- * pays in full at checkout; a café reserving cases pays one flat deposit and settles the balance
- * when the container lands. That split already exists in the cart and the checkout route, so this
- * file describes the bundle and defers to `skus.ts` for anything the cart has to price.
+ * Two kinds of buyer walk the same flow, and the very first question is which one you are. That
+ * fork is not cosmetic: a café buys cases of a thousand against a deposit, a person buys a pack
+ * outright, and the two price lists are far enough apart that showing both to the same buyer
+ * reads as a markup rather than a tier. So `who` decides which quantities exist from then on,
+ * and nobody is shown the other side's prices.
  *
  * Every figure is derived from the catalogue. Nothing here hard-codes a price.
  */
-import { BUNDLES } from "@/lib/cafe-offer";
-import { PACK_SIZES, perTrioCents, type PackSize } from "@/lib/packs";
+import { BUNDLES, CAFE_OFFER } from "@/lib/cafe-offer";
+import { MIN_TRIO_CENTS, PACK_SIZES, perTrioCents, type PackSize } from "@/lib/packs";
 import { products } from "@/lib/products";
 import type { CupSize } from "@/lib/calc/catalog";
 
 export const BUNDLE_SIZES: CupSize[] = [8, 12, 16];
+
+/* ------------------------------------------------------------------ who it is for */
+
+export type BuyerKind = "self" | "cafe";
+
+export type BuyerOption = {
+  id: BuyerKind;
+  name: string;
+  blurb: string;
+  /** The three or four things that are true of this path, for a checklist on the card. */
+  points: string[];
+};
+
+/*
+ * The café card deliberately quotes no per-set price. A consumer who reads "27¢ a set" two lines
+ * above their own 57¢ concludes they are being overcharged, and no amount of explaining a case of
+ * a thousand undoes that. The café sheet is one click away instead, which is the right place for
+ * anyone who wants the numbers before they commit.
+ */
+export const BUYER_OPTIONS: BuyerOption[] = [
+  {
+    id: "self",
+    name: "For me",
+    blurb:
+      "A pack for a home, an office, a market stall, a pop-up — anything that is not a café ordering by the pallet.",
+    points: [
+      "Packs of 100, 200 or 500 complete sets",
+      `From ${MIN_TRIO_CENTS}¢ a set, all in`,
+      "Paid at checkout, shipped December 2026",
+    ],
+  },
+  {
+    id: "cafe",
+    name: "For my café",
+    blurb:
+      "Cases of a thousand at published café pricing, reserved against one flat deposit rather than paid up front.",
+    points: [
+      `Cases of ${CAFE_OFFER.caseCount.toLocaleString()} at café pricing`,
+      `Your first ${CAFE_OFFER.trialCount} cups, lids and sleeves free`,
+      "Cup Casa OS included, not upsold",
+    ],
+  },
+];
+
+export const buyerOption = (id: BuyerKind): BuyerOption =>
+  BUYER_OPTIONS.find((b) => b.id === id) ?? BUYER_OPTIONS[0];
 
 /* ----------------------------------------------------------------- what is in it */
 
@@ -73,6 +120,12 @@ export const MAX_CASES = 250;
 export const unitsIn = (qty: BundleQty): number =>
   qty.kind === "pack" ? qty.packSize : qty.cases * CASE_UNITS;
 
+/** Which kind of quantity this buyer is offered. The other kind never appears to them. */
+export const qtyKindFor = (who: BuyerKind): BundleQty["kind"] => (who === "cafe" ? "case" : "pack");
+
+/** Whether a saved or deep-linked quantity belongs to this buyer at all. */
+export const qtyFitsWho = (who: BuyerKind, qty: BundleQty): boolean => qty.kind === qtyKindFor(who);
+
 /* ----------------------------------------------------------------- price */
 
 /**
@@ -81,9 +134,16 @@ export const unitsIn = (qty: BundleQty): number =>
  * 42¢ — bought together the lid costs 2¢ and the sleeve 4¢. Those two deltas are the whole
  * pricing relationship, and they hold at all three sizes, so the same subtraction gives a
  * consumer pack its cup-and-sleeve and cup-and-lid prices too.
+ *
+ * They are exported because the contents step is asked before the quantity is known, and a
+ * saving of 2¢ is true at every quantity where an absolute price is not.
  */
-const LID_IN_SET_CENTS = 2;
-const SLEEVE_IN_SET_CENTS = 4;
+export const LID_IN_SET_CENTS = 2;
+export const SLEEVE_IN_SET_CENTS = 4;
+
+/** What leaving a part out saves, per set — the only honest figure before a quantity exists. */
+export const savingFor = (parts: BundleParts): number =>
+  parts === "all" ? 0 : parts === "cupSleeve" ? LID_IN_SET_CENTS : SLEEVE_IN_SET_CENTS;
 
 /** What one cup's worth of this bundle costs, in cents. */
 export function unitCents(oz: CupSize, parts: BundleParts, qty: BundleQty): number {
@@ -92,8 +152,7 @@ export function unitCents(oz: CupSize, parts: BundleParts, qty: BundleQty): numb
     return parts === "all" ? b.all : parts === "cupSleeve" ? b.cupSleeve : b.cupLid;
   }
   const set = perTrioCents(qty.packSize, oz);
-  if (parts === "all") return set;
-  return parts === "cupSleeve" ? set - LID_IN_SET_CENTS : set - SLEEVE_IN_SET_CENTS;
+  return set - savingFor(parts);
 }
 
 export const totalCents = (oz: CupSize, parts: BundleParts, qty: BundleQty): number =>
@@ -102,13 +161,15 @@ export const totalCents = (oz: CupSize, parts: BundleParts, qty: BundleQty): num
 /* ----------------------------------------------------------------- the bundle */
 
 export type Bundle = {
+  /** Which buyer, and so which price list and which quantities. Asked first. */
+  who: BuyerKind | null;
   oz: CupSize | null;
-  qty: BundleQty | null;
   parts: BundleParts | null;
+  qty: BundleQty | null;
   /**
    * The design step has been seen and accepted. It gates progress, and it is deliberately not
    * the same as having drawn something: plenty of people will want the plain sleeve, or will
-   * send artwork by email later, and neither should be stuck on step four.
+   * send artwork by email later, and neither should be stuck on the design step.
    */
   designed: boolean;
   /** Something was actually changed on the sleeve. Only affects what the review says. */
@@ -116,9 +177,10 @@ export type Bundle = {
 };
 
 export const emptyBundle: Bundle = {
+  who: null,
   oz: null,
-  qty: null,
   parts: null,
+  qty: null,
   designed: false,
   artwork: false,
 };
@@ -131,15 +193,27 @@ export const needsDesign = (b: Bundle): boolean =>
 
 /* ----------------------------------------------------------------- the steps */
 
-export type StepId = "size" | "quantity" | "parts" | "design" | "review";
+export type StepId = "who" | "size" | "parts" | "quantity" | "design" | "review";
 
-export type Step = { id: StepId; title: string; short: string };
+export type Step = {
+  id: StepId;
+  title: string;
+  short: string;
+  /** Answerable by walking past it. Said out loud, so nobody feels stuck on it. */
+  optional?: boolean;
+};
 
+/*
+ * Contents before quantity, and not the other way round. Quantity is where the money appears,
+ * and pricing a quantity means knowing what is in the set — asked the other way round, the
+ * quantity step had to quote the full set and then change its own numbers a step later.
+ */
 const ALL_STEPS: Step[] = [
+  { id: "who", title: "Who are these for?", short: "You" },
   { id: "size", title: "Pick your size", short: "Size" },
-  { id: "quantity", title: "How many?", short: "Quantity" },
   { id: "parts", title: "What goes in it?", short: "Contents" },
-  { id: "design", title: "Design your sleeve", short: "Design" },
+  { id: "quantity", title: "How many?", short: "Quantity" },
+  { id: "design", title: "Design your sleeve", short: "Design", optional: true },
   { id: "review", title: "Check it over", short: "Review" },
 ];
 
@@ -149,14 +223,18 @@ export function stepsFor(b: Bundle): Step[] {
   return ALL_STEPS;
 }
 
+/** How many steps the flow is, before any of it is answered — for the headline on /shop. */
+export const STEP_COUNT = ALL_STEPS.length;
+
 /**
  * The first step that is not yet answered — where an arriving link should land, and how far a
  * deep link is allowed to jump. You cannot skip ahead to a step whose inputs do not exist yet.
  */
 export function firstIncomplete(b: Bundle): StepId {
+  if (b.who === null) return "who";
   if (b.oz === null) return "size";
-  if (b.qty === null) return "quantity";
   if (b.parts === null) return "parts";
+  if (b.qty === null) return "quantity";
   return needsDesign(b) && !b.designed ? "design" : "review";
 }
 

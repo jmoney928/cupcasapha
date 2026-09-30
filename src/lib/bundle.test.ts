@@ -4,7 +4,9 @@ import {
   firstIncomplete,
   handoff,
   needsDesign,
+  qtyFitsWho,
   reachableStep,
+  savingFor,
   stepsFor,
   totalCents,
   unitCents,
@@ -73,50 +75,103 @@ describe("consumer pricing", () => {
   });
 });
 
+describe("who it is for", () => {
+  it("offers a person packs and a café cases, and never the other way round", () => {
+    expect(qtyFitsWho("self", { kind: "pack", packSize: 100 })).toBe(true);
+    expect(qtyFitsWho("self", { kind: "case", cases: 1 })).toBe(false);
+    expect(qtyFitsWho("cafe", { kind: "case", cases: 1 })).toBe(true);
+    expect(qtyFitsWho("cafe", { kind: "pack", packSize: 500 })).toBe(false);
+  });
+
+  it("asks who before anything else, so no price is shown to the wrong buyer", () => {
+    expect(firstIncomplete(emptyBundle)).toBe("who");
+    expect(stepsFor(emptyBundle)[0].id).toBe("who");
+    expect(reachableStep(emptyBundle, "quantity")).toBe("who");
+  });
+});
+
+describe("contents priced before a quantity exists", () => {
+  it("states the saving, which is the same at every quantity and on both price lists", () => {
+    expect(savingFor("all")).toBe(0);
+    for (const parts of ["cupSleeve", "cupLid"] as const) {
+      const saving = savingFor(parts);
+      for (const oz of [8, 12, 16] as const) {
+        for (const qty of [
+          { kind: "pack", packSize: 100 },
+          { kind: "pack", packSize: 500 },
+          { kind: "case", cases: 1 },
+        ] as const) {
+          expect(unitCents(oz, "all", qty) - unitCents(oz, parts, qty)).toBe(saving);
+        }
+      }
+    }
+  });
+});
+
 describe("steps", () => {
   it("sends an empty bundle to the first step", () => {
-    expect(firstIncomplete(emptyBundle)).toBe("size");
+    expect(firstIncomplete(emptyBundle)).toBe("who");
+  });
+
+  it("asks contents before quantity, so the quantity step can price what was chosen", () => {
+    const order = stepsFor(emptyBundle).map((s) => s.id);
+    expect(order.indexOf("parts")).toBeLessThan(order.indexOf("quantity"));
   });
 
   it("walks forward as answers arrive", () => {
-    expect(firstIncomplete(bundle({ oz: 12 }))).toBe("quantity");
-    expect(firstIncomplete(bundle({ oz: 12, qty: { kind: "pack", packSize: 100 } }))).toBe("parts");
+    expect(firstIncomplete(bundle({ who: "self" }))).toBe("size");
+    expect(firstIncomplete(bundle({ who: "self", oz: 12 }))).toBe("parts");
+    expect(firstIncomplete(bundle({ who: "self", oz: 12, parts: "all" }))).toBe("quantity");
   });
 
   it("separates accepting the design step from having drawn anything", () => {
-    const b = bundle({ oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "all" });
+    const b = bundle({ who: "self", oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "all" });
     // Accepting the plain sleeve is enough to move on; artwork is optional.
     expect(firstIncomplete({ ...b, designed: true, artwork: false })).toBe("review");
     expect(reachableStep({ ...b, designed: true, artwork: false }, "review")).toBe("review");
   });
 
+  it("marks the design step optional so the rail can say so", () => {
+    const design = stepsFor(emptyBundle).find((s) => s.id === "design");
+    expect(design?.optional).toBe(true);
+    // Nothing else claims to be skippable.
+    expect(stepsFor(emptyBundle).filter((s) => s.optional)).toHaveLength(1);
+  });
+
   it("asks for a design when the bundle has a sleeve in it", () => {
-    const b = bundle({ oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "all" });
+    const b = bundle({ who: "self", oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "all" });
     expect(needsDesign(b)).toBe(true);
     expect(firstIncomplete(b)).toBe("design");
     expect(firstIncomplete({ ...b, designed: true })).toBe("review");
   });
 
   it("skips the design step entirely for a bundle with no sleeve", () => {
-    const b = bundle({ oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "cupLid" });
+    const b = bundle({ who: "self", oz: 12, qty: { kind: "pack", packSize: 100 }, parts: "cupLid" });
     expect(needsDesign(b)).toBe(false);
     expect(stepsFor(b).map((s) => s.id)).not.toContain("design");
     expect(firstIncomplete(b)).toBe("review");
   });
 
   it("will not let a deep link jump past an unanswered step", () => {
-    expect(reachableStep(emptyBundle, "review")).toBe("size");
-    expect(reachableStep(bundle({ oz: 8 }), "parts")).toBe("quantity");
+    expect(reachableStep(emptyBundle, "review")).toBe("who");
+    expect(reachableStep(bundle({ who: "self", oz: 8 }), "quantity")).toBe("parts");
   });
 
   it("lets you go back to a step you have already answered", () => {
-    const b = bundle({ oz: 8, qty: { kind: "pack", packSize: 100 }, parts: "all", designed: true });
+    const b = bundle({
+      who: "self",
+      oz: 8,
+      qty: { kind: "pack", packSize: 100 },
+      parts: "all",
+      designed: true,
+    });
+    expect(reachableStep(b, "who")).toBe("who");
     expect(reachableStep(b, "size")).toBe("size");
     expect(reachableStep(b, "quantity")).toBe("quantity");
   });
 
   it("clamps a design step that this bundle does not have", () => {
-    const b = bundle({ oz: 8, qty: { kind: "pack", packSize: 100 }, parts: "cupLid" });
+    const b = bundle({ who: "self", oz: 8, qty: { kind: "pack", packSize: 100 }, parts: "cupLid" });
     expect(reachableStep(b, "design")).toBe("review");
   });
 });
@@ -127,18 +182,18 @@ describe("handoff", () => {
   });
 
   it("maps a full-set pack onto the existing pack SKU", () => {
-    const h = handoff(bundle({ oz: 12, qty: { kind: "pack", packSize: 200 }, parts: "all" }));
+    const h = handoff(bundle({ who: "self", oz: 12, qty: { kind: "pack", packSize: 200 }, parts: "all" }));
     expect(h).toEqual({ kind: "cart", slug: "pack-200-12oz", qty: 1 });
   });
 
   it("maps full-set cases onto the case SKU, one line per case", () => {
-    const h = handoff(bundle({ oz: 16, qty: { kind: "case", cases: 4 }, parts: "all" }));
+    const h = handoff(bundle({ who: "cafe", oz: 16, qty: { kind: "case", cases: 4 }, parts: "all" }));
     expect(h).toEqual({ kind: "cart", slug: "16oz-pha-cup", qty: 4 });
   });
 
   it("sends a partial bundle to a quote rather than inventing a SKU", () => {
     for (const parts of ["cupSleeve", "cupLid"] as const) {
-      const h = handoff(bundle({ oz: 8, qty: { kind: "pack", packSize: 100 }, parts }));
+      const h = handoff(bundle({ who: "self", oz: 8, qty: { kind: "pack", packSize: 100 }, parts }));
       expect(h?.kind).toBe("quote");
     }
   });
