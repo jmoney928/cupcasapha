@@ -27,7 +27,21 @@ const faqs = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ bundle?: string }>;
+}) {
+  /*
+   * A partial bundle cannot be bought online, so the builder sends it here with what was built
+   * in the link. Reading it back means nobody has to retype a bundle they just put together.
+   */
+  const { bundle } = await searchParams;
+  const built = typeof bundle === "string" ? bundle.slice(0, 200).trim() : "";
+  const defaults = built
+    ? { message: `I'd like a price for: ${built}.\n\n` }
+    : undefined;
+
   return (
     <>
       <section className="section-pad pt-12 pb-10 relative overflow-hidden">
@@ -88,6 +102,7 @@ export default function ContactPage() {
         <LeadForm
           type="contact"
           submitLabel="Send message"
+          defaults={defaults}
           fields={[
             { name: "name", label: "Your name", required: true },
             { name: "email", label: "Email", type: "email", required: true },

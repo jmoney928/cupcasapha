@@ -15,12 +15,15 @@ type Field = {
 export function LeadForm({
   type,
   fields,
+  defaults,
   submitLabel = "Send",
   successTitle = "Thanks — we'll be in touch!",
   successText = "We've received your message and will reply within one business day.",
 }: {
   type: string;
   fields: Field[];
+  /** Starting values, keyed by field name — used to carry a built bundle into the message. */
+  defaults?: Record<string, string>;
   submitLabel?: string;
   successTitle?: string;
   successText?: string;
@@ -81,6 +84,7 @@ export function LeadForm({
             <textarea
               name={f.name}
               required={f.required}
+              defaultValue={defaults?.[f.name]}
               rows={4}
               className="w-full rounded-2xl border border-caramel/30 bg-cream px-4 py-3 focus:outline-none focus:ring-2 focus:ring-leaf resize-none"
             />
@@ -88,7 +92,7 @@ export function LeadForm({
             <select
               name={f.name}
               required={f.required}
-              defaultValue=""
+              defaultValue={defaults?.[f.name] ?? ""}
               className="w-full rounded-2xl border border-caramel/30 bg-cream px-4 py-3 focus:outline-none focus:ring-2 focus:ring-leaf"
             >
               <option value="" disabled>
@@ -105,6 +109,7 @@ export function LeadForm({
               name={f.name}
               type={f.type ?? "text"}
               required={f.required}
+              defaultValue={defaults?.[f.name]}
               className="w-full rounded-2xl border border-caramel/30 bg-cream px-4 py-3 focus:outline-none focus:ring-2 focus:ring-leaf"
             />
           )}
