@@ -173,9 +173,11 @@ export default function Home() {
               <p className="text-espresso/70 mt-4 max-w-xl">
                 Cafés buy by the case of {CAFE_OFFER.caseCount.toLocaleString()} — from{" "}
                 <strong>{cafeRows[0].perCupCents}¢ a cup</strong>, {CAFE_OFFER.lidCents}¢ lids and
-                custom-printed sleeves. Never ordered from us? Your first{" "}
-                {CAFE_OFFER.trialCount} cups, lids and sleeves are free. Cup Casa OS comes with
-                it, at no charge.
+                custom-printed sleeves. Never ordered from us?{" "}
+                <a href="/wholesale#free-100" className="font-bold underline decoration-coral decoration-2 underline-offset-2">
+                  Your first {CAFE_OFFER.trialCount} cups, lids and sleeves are free
+                </a>
+                . Cup Casa OS comes with it, at no charge.
               </p>
             </div>
             <Button href="/wholesale" variant="dark" size="lg">

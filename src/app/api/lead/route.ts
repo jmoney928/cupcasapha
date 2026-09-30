@@ -8,6 +8,10 @@ const LABELS: Record<string, string> = {
   company: "Business",
   phone: "Phone",
   volume: "Estimated volume",
+  proof: "Website / Instagram",
+  address: "Street address",
+  city: "City",
+  role: "Their role",
   sizes: "Sizes of interest",
   printing: "Custom printing",
   message: "Message",
@@ -43,10 +47,13 @@ export async function POST(req: Request) {
     .filter(([k, v]) => k !== "type" && String(v ?? "").trim() !== "")
     .map(([k, v]) => ({ label: LABELS[k] ?? k, value: String(v) }));
 
+  /* A free-hundred claim needs checking before anything ships, so it says so in the subject. */
   const subject =
-    type === "wholesale"
-      ? `New wholesale enquiry — ${name}${company ? ` (${company})` : ""}`
-      : `New contact message — ${name}${company ? ` (${company})` : ""}`;
+    type === "trial"
+      ? `FREE 100 claim — ${company || name} (verify before shipping)`
+      : type === "wholesale"
+        ? `New wholesale enquiry — ${name}${company ? ` (${company})` : ""}`
+        : `New contact message — ${name}${company ? ` (${company})` : ""}`;
 
   const text =
     `New ${type} submission from cupcasa cups\n\n` +

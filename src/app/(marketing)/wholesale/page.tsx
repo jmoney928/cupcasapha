@@ -3,6 +3,7 @@ import { Package, Gift, Truck, Leaf, Check, Printer, Sparkles } from "lucide-rea
 import { Reveal, Eyebrow } from "@/components/ui";
 import { LeadForm } from "@/components/lead-form";
 import { cafeRows, CAFE_OFFER, dollars } from "@/lib/cafe-offer";
+import { MIN_TRIO_CENTS } from "@/lib/packs";
 
 export const metadata: Metadata = {
   title: "For Cafés — Pricing & Cup Casa OS",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 const perks = [
   { icon: Sparkles, title: "Cup Casa OS free", text: "Reorder autopilot, costing, compliance and brand tools, bundled with your cups." },
-  { icon: Gift, title: "First 100 free", text: "A hundred cups, lids and custom sleeves, free, before you spend anything." },
+  { icon: Gift, title: "First 100 free", text: "A hundred cups, lids and custom sleeves, free — for working cafés, before you spend anything." },
   { icon: Truck, title: "Freight sorted", text: "Pallet and LTL freight to your door, US & Canada." },
   { icon: Package, title: "Reliable supply", text: "Consistent stock so you never run dry mid-service." },
 ];
@@ -34,6 +35,110 @@ export default function WholesalePage() {
             sleeves printed with your brand — plus Cup Casa OS at no charge for as long as you
             order cups. Your first hundred — cups, lids and sleeves — are free.
           </p>
+          <div className="mt-8">
+            <a
+              href="#free-100"
+              className="btn-pill bg-coral text-white px-6 py-3.5 text-lg hover:bg-coral-deep"
+            >
+              <Gift className="w-5 h-5" /> Claim your free hundred
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* the free hundred — the first thing a café should see it can do */}
+      <section id="free-100" className="section-pad py-10 scroll-mt-24">
+        <div className="rounded-[2.5rem] bg-espresso text-cream p-8 sm:p-12">
+          <div className="grid lg:grid-cols-[1fr_1.15fr] gap-10 items-start">
+            <div>
+              <Eyebrow color="coral">
+                <Gift className="w-4 h-4" /> Free for new cafés
+              </Eyebrow>
+              <h2 className="font-display text-4xl sm:text-5xl font-extrabold mt-5 leading-[0.95]">
+                Try us with a<br />
+                <span className="text-coral">hundred, free.</span>
+              </h2>
+              <p className="text-cream/75 mt-6">
+                {CAFE_OFFER.trialCount} cups, {CAFE_OFFER.trialCount} lids and{" "}
+                {CAFE_OFFER.trialCount} sleeves printed with your own artwork. Free, including
+                freight, for a café that has not ordered from us before — a hundred complete
+                servings, enough to run a week of mornings and hear what your regulars say.
+              </p>
+
+              <ul className="mt-7 space-y-3">
+                {[
+                  "A hundred of each — cup, lid and printed sleeve",
+                  "Your artwork on the sleeve, not ours",
+                  "Freight included, US & Canada",
+                  "No card, no deposit, nothing owed after",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 font-semibold">
+                    <span className="w-6 h-6 rounded-full bg-leaf grid place-items-center shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-cream" />
+                    </span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+
+              {/*
+               * Said plainly rather than buried. A hundred printed cups is real money, and a
+               * café would rather know the rule up front than be refused after filling a form.
+               */}
+              <div className="mt-8 rounded-2xl bg-cream/10 border border-cream/15 p-5">
+                <p className="font-display text-lg font-bold">One per café, and we do check.</p>
+                <p className="text-sm text-cream/70 mt-2">
+                  This is for working cafés. A website or an Instagram with your address on it is
+                  all we need — we are not asking for paperwork, we just cannot send a hundred
+                  printed cups to somebody&apos;s kitchen. If you are not a café but you want to
+                  try the cups,{" "}
+                  <a href="/shop" className="underline font-semibold text-cream">
+                    a pack of 100 is {MIN_TRIO_CENTS}¢ a set
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-cream text-espresso p-6 sm:p-8">
+              <p className="font-display text-2xl font-extrabold">Tell us about your café</p>
+              <p className="text-sm text-espresso/65 mt-2">
+                We reply within one business day, and the box goes out the same week.
+              </p>
+              <div className="mt-5">
+                <LeadForm
+                  type="trial"
+                  submitLabel="Send my free hundred"
+                  successTitle="On its way to being checked."
+                  successText="We'll look you up and come back within one business day. If anything is missing we'll just ask."
+                  fields={[
+                    { name: "company", label: "Café name", required: true },
+                    { name: "proof", label: "Website or Instagram", required: true },
+                    { name: "address", label: "Street address", required: true, full: true },
+                    { name: "city", label: "City & province/state", required: true },
+                    { name: "phone", label: "Café phone", type: "tel", required: true },
+                    { name: "name", label: "Your name", required: true },
+                    {
+                      name: "role",
+                      label: "Your role",
+                      type: "select",
+                      required: true,
+                      options: ["Owner", "Manager", "Barista", "Something else"],
+                    },
+                    { name: "email", label: "Email", type: "email", required: true, full: true },
+                    {
+                      name: "volume",
+                      label: "Roughly how many cups a week?",
+                      type: "select",
+                      required: true,
+                      options: ["Under 500", "500–1,000", "1,000–3,000", "3,000–10,000", "10,000+"],
+                      full: true,
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
