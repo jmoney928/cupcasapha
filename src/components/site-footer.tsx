@@ -20,9 +20,9 @@ const cols = [
     links: [
       { href: "/shop", label: "Order packs" },
       { href: "/sleeve", label: "Design your sleeve" },
-      { href: "/shop/8oz-pha-cup", label: "8oz" },
-      { href: "/shop/12oz-pha-cup", label: "12oz" },
-      { href: "/shop/16oz-pha-cup", label: "16oz" },
+      { href: "/shop?size=8", label: "8oz" },
+      { href: "/shop?size=12", label: "12oz" },
+      { href: "/shop?size=16", label: "16oz" },
     ],
   },
   {

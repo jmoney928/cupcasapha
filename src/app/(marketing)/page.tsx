@@ -134,7 +134,7 @@ export default function Home() {
               { img: "/products/16oz-pha-cup.png", size: "16oz", name: "The Big One" },
             ].map((c, i) => (
               <Reveal key={c.size} delay={i * 90}>
-                <a href={`/shop/${c.size}-pha-cup`} className="group relative block rounded-3xl overflow-hidden aspect-[4/5] bg-cream">
+                <a href={`/shop?size=${c.size.replace("oz", "")}`} className="group relative block rounded-3xl overflow-hidden aspect-[4/5] bg-cream">
                   <Image
                     src={c.img}
                     alt={`${c.size} cupcasa PHA cup`}

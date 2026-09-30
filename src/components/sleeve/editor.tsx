@@ -21,9 +21,21 @@ const MAX_HISTORY = 60;
 /**
  * The sleeve editor. Everything runs here in the browser: nothing is uploaded, and the download is
  * produced by the same function that draws the canvas, so what is on screen is what goes to press.
+ *
+ * Standalone on /sleeve it takes no props. Inside the bundle builder the size has already been
+ * chosen, so it is seeded and the size switcher is hidden rather than left there to contradict
+ * the step before it, and every change is reported up so the flow knows there is artwork.
  */
-export function SleeveEditor() {
-  const [doc, setDoc] = useState<SleeveDoc>(() => emptyDoc(12));
+export function SleeveEditor({
+  initialSize = 12,
+  lockSize = false,
+  onChange,
+}: {
+  initialSize?: CupSize;
+  lockSize?: boolean;
+  onChange?: (doc: SleeveDoc) => void;
+} = {}) {
+  const [doc, setDoc] = useState<SleeveDoc>(() => emptyDoc(initialSize));
   const [past, setPast] = useState<SleeveDoc[]>([]);
   const [future, setFuture] = useState<SleeveDoc[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -194,11 +206,17 @@ export function SleeveEditor() {
 
   const d = sleeveDieline(doc.size);
 
+  const report = useRef(onChange);
+  report.current = onChange;
+  useEffect(() => {
+    report.current?.(doc);
+  }, [doc]);
+
   return (
     <div className="space-y-4">
       {/* toolbar */}
       <div className="flex flex-wrap items-center gap-2 rounded-3xl bg-cream-deep/50 border border-espresso/8 p-3">
-        <div className="flex gap-1.5">
+        {!lockSize && <div className="flex gap-1.5">
           {SLEEVE_SIZES.map((size) => (
             <button
               key={size}
@@ -212,9 +230,9 @@ export function SleeveEditor() {
               {size}oz
             </button>
           ))}
-        </div>
+        </div>}
 
-        <span className="w-px h-7 bg-espresso/10 mx-1" />
+        {!lockSize && <span className="w-px h-7 bg-espresso/10 mx-1" />}
 
         <button type="button" onClick={addText} className="btn-pill px-4 py-2 text-sm border-2 border-espresso/12 hover:border-coral">
           <Type className="w-4 h-4" /> Text

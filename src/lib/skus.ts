@@ -34,7 +34,7 @@ const packSku = (slug: string): Sku | undefined => {
     unit: "pack",
     unitPriceCents: p.totalCents,
     image: p.image,
-    href: `/shop/${p.oz}oz-pha-cup`,
+    href: `/shop?size=${p.oz}`,
     meta: `${p.packSize} cups, ${p.packSize} custom sleeves, ${p.packSize} lids · ${p.perTrioCents}¢ each`,
   };
 };
@@ -49,7 +49,7 @@ const caseSku = (slug: string): Sku | undefined => {
     unit: "case",
     unitPriceCents: Math.round(p.casePrice * 100),
     image: p.image,
-    href: `/shop/${p.slug}`,
+    href: `/shop?size=${p.oz}`,
     meta: `Case of ${p.caseCount.toLocaleString()} · ${Math.round(p.pricePerCup * 100)}¢ per cup`,
   };
 };
