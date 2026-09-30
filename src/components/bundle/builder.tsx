@@ -79,7 +79,10 @@ export function BundleBuilder() {
 
   const go = useCallback(
     (id: StepId) => {
-      router.push(id === "size" ? "/shop" : `/shop?step=${id}`, { scroll: false });
+      // Always carry the step, including the first one. Pushing a bare "/shop" from a URL that
+      // already has a query is a no-op in the App Router, which stranded both the clamp below
+      // and the rail's way back to step one.
+      router.push(`/shop?step=${id}`, { scroll: false });
       // The steps sit below the fold on a phone once the intro is scrolled past.
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
