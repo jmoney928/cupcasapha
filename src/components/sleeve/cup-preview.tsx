@@ -19,6 +19,18 @@ const SPIN = 0.35; // radians a second
 
 const PAPER = "#efe9dd";
 const PAPER_DARK = "#c9c0b1";
+
+/*
+ * The two things that make a paper cup read as one rather than as a cone.
+ *
+ * The lip is rolled outward over itself, so the opening is a couple of millimetres wider than
+ * the wall it sits on — which is also why a lid is wider than the cup. The base is the wall
+ * folded under and crimped, leaving a ring that steps proud of the wall just above the bottom.
+ * Both are plainly there on our own cups; measure one and these are the numbers.
+ */
+const RIM_ROLL_MM = 2.1;
+const BASE_ROLL_MM = 3.2;
+const BASE_FLARE_MM = 0.55;
 const LID = "#ddd6c7";
 const LID_TOP = "#e7e1d4";
 const LID_WELL = "#ded7c8";
@@ -193,9 +205,107 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
   ctx.fill();
   ctx.restore();
 
+  drawBaseRoll(ctx, view, rb, baseY, rt);
+
   if (tex) drawBand(ctx, doc, view, tex, rot);
 
-  drawLid(ctx, view, rt, topY);
+  /* The lid grips the rolled lip, not the wall, so it is set out by the roll as well. */
+  const rimOuter = rt + RIM_ROLL_MM * scale;
+  drawRim(ctx, view, rt, rimOuter, topY);
+  drawLid(ctx, view, rimOuter, topY);
+}
+
+/**
+ * The crimped base: the wall folded under itself, standing a hair proud of the cone and casting
+ * a thin shadow into the step. Drawn after the body so it sits on top of the gradient.
+ */
+function drawBaseRoll(
+  ctx: CanvasRenderingContext2D,
+  view: CupView,
+  rb: number,
+  baseY: number,
+  bodyR: number
+) {
+  const { cx, scale, tilt } = view;
+  const h = BASE_ROLL_MM * scale;
+  const ro = rb + BASE_FLARE_MM * scale;
+  const yTop = baseY - h;
+
+  /*
+   * A strip between two front-facing arcs, not a full silhouette.
+   *
+   * Taking the BACK arc for the top edge — as the body does for the cup's open mouth — was
+   * wrong here: the back of this ring is behind the cup, and drawing it ballooned a 3mm fold
+   * into a lens across the whole base. You only ever see the near side of a ring on the
+   * outside of a cone, so both edges are front arcs and the strip keeps its height all the
+   * way round.
+   */
+  ctx.beginPath();
+  ctx.ellipse(cx, baseY, ro, ro * tilt, 0, 0, Math.PI);
+  ctx.lineTo(cx - ro, yTop);
+  ctx.ellipse(cx, yTop, ro, ro * tilt, 0, Math.PI, 0, true);
+  ctx.closePath();
+  /*
+   * Lit across the same span as the body, not its own, so the tones line up where the two meet.
+   * Given its own gradient the ring came out paler than the wall above it and read as a glass
+   * tumbler base rather than a fold in the same paper.
+   */
+  const g = ctx.createLinearGradient(cx - bodyR, 0, cx + bodyR, 0);
+  g.addColorStop(0, PAPER_DARK);
+  g.addColorStop(0.32, PAPER);
+  g.addColorStop(0.72, PAPER);
+  g.addColorStop(1, PAPER_DARK);
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  /* Folded paper catches a little less light than the wall it came from. */
+  ctx.fillStyle = "rgba(26,26,26,0.05)";
+  ctx.fill();
+
+  /* The step itself: a shadow where the wall meets the ring, across the front only. */
+  ctx.save();
+  ctx.strokeStyle = "rgba(26,26,26,0.18)";
+  ctx.lineWidth = Math.max(0.6, 0.28 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, yTop, ro, ro * tilt, 0, 0, Math.PI);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * The rolled lip. Mostly hidden under a lid — which is the point: it is why the lid is wider
+ * than the wall — but a sliver of it shows where the skirt ends.
+ */
+function drawRim(
+  ctx: CanvasRenderingContext2D,
+  view: CupView,
+  rt: number,
+  rimOuter: number,
+  topY: number
+) {
+  const { cx, scale, tilt } = view;
+  const h = RIM_ROLL_MM * scale * 1.2;
+
+  ctx.beginPath();
+  ctx.moveTo(cx - rimOuter, topY);
+  ctx.ellipse(cx, topY, rimOuter, rimOuter * tilt, 0, Math.PI, Math.PI * 2);
+  ctx.lineTo(cx + rimOuter, topY + h);
+  ctx.ellipse(cx, topY + h, rimOuter, rimOuter * tilt, 0, 0, Math.PI);
+  ctx.closePath();
+  const g = ctx.createLinearGradient(cx - rimOuter, 0, cx + rimOuter, 0);
+  g.addColorStop(0, PAPER_DARK);
+  g.addColorStop(0.36, PAPER);
+  g.addColorStop(0.7, PAPER);
+  g.addColorStop(1, PAPER_DARK);
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  /* Where the roll meets the wall below it. */
+  ctx.strokeStyle = "rgba(26,26,26,0.12)";
+  ctx.lineWidth = Math.max(0.5, 0.3 * scale);
+  ctx.beginPath();
+  ctx.ellipse(cx, topY + h, rt, rt * tilt, 0, 0, Math.PI);
+  ctx.stroke();
 }
 
 /**
@@ -206,9 +316,10 @@ function draw(ctx: CanvasRenderingContext2D, doc: SleeveDoc, tex: HTMLImageEleme
  * clipped to the skirt — painting a gradient over a bare rect is what left a grey block hanging
  * off the sides.
  */
-function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimTop: number, topY: number) {
+function drawLid(ctx: CanvasRenderingContext2D, view: CupView, rimOuter: number, topY: number) {
   const { cx, scale, tilt } = view;
-  const skirtR = rimTop * 1.04;
+  /* It only has to clear the rolled lip, which is already in `rimOuter`. */
+  const skirtR = rimOuter * 1.015;
   /* Shallow: a lid grips the rim, it does not sit on the cup like a tub. */
   const skirtH = 3.2 * scale;
   const faceY = topY - skirtH;
