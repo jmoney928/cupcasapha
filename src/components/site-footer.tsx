@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { Logo, Mark, Particles } from "@/components/brand";
+import { CERT_ISSUER, CERT_ON_REQUEST } from "@/lib/certs";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -101,7 +102,17 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-14 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-cream/50">
+        {/* the fine print: the claim, and how to check it, on every page of the site */}
+        <p className="mt-14 pt-8 border-t border-cream/10 text-xs text-cream/40 max-w-3xl">
+          Cups are paper with a plant-based PHA lining, certified home compostable by{" "}
+          {CERT_ISSUER}. {CERT_ON_REQUEST} Email{" "}
+          <a href="mailto:hello@cupcasa.com" className="underline hover:text-cream/70">
+            hello@cupcasa.com
+          </a>{" "}
+          and we will send the certification documents for the cup and for the lining material.
+        </p>
+
+        <div className="mt-8 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-cream/50">
           <div className="flex items-center gap-3">
             <Mark variant="white" className="h-6 w-auto" />
             <span>© {new Date().getFullYear()} Cup Casa Inc.</span>

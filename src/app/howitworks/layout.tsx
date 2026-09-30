@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://cupcasa.com/howitworks" },
   openGraph: {
     title: "This cup is made to disappear",
-    description: "Plant-based PHA lining, no PE, no PLA, certified home compostable (TÜV Rheinland 9P0326). Here's what to do with it.",
+    description: "Plant-based PHA lining, no PE, no PLA, certified home compostable by TÜV Rheinland. Here's what to do with it.",
     url: "https://cupcasa.com/howitworks",
   },
 };

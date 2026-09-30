@@ -3,7 +3,7 @@ import { ShieldCheck, ExternalLink } from "lucide-react";
 import { CERT, CERT_ISSUER } from "@/lib/certs";
 
 /**
- * "Certified home compostable · TÜV Rheinland 9P0326". Plain text until CERT.entryUrl is set, then a link
+ * "Certified home compostable · TÜV Rheinland". Plain text until CERT.entryUrl is set, then a link
  * to the public register. Shows the DIN-Geprüft mark once CERT.logoSrc is set; a shield icon until then.
  */
 export function CertBadge({ variant = "light", size = "md" }: { variant?: "light" | "dark"; size?: "sm" | "md" }) {
@@ -19,14 +19,14 @@ export function CertBadge({ variant = "light", size = "md" }: { variant?: "light
         <ShieldCheck style={{ width: icon, height: icon }} className="shrink-0" />
       )}
       <span>
-        {CERT.title} · {CERT_ISSUER} <span className="tabular-nums">{CERT.number}</span>
+        {CERT.title} · {CERT_ISSUER}
       </span>
       {CERT.entryUrl && <ExternalLink className="w-3.5 h-3.5 opacity-60" aria-hidden />}
     </>
   );
   if (!CERT.entryUrl) return <span className={cls}>{inner}</span>;
   return (
-    <a href={CERT.entryUrl} target="_blank" rel="noopener noreferrer" className={`${cls} hover:opacity-90`} title={`Verify certificate ${CERT.number} on the public ${CERT_ISSUER} register`}>
+    <a href={CERT.entryUrl} target="_blank" rel="noopener noreferrer" className={`${cls} hover:opacity-90`} title={`Certified by ${CERT_ISSUER} — certifications available on request`}>
       {inner}
     </a>
   );

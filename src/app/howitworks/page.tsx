@@ -5,7 +5,7 @@ import { Button, Reveal } from "@/components/ui";
 import { Particles, Speckle } from "@/components/brand";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { CertBadge } from "@/components/cert-badge";
-import { CERT } from "@/lib/certs";
+import { CERT_ON_REQUEST } from "@/lib/certs";
 
 const dispose = [
   {
@@ -13,7 +13,7 @@ const dispose = [
     title: "Home compost",
     tag: "Best",
     /*
-     * The cup's certification (TÜV Rheinland 9P0326) covers the PHA lining, not the lid. The lid is
+     * The cup's TÜV Rheinland certification covers the PHA lining, not the lid. The lid is
      * moulded sugarcane fibre — a plant material, and described as one. Composting is stated of
      * the cup, which we can stand behind, and the lid is described by what it is made of.
      */
@@ -57,7 +57,7 @@ const faqs = [
   { q: "Is it safe to drink from?", a: "Yes. It’s food-safe. The lining is PHA, not polyethylene or PLA, so there’s no conventional plastic in contact with your drink." },
   { q: "Can I put it in the recycling instead?", a: "Please don't. Cups of any kind contaminate paper recycling. Compost or green bin is the right home for this one." },
   { q: "How long does it take to break down?", a: "Certified home-compost conditions: months, not centuries. Exact time depends on heat, moisture and how active your compost is." },
-  { q: "Why do you say “certified”?", a: "TÜV Rheinland, an independent certifier, tested the cup and issued certificate 9P0326 for home compostability. The PHA lining material holds its own TÜV Rheinland registrations too. We only claim what’s been tested." },
+  { q: "Why do you say “certified”?", a: "TÜV Rheinland, an independent certifier, tested the cup and certified it home compostable. The PHA lining material is certified too. We only claim what’s been tested, and we’ll send the certifications to anyone who asks." },
   { q: "Can I get these for my café?", a: "Yes. Cups are sold by the case of 1,000, and wholesale pricing is available for volume." },
 ];
 
@@ -193,7 +193,7 @@ export default function HowItWorksPage() {
           ))}
         </div>
         <p className="text-xs text-espresso/50 mt-4 max-w-2xl">
-          Certified home compostable by TÜV Rheinland, certificate {CERT.number}.
+          Certified home compostable by TÜV Rheinland. {CERT_ON_REQUEST}
         </p>
       </section>
 

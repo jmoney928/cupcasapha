@@ -85,7 +85,7 @@ function build(b: Base): Product {
       { label: "Wall", value: "Single wall — add a sleeve for hot drinks" },
       { label: "Finish", value: "Blank cup — your design prints on the sleeve" },
       { label: "Sold in", value: "Packs of 100, 200 or 500 sets" },
-      { label: "Certified", value: "Home compostable — TÜV Rheinland 9P0326" },
+      { label: "Certified", value: "Home compostable — TÜV Rheinland" },
     ],
   };
 }

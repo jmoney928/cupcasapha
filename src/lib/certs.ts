@@ -11,7 +11,17 @@
 /** How the certifier is named everywhere on the site. Never hard-code this. */
 export const CERT_ISSUER = "TÜV Rheinland";
 
-/** The cup's own certificate — the headline claim. */
+/**
+ * What the site says instead of publishing certificate numbers and register links.
+ *
+ * The numbers below are still the truth and are still what we send, but a registration number
+ * on a marketing page is a promise to keep it current: schemes get renewed, re-issued and
+ * re-numbered, and a stale number in a page's metadata is worse than no number at all. Anyone
+ * who wants the paperwork asks and gets it.
+ */
+export const CERT_ON_REQUEST = "Certifications available on request.";
+
+/** The cup's own certificate. Held for the record and for the document we send, not published. */
 export const CERT = {
   number: "9P0326",
   title: "Certified home compostable",
@@ -58,4 +68,4 @@ export const RESIN_REGISTER_URL = "https://www.dincertco.tuv.com/companies/89794
 
 export const MATERIAL_CLAIM = "No PE, no PLA, no microplastics — PHA lining";
 export const MATERIAL_SHORT = "No PE · no PLA · no microplastics";
-export const CERT_SHORT = `${CERT.title} — ${CERT_ISSUER} ${CERT.number}`;
+export const CERT_SHORT = `${CERT.title} — ${CERT_ISSUER}`;

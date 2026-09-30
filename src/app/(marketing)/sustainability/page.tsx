@@ -3,12 +3,12 @@ import { Ban, ShieldCheck, ArrowRight, Sprout, Search, Leaf } from "lucide-react
 import { Button, Reveal } from "@/components/ui";
 import { Speckle } from "@/components/brand";
 import { CertBadge } from "@/components/cert-badge";
-import { CERT, CERT_ISSUER, RESIN_CERTS, RESIN_CERT_HOLDER, RESIN_CERT_VALID_UNTIL, RESIN_REGISTER_URL, MATERIAL_CLAIM } from "@/lib/certs";
+import { CERT, CERT_ISSUER, CERT_ON_REQUEST, RESIN_CERT_HOLDER, MATERIAL_CLAIM } from "@/lib/certs";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
-    "PHA-lined paper cups certified home compostable by TÜV Rheinland, certificate 9P0326. No PE, no PLA, no microplastics.",
+    "PHA-lined paper cups certified home compostable by TÜV Rheinland. No PE, no PLA, no microplastics. Certifications available on request.",
 };
 
 const pillars = [
@@ -25,22 +25,21 @@ const pillars = [
   {
     icon: Search,
     title: "Verifiable, not just claimed",
-    text: `Certificate ${CERT.number} is issued by ${CERT_ISSUER}. The lining material carries its own public registrations as well.`,
+    text: `Independently certified by ${CERT_ISSUER}, and the lining material is certified in its own right. Ask and we will send the paperwork — to a café, a customer or a city.`,
   },
 ];
 
 const certs = [
   {
-    name: `${CERT.title} — ${CERT_ISSUER} ${CERT.number}`,
+    name: `${CERT.title} — ${CERT_ISSUER}`,
     body: "The cup is independently certified by TÜV Rheinland to break down in home and garden compost conditions.",
     tag: "Certified",
     icon: ShieldCheck,
   },
   {
-    name: `PHA lining resin — ${CERT_ISSUER} ${RESIN_CERTS[0].number}`,
-    body: `The lining material itself (${RESIN_CERT_HOLDER}) holds ${CERT_ISSUER} registrations for home & garden composting (${RESIN_CERTS[0].number}), industrial composting (${RESIN_CERTS[1].number}) and the Seedling mark (${RESIN_CERTS[2].number}), valid to ${RESIN_CERT_VALID_UNTIL}.`,
+    name: `PHA lining resin — ${CERT_ISSUER}`,
+    body: `The lining material itself (${RESIN_CERT_HOLDER}) is separately certified for home and garden composting, for industrial composting, and carries the Seedling mark.`,
     tag: "Material",
-    href: RESIN_REGISTER_URL,
     icon: Leaf,
   },
   {
@@ -99,7 +98,7 @@ export default function SustainabilityPage() {
           <div className="grid sm:grid-cols-3 gap-8 text-center">
             {[
               { v: "0%", l: "PE or PLA in the lining" },
-              { v: CERT.number, l: "TÜV Rheinland certificate, home compostable" },
+              { v: "Certified", l: `home compostable by ${CERT_ISSUER}` },
               { v: "Home", l: "compost — not just industrial" },
             ].map((s) => (
               <div key={s.l}>
@@ -135,11 +134,6 @@ export default function SustainabilityPage() {
                   <p className="text-espresso/65 text-sm mt-1">{c.body}</p>
                   <div className="flex items-center gap-3 mt-2">
                     <span className={`label-caps ${c.tag === "Certified" ? "text-leaf" : "text-espresso/40"}`}>{c.tag}</span>
-                    {c.href && (
-                      <a href={c.href} target="_blank" rel="noopener noreferrer" className="text-xs font-bold underline text-espresso/70 hover:text-espresso">
-                        View on the {CERT_ISSUER} register →
-                      </a>
-                    )}
                   </div>
                 </div>
               </div>
@@ -147,8 +141,8 @@ export default function SustainabilityPage() {
           ))}
         </div>
         <p className="text-xs text-espresso/45 mt-5 max-w-2xl">
-          Certificates are issued by TÜV Rheinland and listed on its public DIN CERTCO register.
-          Certificate documents are available on request at hello@cupcasa.com.
+          {CERT_ON_REQUEST} Email hello@cupcasa.com and we will send the certification documents
+          for the cup and for the lining material.
         </p>
       </section>
 
@@ -158,10 +152,10 @@ export default function SustainabilityPage() {
           <Speckle className="absolute bottom-0 right-0 w-1/2 h-2/3 text-white/25" />
           <div className="relative">
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold">
-              See the certificate.
+              See the certifications.
             </h2>
             <p className="text-white/85 mt-4 max-w-xl mx-auto">
-              We&apos;ll send the TÜV Rheinland document for certificate 9P0326 to anyone who asks.
+              We&apos;ll send the TÜV Rheinland documents to anyone who asks — no account, no form.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-8">
               <Button href="/shop" variant="cream" size="lg">
