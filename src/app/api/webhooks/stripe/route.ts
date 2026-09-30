@@ -81,6 +81,13 @@ async function notifyOrder(stripe: Stripe, session: Stripe.Checkout.Session) {
         .join(", ")
     : "—";
 
+  /* Whatever the builder recorded about the sleeves, straight off the payment. The artwork
+     itself arrived separately when checkout started, under this same session id. */
+  const sleeves = Object.entries(session.metadata ?? {})
+    .filter(([k]) => k.startsWith("sleeve_"))
+    .map(([, v]) => v)
+    .join("\n");
+
   const total = fmt(session.amount_total, cur);
   const name = cd?.name ?? "Customer";
   const email = cd?.email ?? "—";
@@ -92,13 +99,23 @@ async function notifyOrder(stripe: Stripe, session: Stripe.Checkout.Session) {
     to,
     replyTo: cd?.email ? cd.email : undefined,
     subject: `🎉 New order — ${total} (${name})`,
-    text: `New order on cupcasa.com\n\nTotal: ${total}\n\nItems:\n${items}\n\nCustomer: ${name}\nEmail: ${email}\nPhone: ${phone}\nShip to: ${addrStr}`,
+    text:
+      `New order on cupcasa.com\n\nTotal: ${total}\n\nItems:\n${items}\n` +
+      (sleeves ? `\nSleeves:\n${sleeves}\nArtwork was emailed separately under session ${session.id}.\n` : "") +
+      `\nCustomer: ${name}\nEmail: ${email}\nPhone: ${phone}\nShip to: ${addrStr}\n\nSession: ${session.id}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:560px">
         <h2 style="color:#3a2417;margin-bottom:2px">🎉 New order — ${esc(total)}</h2>
         <p style="color:#6f4a30;margin-top:0">via cupcasa.com</p>
         <h3 style="color:#3a2417;margin-bottom:6px">Items</h3>
         <p style="color:#3a2417;white-space:pre-line;margin-top:0">${esc(items)}</p>
+        ${
+          sleeves
+            ? `<h3 style="color:#3a2417;margin-bottom:6px">Sleeves</h3>
+               <p style="color:#3a2417;white-space:pre-line;margin-top:0">${esc(sleeves)}</p>
+               <p style="color:#6f4a30;font-size:13px;margin-top:4px">The print files were emailed when checkout started, under session <code>${esc(session.id)}</code>.</p>`
+            : ""
+        }
         <h3 style="color:#3a2417;margin-bottom:6px">Customer</h3>
         <table style="border-collapse:collapse;color:#3a2417">
           <tr><td style="padding:4px 12px 4px 0;color:#6f4a30">Name</td><td>${esc(name)}</td></tr>

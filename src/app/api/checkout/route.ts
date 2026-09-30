@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { findSku } from "@/lib/skus";
 import { DEPOSIT_CENTS } from "@/lib/deposit";
+import { sanitiseArtwork, type Artwork } from "@/lib/artwork";
+import { Resend } from "resend";
 
 type IncomingItem = { slug: string; qty: number };
 
@@ -19,12 +21,14 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { items?: IncomingItem[] };
+  let body: { items?: IncomingItem[]; artwork?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
+
+  const artwork = sanitiseArtwork(body.artwork);
 
   const items = (body.items ?? [])
     .filter((i) => i && typeof i.slug === "string" && Number.isFinite(Number(i.qty)) && Number(i.qty) > 0)
@@ -53,12 +57,17 @@ export async function POST(req: Request) {
     const sku = findSku(item.slug);
     if (!sku) continue;
     if (sku.kind === "pack") {
+      const art = artwork.find((a) => a.slug === sku.slug);
       line_items.push({
         quantity: item.qty,
         price_data: {
           currency: "cad",
           unit_amount: sku.unitPriceCents,
-          product_data: { name: `cupcasa — ${sku.name}`, description: sku.meta },
+          product_data: {
+            name: `cupcasa — ${sku.name}`,
+            // Stripe caps a description at 500; the sleeve summary is the useful half.
+            description: `${sku.meta}${art?.summary ? ` · Sleeve: ${art.summary}` : ""}`.slice(0, 500),
+          },
         },
       });
     } else {
@@ -98,8 +107,25 @@ export async function POST(req: Request) {
       metadata: {
         type: reserved ? "packs_and_reservation" : "packs",
         reserved: reserved.slice(0, 490),
+        // Stripe allows 50 keys of 500 characters. The sleeve description lives here so the
+        // payment record alone is enough to know what was ordered, with no other system.
+        ...Object.fromEntries(
+          artwork
+            .slice(0, 10)
+            .map((a, i) => [
+              `sleeve_${i + 1}`,
+              `${a.slug}: ${a.summary}${a.svg ? "" : " [ARTWORK FILE MISSING — ask the customer]"}`.slice(0, 490),
+            ])
+        ),
       },
     });
+    // The file goes now rather than on payment: by the time the webhook fires the browser that
+    // held it is gone. An abandoned checkout costs us a stray email; the other way round costs
+    // us the artwork for an order somebody paid for.
+    await sendArtwork(artwork, session.id).catch((err) =>
+      console.error("Artwork email failed (order unaffected):", err)
+    );
+
     return NextResponse.json({ url: session.url });
   } catch (err) {
     console.error("Stripe checkout error", err);
@@ -108,4 +134,42 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Emails the print files to us, one attachment per sleeve, tagged with the Checkout Session that
+ * will pay for them. The webhook's order email carries the same id, so the two meet in the inbox.
+ *
+ * Never throws into the checkout path: a failure here must not cost a sale.
+ */
+async function sendArtwork(artwork: Artwork[], sessionId: string) {
+  const withFiles = artwork.filter((a) => a.svg);
+  if (withFiles.length === 0) return;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("RESEND_API_KEY not set — artwork not sent.");
+    return;
+  }
+  const to = process.env.LEADS_EMAIL ?? "hello@cupcasa.com";
+  const from = process.env.LEADS_FROM ?? "cupcasa cups <onboarding@resend.dev>";
+
+  const lines = artwork
+    .map((a) => `${a.slug} (${a.oz}oz): ${a.summary}${a.svg ? "" : " — FILE MISSING, ask the customer"}`)
+    .join("\n");
+
+  const resend = new Resend(apiKey);
+  await resend.emails.send({
+    from,
+    to,
+    subject: `Sleeve artwork — checkout ${sessionId.slice(-8)}`,
+    text:
+      `Artwork for a checkout in progress.\n\nSession: ${sessionId}\n\n${lines}\n\n` +
+      `This arrives when checkout starts, so it may not have been paid for. The order email ` +
+      `for this session confirms that.`,
+    attachments: withFiles.map((a) => ({
+      filename: `${a.slug}-sleeve.svg`,
+      content: Buffer.from(a.svg as string).toString("base64"),
+    })),
+  });
 }

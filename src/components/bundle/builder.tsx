@@ -53,6 +53,9 @@ export function BundleBuilder() {
   // bundle must never make the first client render disagree with the server's.
   const [bundle, setBundle] = useState<Bundle>(emptyBundle);
   const [ready, setReady] = useState(false);
+  /* The live sleeve. A ref, not state — the editor emits on every keystroke and re-rendering
+     the whole flow for each one would be wasteful and would fight the canvas. */
+  const doc = useRef<SleeveDoc | null>(null);
 
   useEffect(() => {
     const saved = load();
@@ -146,10 +149,14 @@ export function BundleBuilder() {
       )}
 
       {current === "design" && bundle.oz !== null && (
-        <DesignStep oz={bundle.oz} onDesigned={() => !bundle.artwork && set({ artwork: true, designed: true })} />
+        <DesignStep
+          oz={bundle.oz}
+          docRef={doc}
+          onDesigned={() => !bundle.artwork && set({ artwork: true, designed: true })}
+        />
       )}
 
-      {current === "review" && <StepReview bundle={bundle} onGo={go} />}
+      {current === "review" && <StepReview bundle={bundle} docRef={doc} onGo={go} />}
 
       {current !== "review" && (
         <div className="flex items-center justify-between gap-3 pt-2">
@@ -188,19 +195,28 @@ export function BundleBuilder() {
  * The editor, seeded with the size already chosen. "Designed" means the document moved off the
  * one the editor opens with — so arriving, looking, and leaving does not count as artwork.
  */
-function DesignStep({ oz, onDesigned }: { oz: CupSize; onDesigned: () => void }) {
+function DesignStep({
+  oz,
+  docRef,
+  onDesigned,
+}: {
+  oz: CupSize;
+  docRef: React.RefObject<SleeveDoc | null>;
+  onDesigned: () => void;
+}) {
   const initial = useRef<string | null>(null);
 
   const onChange = useCallback(
-    (doc: SleeveDoc) => {
-      const shape = JSON.stringify(doc);
+    (next: SleeveDoc) => {
+      docRef.current = next;
+      const shape = JSON.stringify(next);
       if (initial.current === null) {
         initial.current = shape;
         return;
       }
       if (shape !== initial.current) onDesigned();
     },
-    [onDesigned]
+    [docRef, onDesigned]
   );
 
   return (

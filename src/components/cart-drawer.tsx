@@ -7,6 +7,7 @@ import { useCart } from "@/components/cart-context";
 import { findSku, formatCents } from "@/lib/skus";
 import { DEPOSIT_CENTS } from "@/lib/deposit";
 import { fbqTrack } from "@/lib/fbq";
+import { loadArtwork } from "@/lib/artwork";
 import { Cup } from "@/components/cup";
 
 export function CartDrawer() {
@@ -30,7 +31,12 @@ export function CartDrawer() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        // Only the artwork for what is actually being bought; a sleeve left over from a
+        // bundle the person removed is not part of this order.
+        body: JSON.stringify({
+          items,
+          artwork: loadArtwork().filter((a) => items.some((i) => i.slug === a.slug)),
+        }),
       });
       const data = await res.json();
       if (data.url) {

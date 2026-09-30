@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { AlertCircle, ArrowRight, Loader2, Pencil } from "lucide-react";
 import { useCart } from "@/components/cart-context";
+import { buildArtwork, describeDoc, saveArtwork } from "@/lib/artwork";
+import { renderDoc } from "@/lib/sleeve/render-doc";
+import type { SleeveDoc } from "@/lib/sleeve/doc";
 import { formatCents } from "@/lib/skus";
 import { DEPOSIT_CENTS } from "@/lib/deposit";
 import { CAFE_OFFER } from "@/lib/cafe-offer";
@@ -43,7 +46,15 @@ function Line({
   );
 }
 
-export function StepReview({ bundle, onGo }: { bundle: Bundle; onGo: (id: StepId) => void }) {
+export function StepReview({
+  bundle,
+  docRef,
+  onGo,
+}: {
+  bundle: Bundle;
+  docRef: React.RefObject<SleeveDoc | null>;
+  onGo: (id: StepId) => void;
+}) {
   const { add, setOpen } = useCart();
   const [busy, setBusy] = useState(false);
 
@@ -59,6 +70,16 @@ export function StepReview({ bundle, onGo }: { bundle: Bundle; onGo: (id: StepId
   const addToCart = () => {
     if (hand?.kind !== "cart") return;
     setBusy(true);
+    /* The sleeve goes with the SKU it was drawn for. It is put aside here rather than at
+       checkout because by then the editor is long unmounted and the document is gone. */
+    const sleeve = docRef.current;
+    if (opt.hasSleeve && sleeve) {
+      try {
+        saveArtwork(buildArtwork(hand.slug, oz, describeDoc(sleeve), renderDoc(sleeve)));
+      } catch {
+        // Losing the file must not lose the order; the order email says to chase it.
+      }
+    }
     add(hand.slug, hand.qty);
     setOpen(true);
     setBusy(false);
