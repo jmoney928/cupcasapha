@@ -53,7 +53,8 @@ export const BUYER_OPTIONS: BuyerOption[] = [
     blurb:
       "Cases of a thousand at published café pricing, reserved against one flat deposit rather than paid up front.",
     points: [
-      `Cases of ${CAFE_OFFER.caseCount.toLocaleString()} at café pricing`,
+      // Locale pinned: this renders on the server too, and "1.000" vs "1,000" is a hydration mismatch.
+      `Cases of ${CAFE_OFFER.caseCount.toLocaleString("en-US")} at café pricing`,
       `Your first ${CAFE_OFFER.trialCount} cups, lids and sleeves free`,
       "Cup Casa OS included, not upsold",
     ],

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, Palette } from "lucide-react";
 import { SleeveEditor } from "@/components/sleeve/editor";
 import { resize, type SleeveDoc } from "@/lib/sleeve/doc";
@@ -57,25 +56,63 @@ function load(): Bundle {
   }
 }
 
-export function BundleBuilder() {
-  const router = useRouter();
-  const params = useSearchParams();
+/**
+ * Writes the step into the address bar. A side effect, never the source of truth: the wizard
+ * must keep working if this fails, and in odd embeds (in-app browsers, sandboxed webviews)
+ * history calls can throw. Next integrates native pushState/replaceState with its router, so
+ * this costs no server round-trip and no framework machinery at all.
+ */
+function mirror(id: StepId, replace = false) {
+  try {
+    const url = `/shop?step=${id}`;
+    if (replace) window.history.replaceState(null, "", url);
+    else window.history.pushState(null, "", url);
+  } catch {}
+}
 
+/**
+ * Jump, do not glide, and say so explicitly: globals.css sets `html { scroll-behavior: smooth }`,
+ * and an unspecified behaviour inherits that, so plain `scrollTo({top: 0})` animates. On a page
+ * as tall as the design step the glide runs long enough that the next thing someone clicks
+ * slides out from under the cursor — indistinguishable from a broken button. The catch covers
+ * engines old enough to reject "instant" as an enum value rather than ignore it.
+ */
+function jumpToTop() {
+  try {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } catch {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function BundleBuilder() {
   // Start empty on both server and client, then adopt saved answers after mount — a stored
   // bundle must never make the first client render disagree with the server's.
   const [bundle, setBundle] = useState<Bundle>(emptyBundle);
   const [ready, setReady] = useState(false);
   /** A design waiting to be picked up from the standalone sleeve designer. */
   const [carried, setCarried] = useState(false);
+  /*
+   * The step being shown — plain state, deliberately not derived from the URL. When it was, a
+   * click had to survive the whole router pipeline before anything on screen changed, and any
+   * failure in that pipeline froze every button while the selection ticks still rendered.
+   * Advancing now needs nothing but React; the URL is written afterwards, and read only on
+   * arrival and when the back button fires.
+   */
+  const [current, setCurrent] = useState<StepId>("who");
   /* The live sleeve. A ref, not state — the editor emits on every keystroke and re-rendering
      the whole flow for each one would be wasteful and would fight the canvas. */
   const doc = useRef<SleeveDoc | null>(null);
+  /* For the popstate listener, which outlives any one render. */
+  const bundleRef = useRef(bundle);
+  bundleRef.current = bundle;
 
   useEffect(() => {
     const saved = load();
+    const url = new URLSearchParams(window.location.search);
     // A redirected product link carries its size; it wins over whatever was saved before.
-    const asked = Number(params.get("size"));
-    const askedWho = params.get("who");
+    const asked = Number(url.get("size"));
+    const askedWho = url.get("who");
     let seeded = saved;
     if ([8, 12, 16].includes(asked)) {
       seeded =
@@ -93,14 +130,25 @@ export function BundleBuilder() {
     }
     setBundle(seeded);
     setCarried(hasStashedSleeve());
+    /* Land where the link asks, clamped to what the bundle has earned. A link that answers a
+       step has answered it: "Reserve cases" arriving with ?who=cafe lands on size, not on the
+       fork it just came through. */
+    const askedStep = (url.get("step") as StepId | null) ?? firstIncomplete(seeded);
+    const landing = reachableStep(seeded, askedStep);
+    setCurrent(landing);
+    mirror(landing, true);
     setReady(true);
-    /* A link that answers a step has answered it. "Reserve cases" arriving from the café page
-       should not be shown the who-are-you fork it just came through; the clamp below only pulls
-       people back, never forward, so the landing step is set here. */
-    if (!params.get("step") && (askedWho === "self" || askedWho === "cafe")) {
-      router.replace(`/shop?step=${firstIncomplete(seeded)}`, { scroll: false });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Back and forward move the wizard. This is the only place the URL is read after arrival. */
+  useEffect(() => {
+    const onPop = () => {
+      const id = new URLSearchParams(window.location.search).get("step") as StepId | null;
+      const b = bundleRef.current;
+      setCurrent(reachableStep(b, id ?? firstIncomplete(b)));
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   useEffect(() => {
@@ -111,31 +159,12 @@ export function BundleBuilder() {
   }, [bundle, ready]);
 
   const steps = useMemo(() => stepsFor(bundle), [bundle]);
-  const wanted = (params.get("step") ?? "who") as StepId;
-  const current = ready ? reachableStep(bundle, wanted) : "who";
 
-  const go = useCallback(
-    (id: StepId) => {
-      // Always carry the step, including the first one. Pushing a bare "/shop" from a URL that
-      // already has a query is a no-op in the App Router, which stranded both the clamp below
-      // and the rail's way back to step one.
-      router.push(`/shop?step=${id}`, { scroll: false });
-      /*
-       * Jump, do not glide, and say so explicitly: globals.css sets `html { scroll-behavior:
-       * smooth }`, and an unspecified behaviour inherits that, so plain `scrollTo({top: 0})`
-       * animates too. On a page as tall as the design step the glide runs long enough that the
-       * next thing someone clicks slides out from under the cursor and the click lands on
-       * nothing — indistinguishable, from the other side of the screen, from a broken button.
-       */
-      window.scrollTo({ top: 0, behavior: "instant" });
-    },
-    [router]
-  );
-
-  // A deep link past an unanswered step is clamped above; keep the URL honest about it.
-  useEffect(() => {
-    if (ready && wanted !== current) go(current);
-  }, [ready, wanted, current, go]);
+  const go = useCallback((id: StepId) => {
+    setCurrent(id);
+    mirror(id);
+    jumpToTop();
+  }, []);
 
   const at = steps.findIndex((s) => s.id === current);
   const limit = firstIncomplete(bundle);

@@ -53,7 +53,7 @@ export default function ShopPage() {
       </section>
 
       <section className="section-pad pb-20">
-        {/* useSearchParams needs a boundary; the rail is what the fallback stands in for. */}
+        {/* The builder reads the URL itself on mount; the boundary stays as a safety net. */}
         <Suspense fallback={<div className="h-12 rounded-full bg-espresso/5 animate-pulse" />}>
           <BundleBuilder />
         </Suspense>
