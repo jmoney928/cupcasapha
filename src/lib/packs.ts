@@ -11,7 +11,7 @@ export const PACK_SIZES = [100, 200, 500] as const;
 export type PackSize = (typeof PACK_SIZES)[number];
 
 /** Per-trio price of the 8oz, in cents. Bigger pack, lower price. */
-const BASE_CENTS: Record<PackSize, number> = { 100: 50, 200: 45, 500: 35 };
+const BASE_CENTS: Record<PackSize, number> = { 100: 57, 200: 52, 500: 47 };
 
 /** Each size step up the range adds this much per trio. */
 const SIZE_STEP_CENTS = 2;
@@ -52,6 +52,12 @@ function build(packSize: PackSize, oz: CupSize): Pack {
 export const packs: Pack[] = PACK_SIZES.flatMap((size) => SIZES.map((oz) => build(size, oz)));
 
 export const getPack = (slug: string) => packs.find((p) => p.slug === slug);
+
+/**
+ * The cheapest a set can be — the biggest pack in the smallest size. Every "from …" on the
+ * site reads this, so a reprice can never leave a headline quoting a price nobody can buy.
+ */
+export const MIN_TRIO_CENTS = Math.min(...packs.map((p) => p.perTrioCents));
 
 /** The packs for one size, smallest first — what a size's buy panel renders. */
 export const packsForSize = (oz: CupSize) => packs.filter((p) => p.oz === oz);

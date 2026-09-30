@@ -13,6 +13,7 @@ import { Particles, Speckle, Mark } from "@/components/brand";
 import { ReserveStrip } from "@/components/reserve-strip";
 import { CertBadge } from "@/components/cert-badge";
 import { cafeRows, CAFE_OFFER } from "@/lib/cafe-offer";
+import { MIN_TRIO_CENTS } from "@/lib/packs";
 import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
 
 const heroSlides: HeroSlide[] = [
@@ -52,7 +53,7 @@ export default function Home() {
             </h1>
             <p className="text-lg text-cream/80 mt-6 max-w-md">
               Home-compostable PHA-lined cups, a lid, and a sleeve printed with your
-              design — from 35¢ a set. No PE, no PLA, no microplastics.
+              design — from {MIN_TRIO_CENTS}¢ a set. No PE, no PLA, no microplastics.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button href="/shop" variant="primary" size="lg">

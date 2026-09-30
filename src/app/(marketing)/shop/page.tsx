@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Leaf, Package, Recycle, Palette } from "lucide-react";
 import { products } from "@/lib/products";
+import { MIN_TRIO_CENTS } from "@/lib/packs";
 import { CERT_SHORT, MATERIAL_SHORT } from "@/lib/certs";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/ui";
@@ -8,7 +9,7 @@ import { Reveal } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Shop PHA Cups",
   description:
-    "PHA-lined paper cups in 8oz, 12oz and 16oz, sold as packs of cups, custom-printed sleeves and lids. Certified home compostable by DIN CERTCO. No PE, no PLA. From 35¢ a set.",
+    `PHA-lined paper cups in 8oz, 12oz and 16oz, sold as packs of cups, custom-printed sleeves and lids. Certified home compostable by DIN CERTCO. No PE, no PLA. From ${MIN_TRIO_CENTS}¢ a set.`,
 };
 
 const perks = [
@@ -26,7 +27,7 @@ export default function ShopPage() {
         <h1 className="font-display text-5xl sm:text-6xl mt-4">Pick your pack.</h1>
         <p className="text-lg text-espresso/70 mt-4 max-w-xl mx-auto">
           Every pack is a matched set: a PHA-lined cup, a sleeve printed with your design,
-          and a lid. From <strong>35¢ a set</strong>, arriving{" "}
+          and a lid. From <strong>{MIN_TRIO_CENTS}¢ a set</strong>, arriving{" "}
           <strong>December 2026</strong>. Running a café?{" "}
           <a href="/wholesale" className="text-coral font-semibold underline">See case pricing</a>.
         </p>
