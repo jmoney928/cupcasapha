@@ -21,7 +21,13 @@ export default function AboutPage() {
       <section className="section-pad pt-12 pb-12 relative overflow-hidden">
         <div className="absolute -top-10 right-0 w-96 h-96 rounded-full bg-caramel-light/30 blur-3xl" />
         <div className="relative grid lg:grid-cols-2 gap-10 items-center">
-          <div>
+          {/*
+            * min-w-0 on both columns: a grid column grows to its widest child's min-content,
+            * and the fixed-width cup row once inflated it past the phone's width — which
+            * dragged the heading and paragraph wide too, where the section's overflow-hidden
+            * cut them off mid-word. Nothing in here may ever set the column's width again.
+            */}
+          <div className="min-w-0">
             <Eyebrow color="caramel">Our story</Eyebrow>
             <h1 className="font-display text-5xl sm:text-6xl font-bold mt-5 leading-[0.95]">
               The home of <span className="text-coral">honest cups.</span>
@@ -38,14 +44,14 @@ export default function AboutPage() {
               </Button>
             </div>
           </div>
-          <div className="flex justify-center gap-4">
-            <div className="w-32 animate-float">
+          <div className="min-w-0 flex justify-center gap-3 sm:gap-4">
+            <div className="w-24 sm:w-32 animate-float">
               <Cup tone="coral" />
             </div>
-            <div className="w-36 animate-float-slow mt-10">
+            <div className="w-28 sm:w-36 animate-float-slow mt-10">
               <Cup tone="leaf" />
             </div>
-            <div className="w-28 animate-float mt-4" style={{ animationDelay: "0.8s" }}>
+            <div className="w-20 sm:w-28 animate-float mt-4" style={{ animationDelay: "0.8s" }}>
               <Cup tone="caramel" />
             </div>
           </div>
