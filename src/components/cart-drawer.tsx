@@ -64,6 +64,9 @@ export function CartDrawer() {
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-hidden={!isOpen}
+        /* inert as well: aria-hidden alone leaves the close and checkout buttons tabbable from
+           behind the page, which is both an axe violation and a genuinely weird keyboard trap. */
+        inert={!isOpen}
       >
         <div className="flex items-center justify-between p-5 border-b border-caramel/25">
           <h2 className="font-display text-2xl font-bold">

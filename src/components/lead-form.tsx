@@ -74,14 +74,19 @@ export function LeadForm({
       onSubmit={handleSubmit}
       className="rounded-3xl bg-white/70 border border-caramel/20 p-6 sm:p-8 grid sm:grid-cols-2 gap-4"
     >
-      {fields.map((f) => (
+      {fields.map((f) => {
+        /* The label must be *attached*, not adjacent: an unassociated label reads as silence
+           to a screen reader, and these are the forms the business runs on. */
+        const id = `lead-${type}-${f.name}`;
+        return (
         <div key={f.name} className={f.full || f.type === "textarea" ? "sm:col-span-2" : ""}>
-          <label className="block text-sm font-bold mb-1.5 text-espresso/80">
+          <label htmlFor={id} className="block text-sm font-bold mb-1.5 text-espresso/80">
             {f.label}
             {f.required && <span className="text-coral"> *</span>}
           </label>
           {f.type === "textarea" ? (
             <textarea
+              id={id}
               name={f.name}
               required={f.required}
               defaultValue={defaults?.[f.name]}
@@ -90,6 +95,7 @@ export function LeadForm({
             />
           ) : f.type === "select" ? (
             <select
+              id={id}
               name={f.name}
               required={f.required}
               defaultValue={defaults?.[f.name] ?? ""}
@@ -106,6 +112,7 @@ export function LeadForm({
             </select>
           ) : (
             <input
+              id={id}
               name={f.name}
               type={f.type ?? "text"}
               required={f.required}
@@ -114,7 +121,8 @@ export function LeadForm({
             />
           )}
         </div>
-      ))}
+        );
+      })}
 
       {error && (
         <p className="sm:col-span-2 text-coral font-semibold bg-coral/10 rounded-xl p-3 text-sm">

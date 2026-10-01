@@ -50,7 +50,7 @@ const cols = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-espresso text-cream/75 mt-24">
+    <footer className="bg-espresso text-cream/80 mt-24">
       <div className="section-pad py-16">
         {/* newsletter */}
         <div className="pb-12 mb-12 border-b border-cream/10 grid lg:grid-cols-2 gap-6 lg:items-center">
@@ -58,7 +58,7 @@ export function SiteFooter() {
             <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-cream tracking-tight">
               Know when they land.
             </h3>
-            <p className="text-cream/60 mt-2 max-w-md">
+            <p className="text-cream/70 mt-2 max-w-md">
               The occasional email about shipping dates, pricing and new sizes. Nothing else.
             </p>
           </div>
@@ -68,7 +68,7 @@ export function SiteFooter() {
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo variant="white" className="h-7 w-auto mb-5" />
-            <p className="max-w-xs text-cream/60 leading-relaxed">
+            <p className="max-w-xs text-cream/70 leading-relaxed">
               Home-compostable PHA-lined paper cups for hot and cold drinks.
               No PE, no PLA, no microplastics.
             </p>
@@ -103,7 +103,7 @@ export function SiteFooter() {
         </div>
 
         {/* the fine print: the claim, and how to check it, on every page of the site */}
-        <p className="mt-14 pt-8 border-t border-cream/10 text-xs text-cream/40 max-w-3xl">
+        <p className="mt-14 pt-8 border-t border-cream/10 text-xs text-cream/60 max-w-3xl">
           Cups are paper with a plant-based PHA lining, certified home compostable by{" "}
           {CERT_ISSUER}. {CERT_ON_REQUEST} Email{" "}
           <a href="mailto:hello@cupcasa.com" className="underline hover:text-cream/70">
@@ -112,7 +112,7 @@ export function SiteFooter() {
           and we will send the certification documents for the cup and for the lining material.
         </p>
 
-        <div className="mt-8 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-cream/50">
+        <div className="mt-8 pt-8 border-t border-cream/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-cream/65">
           <div className="flex items-center gap-3">
             <Mark variant="white" className="h-6 w-auto" />
             <span>© {new Date().getFullYear()} Cup Casa Inc.</span>

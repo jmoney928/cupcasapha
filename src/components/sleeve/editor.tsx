@@ -299,6 +299,7 @@ export function SleeveEditor({
 
       <input
         ref={fileInput}
+        aria-label="Upload a logo or picture for the sleeve"
         type="file"
         accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
         className="sr-only"
@@ -311,6 +312,7 @@ export function SleeveEditor({
 
       <input
         ref={bgInput}
+        aria-label="Upload a background picture for the sleeve"
         type="file"
         accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
         className="sr-only"
