@@ -1,9 +1,14 @@
 "use client";
 
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import { useEffect, useState } from "react";
 
-export type HeroSlide = { src: string; alt: string };
+export type HeroSlide = {
+  src: string;
+  alt: string;
+  /** A portrait recomposition for phones. Without one, the landscape is cropped as before. */
+  mobileSrc?: string;
+};
 
 const INTERVAL_MS = 6000;
 
@@ -53,25 +58,7 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
       onBlurCapture={() => setPaused(false)}
     >
       {slides.map((slide, i) => (
-        <Image
-          key={slide.src}
-          src={slide.src}
-          alt={slide.alt}
-          fill
-          priority={i === 0}
-          sizes="100vw"
-          /*
-           * Full width on a wide screen crops the 16:9 photo vertically, so x doesn't matter there.
-           * A phone crops it hard horizontally instead, and the cups sit right of centre in all
-           * three frames — centring would cut every one of them off.
-           */
-          className="object-cover object-[75%_center] sm:object-center"
-          style={{
-            opacity: i === index ? 1 : 0,
-            transition: reduced ? "none" : "opacity 900ms ease-in-out",
-          }}
-          aria-hidden={i !== index}
-        />
+        <Slide key={slide.src} slide={slide} shown={i === index} first={i === 0} reduced={reduced} />
       ))}
 
       {/*
@@ -103,5 +90,53 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * One photo, art-directed: phones get the portrait shot where one exists, everything wider gets
+ * the landscape. <Image> cannot serve two different pictures from one slot, so this drops down
+ * to getImageProps and a <picture> — the browser downloads only whichever source matches, which
+ * matters on exactly the connections the mobile shots exist for.
+ */
+function Slide({
+  slide,
+  shown,
+  first,
+  reduced,
+}: {
+  slide: HeroSlide;
+  shown: boolean;
+  first: boolean;
+  reduced: boolean;
+}) {
+  const common = { alt: slide.alt, fill: true as const, sizes: "100vw", priority: first };
+  const desktop = getImageProps({ ...common, src: slide.src });
+  const mobile = slide.mobileSrc ? getImageProps({ ...common, src: slide.mobileSrc }) : null;
+  const { alt, ...img } = desktop.props;
+
+  return (
+    <picture>
+      {/* 639px: everything below Tailwind's sm, matching the layout's own breakpoint. */}
+      {mobile && <source media="(max-width: 639px)" srcSet={mobile.props.srcSet} sizes="100vw" />}
+      <img
+        {...img}
+        alt={alt}
+        /*
+         * Full width on a wide screen crops the 16:9 photo vertically, so x doesn't matter there.
+         * A phone crops a landscape hard horizontally, and the cups sit right of centre in those
+         * frames — but a slide with its own portrait shot is composed for the middle.
+         */
+        className={`object-cover sm:object-center ${
+          slide.mobileSrc ? "object-center" : "object-[75%_center]"
+        }`}
+        style={{
+          ...img.style,
+          opacity: shown ? 1 : 0,
+          transition: reduced ? "none" : "opacity 900ms ease-in-out",
+        }}
+        aria-hidden={!shown}
+      />
+    </picture>
   );
 }

@@ -16,10 +16,12 @@ import { cafeRows, CAFE_OFFER } from "@/lib/cafe-offer";
 import { MIN_TRIO_CENTS } from "@/lib/packs";
 import { HeroSlideshow, type HeroSlide } from "@/components/hero-slideshow";
 
+/* The -mobile shots are the same scenes recomposed in portrait, so a phone is not stuck with
+   a brutal crop of a landscape. The counter has no portrait version and keeps its crop. */
 const heroSlides: HeroSlide[] = [
-  { src: "/hero/seedling.jpg", alt: "A cupcasa cup lying on its side in dark soil, its printed base to the camera reading Made to disappear, a seedling pushing up beside it" },
-  { src: "/hero/forest.jpg", alt: "The three cupcasa sizes lying on a mossy rock in a rainforest, printed bases to the camera" },
-  { src: "/hero/hand.jpg", alt: "A hand holding up a cupcasa cup, base to the camera reading Made to disappear, old-growth forest behind" },
+  { src: "/hero/seedling.jpg", mobileSrc: "/hero/seedling-mobile.jpg", alt: "A cupcasa cup lying on its side in dark soil, its printed base to the camera reading Made to disappear, a seedling pushing up beside it" },
+  { src: "/hero/forest.jpg", mobileSrc: "/hero/forest-mobile.jpg", alt: "The three cupcasa sizes lying on a mossy rock in a rainforest, printed bases to the camera" },
+  { src: "/hero/hand.jpg", mobileSrc: "/hero/hand-mobile.jpg", alt: "A hand holding up a cupcasa cup, base to the camera reading Made to disappear, old-growth forest behind" },
   { src: "/hero/counter.jpg", alt: "Three cupcasa cups upturned on a sunlit wooden counter, their printed bases reading Made to disappear, with coffee beans and an espresso behind" },
 ];
 
@@ -44,8 +46,14 @@ export default function Home() {
       <section className="relative isolate overflow-hidden flex items-end sm:items-center -mt-[65px] sm:-mt-[73px] min-h-[calc(78svh+65px)] sm:min-h-[calc(min(80svh,740px)+73px)]">
         <HeroSlideshow slides={heroSlides} />
 
-        <div className="section-pad w-full pt-28 pb-16 sm:pt-[73px] sm:pb-0">
-          <Reveal className="max-w-xl">
+        {/*
+          * pointer-events-none, restored on the copy itself: this block spans the whole hero,
+          * and on a phone it sits at the bottom — directly over the slideshow's dots, which
+          * live behind it at -z-10 and cannot be raised past it. Taps on empty space must fall
+          * through; taps on the buttons must not.
+          */}
+        <div className="section-pad w-full pt-28 pb-16 sm:pt-[73px] sm:pb-0 pointer-events-none">
+          <Reveal className="max-w-xl pointer-events-auto">
             <span className="label-caps text-coral">Home compostable · plastic-free</span>
             <h1 className="font-display text-5xl sm:text-6xl xl:text-7xl mt-4 text-cream">
               Made for every drink.
